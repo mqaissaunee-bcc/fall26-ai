@@ -163,6 +163,20 @@ body:not(.show-facil) .facil{display:none}
 .shot.has-image .shot-frame{width:fit-content;max-width:100%;min-width:min(280px,100%);margin-inline:auto}
 .shot.has-image .shot-frame img{width:100%}
 .shot.has-image figcaption{text-align:center}
+.zoom-btn{display:block;position:relative;width:100%;padding:0;margin:0;border:0;background:none;cursor:zoom-in;color:inherit}
+.zoom-btn img{width:100%}
+.zoom-hint{position:absolute;right:10px;bottom:10px;font-family:var(--font-ui);font-size:.78rem;font-weight:600;padding:4px 10px;border-radius:99px;background:var(--ink);color:var(--paper);opacity:.85;box-shadow:0 1px 4px rgba(0,0,0,.25);transition:opacity .15s}
+.zoom-btn:hover .zoom-hint,.zoom-btn:focus-visible .zoom-hint{opacity:1}
+.zoom-btn:focus-visible{outline:3px solid var(--focus);outline-offset:-3px}
+.lightbox{border:0;padding:0;width:min(96vw,1800px);max-width:96vw;max-height:94vh;border-radius:var(--r-md);background:var(--surface);color:var(--ink);overflow:hidden}
+.lightbox::backdrop{background:rgba(10,12,20,.8)}
+.lightbox[open]{display:flex;flex-direction:column}
+.lb-bar{display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s3) var(--s2) var(--s4);border-bottom:1px solid var(--line);font-family:var(--font-ui)}
+.lb-cap{margin:0;flex:1;font-size:.9rem;color:var(--ink-soft)}
+.lb-stage{overflow:auto;padding:var(--s3);display:flex;justify-content:center;align-items:flex-start;background:var(--sunk)}
+.lb-stage img{max-width:100%;height:auto;display:block}
+body.lb-open{overflow:hidden}
+@media print{.zoom-hint{display:none}}
 .shot figcaption{font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft);margin-top:var(--s2)}
 .shot figcaption b{color:var(--ink)}
 
@@ -1134,6 +1148,14 @@ footer{border-top:1px solid var(--line);margin-top:var(--s8);padding:var(--s5) v
 </main>
 </div>
 
+<dialog class="lightbox" id="lightbox" aria-label="Enlarged screenshot">
+  <div class="lb-bar">
+    <p class="lb-cap" id="lbCap"></p>
+    <button type="button" class="btn lb-close" id="lbClose">Close <span aria-hidden="true">✕</span></button>
+  </div>
+  <div class="lb-stage"><img id="lbImg" alt=""></div>
+</dialog>
+
 <footer>
   <p>Gemini Notebook workshop tutorial, 2026. Features, limits, and privacy terms reflect Google's documentation as of September 2026 and may change.</p>
 </footer>
@@ -1217,6 +1239,34 @@ footer{border-top:1px solid var(--line);margin-top:var(--s8);padding:var(--s5) v
   facil.addEventListener("change", function(){ state.facil = facil.checked; document.body.classList.toggle("show-facil", facil.checked); save(); });
 
   /* ---------- Screenshots: auto-load from img/ ---------- */
+  var lb = document.getElementById("lightbox");
+  var lbImg = document.getElementById("lbImg");
+  var lbCap = document.getElementById("lbCap");
+  var lbReturn = null;
+  function openLightbox(img, fig, opener){
+    lbImg.src = img.src;
+    lbImg.alt = img.alt;
+    lbImg.style.width = img.naturalWidth + "px";
+    var cap = fig.querySelector("figcaption");
+    lbCap.textContent = cap ? cap.textContent : "";
+    lbReturn = opener;
+    if (typeof lb.showModal === "function") lb.showModal(); else lb.setAttribute("open","");
+    document.body.classList.add("lb-open");
+    document.getElementById("lbClose").focus();
+  }
+  function closeLightbox(){
+    if (typeof lb.close === "function") lb.close();
+    else { lb.removeAttribute("open"); afterClose(); }
+  }
+  function afterClose(){
+    document.body.classList.remove("lb-open");
+    if (lbReturn) lbReturn.focus();
+  }
+  lb.addEventListener("close", afterClose);
+  document.getElementById("lbClose").addEventListener("click", closeLightbox);
+  lb.addEventListener("click", function(e){ if (e.target === lb || e.target.classList.contains("lb-stage")) closeLightbox(); });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape" && typeof lb.showModal !== "function" && lb.hasAttribute("open")) closeLightbox(); });
+
   var shotList = document.getElementById("shotList");
   var shots = Array.prototype.slice.call(document.querySelectorAll("figure.shot[data-src]"));
   shots.sort(function(a,b){ return a.dataset.src.localeCompare(b.dataset.src); });
@@ -1235,7 +1285,17 @@ footer{border-top:1px solid var(--line);margin-top:var(--s8);padding:var(--s5) v
       var scale = parseFloat(fig.dataset.scale) || 2;
       img.style.maxWidth = Math.round(img.naturalWidth / scale) + "px";
       var frame = fig.querySelector(".shot-frame");
-      frame.appendChild(img);
+      var zoom = document.createElement("button");
+      zoom.type = "button";
+      zoom.className = "zoom-btn";
+      zoom.setAttribute("aria-label", "Enlarge screenshot: " + (fig.dataset.alt || "screenshot"));
+      zoom.appendChild(img);
+      var hint = document.createElement("span");
+      hint.className = "zoom-hint"; hint.setAttribute("aria-hidden","true");
+      hint.textContent = "⤢ Click to enlarge";
+      zoom.appendChild(hint);
+      zoom.addEventListener("click", function(){ openLightbox(img, fig, zoom); });
+      frame.appendChild(zoom);
       fig.classList.add("has-image");
       li.classList.add("found");
     });
