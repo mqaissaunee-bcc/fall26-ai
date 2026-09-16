@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fall 2026 AI Teaching Workshop Series</title>
+<meta name="description" content="Index of the Fall 2026 faculty workshop series on AI for teaching: audio and video, images and infographics, presentation materials, and gamification.">
+<!--
+  HOW TO UPDATE THIS PAGE
+  Each workshop is an <article class="ws"> below.
+  - When materials are ready: set data-ready="true", replace the "coming soon" <span> with a link
+    (<a class="btn" href="your-file.html">Open workshop materials</a>), and update the "In this session" list.
+  - data-date (YYYY-MM-DD) drives the automatic "Next up" and "Completed" labels.
+  - Replace the TBA text in the series details bar when time and location are set.
+  Keep this file in the same folder as the workshop HTML files.
+-->
+<style>
+:root{
+  --paper:#F6F7FB; --surface:#FFFFFF; --sunk:#ECEEF6;
+  --ink:#1A2032; --ink-soft:#4A5268; --line:#D5D9E6;
+  --accent:#4536C9; --accent-soft:#E8E5FB; --accent-ink:#FFFFFF;
+  --c1:#0B6E6D; --c1-soft:#DDF1F0;
+  --c2:#9A3412; --c2-soft:#FBE9DF;
+  --c3:#1D5FA8; --c3-soft:#E0ECFA;
+  --c4:#7A3E9D; --c4-soft:#F1E6F8;
+  --ok:#1D6B34; --ok-soft:#E1F3E6;
+  --tba:#8A5A00; --tba-soft:#FFF3D6;
+  --focus:#1F6FEB;
+  --font-head:"Avenir Next","Segoe UI Variable Display","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+  --font-body:Charter,"Bitstream Charter","Iowan Old Style","Sitka Text",Cambria,Georgia,serif;
+  --font-ui:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r-sm:6px; --r-md:14px;
+  --s1:.25rem; --s2:.5rem; --s3:.75rem; --s4:1rem; --s5:1.5rem; --s6:2rem; --s7:3rem;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#12151F; --surface:#1A1F2D; --sunk:#222839;
+    --ink:#E7EAF3; --ink-soft:#AEB5C8; --line:#343B50;
+    --accent:#A99DFF; --accent-soft:#2B2654; --accent-ink:#12151F;
+    --c1:#5FD0CD; --c1-soft:#123433;
+    --c2:#F5A47A; --c2-soft:#3A2218;
+    --c3:#8CBDF5; --c3-soft:#172A40;
+    --c4:#D2A6EE; --c4-soft:#2E1F3A;
+    --ok:#7DD89A; --ok-soft:#173222;
+    --tba:#F2C45A; --tba-soft:#3A2E12;
+    --focus:#7FB2FF;
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:clamp(1rem,.96rem + .2vw,1.1rem);line-height:1.6}
+a{color:var(--accent);text-underline-offset:.18em}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.skip-link{position:absolute;left:-9999px;top:0;background:var(--ink);color:var(--paper);padding:var(--s2) var(--s4);z-index:10}
+.skip-link:focus{left:var(--s4);top:var(--s4)}
+.wrap{max-width:1040px;margin:0 auto;padding:0 var(--s4)}
+
+header.hero{padding:var(--s7) 0 var(--s5)}
+.eyebrow{font-family:var(--font-ui);font-size:.8rem;font-weight:650;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 var(--s3)}
+h1{font-family:var(--font-head);font-size:clamp(2.1rem,1.4rem + 3.2vw,3.6rem);line-height:1.05;letter-spacing:-.025em;margin:0 0 var(--s4)}
+.lede{font-size:1.15rem;color:var(--ink-soft);max-width:62ch;margin:0}
+
+.details-bar{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);margin:var(--s5) 0 0;padding:var(--s3) var(--s4);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);font-family:var(--font-ui);font-size:.9rem}
+.details-bar div{display:flex;gap:var(--s2);align-items:baseline}
+.details-bar dt{font-weight:650}
+.details-bar dd{margin:0}
+.tba{background:var(--tba-soft);color:var(--tba);padding:1px 8px;border-radius:99px;font-weight:600}
+
+/* Timeline strip */
+.strip{list-style:none;margin:var(--s6) 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s2);position:relative}
+.strip::before{content:"";position:absolute;left:12.5%;right:12.5%;top:21px;height:3px;background:var(--line)}
+.strip li{text-align:center;position:relative;font-family:var(--font-ui);font-size:.82rem}
+.strip a{display:flex;flex-direction:column;align-items:center;gap:var(--s1);text-decoration:none;color:var(--ink);min-height:44px;padding:0 var(--s1)}
+.dot{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:var(--surface);background:var(--c);border:4px solid var(--paper)}
+.strip .d{font-weight:650}
+.strip .t{color:var(--ink-soft);line-height:1.3}
+@media (max-width:560px){.strip .t{display:none}}
+
+main{padding-bottom:var(--s7)}
+h2{font-family:var(--font-head);font-size:clamp(1.4rem,1.2rem + .8vw,1.8rem);margin:var(--s7) 0 var(--s4)}
+
+.ws{--c:var(--c1);--cs:var(--c1-soft);display:grid;grid-template-columns:auto 1fr;gap:var(--s5);background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:var(--r-md);padding:var(--s5);margin-bottom:var(--s4);scroll-margin-top:var(--s4)}
+.ws.w2{--c:var(--c2);--cs:var(--c2-soft)}
+.ws.w3{--c:var(--c3);--cs:var(--c3-soft)}
+.ws.w4{--c:var(--c4);--cs:var(--c4-soft)}
+.strip li:nth-child(1){--c:var(--c1)} .strip li:nth-child(2){--c:var(--c2)}
+.strip li:nth-child(3){--c:var(--c3)} .strip li:nth-child(4){--c:var(--c4)}
+.ws.is-next{box-shadow:0 0 0 3px var(--c)}
+.date{width:92px;text-align:center;background:var(--cs);border-radius:var(--r-sm);padding:var(--s3) var(--s2);font-family:var(--font-ui);align-self:start}
+.date .m{display:block;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c)}
+.date .dd{display:block;font-family:var(--font-head);font-size:2.3rem;font-weight:750;line-height:1.05}
+.date .wd{display:block;font-size:.8rem;color:var(--ink-soft)}
+.ws-top{display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center;margin-bottom:var(--s2)}
+.num{font-family:var(--font-ui);font-size:.8rem;font-weight:650;color:var(--ink-soft)}
+.pill{font-family:var(--font-ui);font-size:.74rem;font-weight:650;padding:2px 10px;border-radius:99px;background:var(--sunk);color:var(--ink-soft)}
+.pill.ready{background:var(--ok-soft);color:var(--ok)}
+.pill.dev{background:var(--tba-soft);color:var(--tba)}
+.pill.next{background:var(--c);color:var(--surface)}
+.ws h3{font-family:var(--font-head);font-size:clamp(1.25rem,1.1rem + .5vw,1.5rem);line-height:1.2;margin:0 0 var(--s2)}
+.ws p{margin:0 0 var(--s3);max-width:68ch}
+.ws h4{font-family:var(--font-ui);font-size:.85rem;margin:var(--s3) 0 var(--s1)}
+.ws ul{margin:0 0 var(--s4);padding-left:1.2rem;font-size:.95rem}
+.ws ul.placeholder{list-style:none;padding:0}
+.ws ul.placeholder li{background:repeating-linear-gradient(135deg,var(--sunk) 0 10px,transparent 10px 20px);border:1px dashed var(--line);border-radius:var(--r-sm);padding:var(--s2) var(--s3);color:var(--ink-soft);font-family:var(--font-ui);font-size:.85rem}
+.btn{display:inline-flex;align-items:center;gap:var(--s2);min-height:44px;padding:0 var(--s5);border-radius:var(--r-sm);background:var(--accent);color:var(--accent-ink);font-family:var(--font-ui);font-weight:650;text-decoration:none}
+.btn:hover{filter:brightness(1.08)}
+.btn.soon{background:var(--sunk);color:var(--ink-soft);cursor:default}
+@media (max-width:600px){
+  .ws{grid-template-columns:1fr;gap:var(--s3);padding:var(--s4)}
+  .date{width:auto;display:flex;gap:var(--s2);align-items:baseline;justify-content:flex-start;padding:var(--s2) var(--s3)}
+  .date .dd{font-size:1.4rem}
+}
+
+.about{display:grid;gap:var(--s4);grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr))}
+.about div{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4)}
+.about h3{font-family:var(--font-ui);font-size:1rem;margin:0 0 var(--s2)}
+.about p{margin:0;font-size:.95rem}
+footer{border-top:1px solid var(--line);padding:var(--s5) 0;font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft)}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important;transition:none!important}}
+html{scroll-behavior:smooth}
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Faculty professional development · Fall 2026</p>
+    <h1>AI Teaching Workshop Series</h1>
+    <p class="lede">Four hands-on sessions on using AI to create course materials for any discipline. Each workshop has a self-paced tutorial you can follow during the session or on your own afterward.</p>
+
+    <dl class="details-bar">
+      <div><dt>Time:</dt><dd><span class="tba">To be announced</span></dd></div>
+      <div><dt>Location:</dt><dd><span class="tba">To be announced</span></dd></div>
+      <div><dt>Length:</dt><dd>90 minutes</dd></div>
+      <div><dt>Bring:</dt><dd>A laptop and a few course files you're allowed to share</dd></div>
+    </dl>
+
+    <nav aria-label="Workshop dates">
+      <ol class="strip">
+        <li><a href="#w1"><span class="dot">1</span><span class="d">Sep 24</span><span class="t">Audio, video &amp; interactive</span></a></li>
+        <li><a href="#w2"><span class="dot">2</span><span class="d">Oct 29</span><span class="t">Images &amp; infographics</span></a></li>
+        <li><a href="#w3"><span class="dot">3</span><span class="d">Nov 19</span><span class="t">Presentation materials</span></a></li>
+        <li><a href="#w4"><span class="dot">4</span><span class="d">Dec 17</span><span class="t">Gamification</span></a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <h2>The workshops</h2>
+
+  <article class="ws w1" id="w1" data-date="2026-09-24" data-ready="true">
+    <div class="date" aria-hidden="true"><span class="m">Sep</span><span class="dd">24</span><span class="wd">Thursday</span></div>
+    <div>
+      <div class="ws-top"><span class="num">Workshop 1</span><span class="pill ready">Materials available</span></div>
+      <h3>Audio, video, and interactive exercises</h3>
+      <p><strong>Thursday, September 24, 2026.</strong> Turn your course materials into podcast-style audio, narrated videos, quizzes, and flashcards with Gemini Notebook (formerly NotebookLM).</p>
+      <h4>In this session</h4>
+      <ul>
+        <li>Adding sources and chatting with them, with citations you can check</li>
+        <li>Audio Overviews: formats, custom prompts, and Interactive mode</li>
+        <li>Video Overviews: formats, visual styles, and steering prompts</li>
+        <li>Quizzes, flashcards, mind maps, and other interactive outputs</li>
+        <li>Choosing an account and sharing materials with students</li>
+      </ul>
+      <a class="btn" href="gemini-notebook-workshop.html">Open workshop materials <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+
+  <article class="ws w2" id="w2" data-date="2026-10-29" data-ready="false">
+    <div class="date" aria-hidden="true"><span class="m">Oct</span><span class="dd">29</span><span class="wd">Thursday</span></div>
+    <div>
+      <div class="ws-top"><span class="num">Workshop 2</span><span class="pill dev">In development</span></div>
+      <h3>Generating images and infographics</h3>
+      <p><strong>Thursday, October 29, 2026.</strong> Create illustrations, diagrams, and infographics that explain course concepts, and learn to check them for accuracy, accessibility, and copyright.</p>
+      <h4>In this session</h4>
+      <ul class="placeholder"><li>Session topics coming soon</li></ul>
+      <span class="btn soon" role="note">Materials coming soon</span>
+    </div>
+  </article>
+
+  <article class="ws w3" id="w3" data-date="2026-11-19" data-ready="false">
+    <div class="date" aria-hidden="true"><span class="m">Nov</span><span class="dd">19</span><span class="wd">Thursday</span></div>
+    <div>
+      <div class="ws-top"><span class="num">Workshop 3</span><span class="pill dev">In development</span></div>
+      <h3>Developing presentation materials</h3>
+      <p><strong>Thursday, November 19, 2026.</strong> Build slide decks, speaker notes, and visual aids from the materials you already have, and revise them so they are clear and accessible.</p>
+      <h4>In this session</h4>
+      <ul class="placeholder"><li>Session topics coming soon</li></ul>
+      <span class="btn soon" role="note">Materials coming soon</span>
+    </div>
+  </article>
+
+  <article class="ws w4" id="w4" data-date="2026-12-17" data-ready="false">
+    <div class="date" aria-hidden="true"><span class="m">Dec</span><span class="dd">17</span><span class="wd">Thursday</span></div>
+    <div>
+      <div class="ws-top"><span class="num">Workshop 4</span><span class="pill dev">In development</span></div>
+      <h3>Gamification</h3>
+      <p><strong>Thursday, December 17, 2026.</strong> Use AI to design review games, challenges, and game-style activities that keep students practicing and engaged.</p>
+      <h4>In this session</h4>
+      <ul class="placeholder"><li>Session topics coming soon</li></ul>
+      <span class="btn soon" role="note">Materials coming soon</span>
+    </div>
+  </article>
+
+  <h2>About the series</h2>
+  <div class="about">
+    <div><h3>Who it's for</h3><p>Faculty and staff in every discipline. No prior experience with AI tools is needed.</p></div>
+    <div><h3>Self-paced materials</h3><p>Each tutorial works on its own, so you can catch up on a session you missed or review later.</p></div>
+    <div><h3>Use AI responsibly</h3><p>Follow your institution's AI policy, and never upload student records or other private information to AI tools.</p></div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>AI Teaching Workshop Series, Fall 2026. Dates, times, and materials may change; check this page for updates.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var today = new Date(); today.setHours(0,0,0,0);
+  var nextFound = false;
+  var cards = Array.prototype.slice.call(document.querySelectorAll(".ws"));
+  cards.forEach(function(card){
+    var parts = card.dataset.date.split("-");
+    var d = new Date(+parts[0], +parts[1]-1, +parts[2]);
+    var top = card.querySelector(".ws-top");
+    var pill = document.createElement("span");
+    pill.className = "pill";
+    if (d < today){
+      pill.textContent = "Completed";
+    } else if (!nextFound){
+      nextFound = true;
+      card.classList.add("is-next");
+      pill.className = "pill next";
+      var days = Math.round((d - today) / 86400000);
+      pill.textContent = days === 0 ? "Today" : days === 1 ? "Next up · tomorrow" : "Next up · in " + days + " days";
+    } else {
+      return;
+    }
+    top.appendChild(pill);
+  });
+})();
+</script>
+</body>
+</html>

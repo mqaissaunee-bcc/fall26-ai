@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gemini Notebook (formerly NotebookLM): Audio &amp; Video Workshop Tutorial</title>
+<meta name="description" content="A self-paced, 90-minute tutorial on Gemini Notebook (formerly NotebookLM): sources, chat, every Studio output, and hands-on labs for Audio and Video Overviews.">
+<style>
+:root{
+  --paper:#F6F7FB;
+  --surface:#FFFFFF;
+  --sunk:#ECEEF6;
+  --ink:#1A2032;
+  --ink-soft:#4A5268;
+  --line:#D5D9E6;
+  --accent:#4536C9;
+  --accent-soft:#E8E5FB;
+  --accent-ink:#FFFFFF;
+  --audio:#0B6E6D;
+  --audio-soft:#DDF1F0;
+  --video:#9A3412;
+  --video-soft:#FBE9DF;
+  --caution:#8A5A00;
+  --caution-soft:#FFF3D6;
+  --ok:#1D6B34;
+  --focus:#1F6FEB;
+  --font-head:"Avenir Next","Segoe UI Variable Display","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+  --font-body:Charter,"Bitstream Charter","Iowan Old Style","Sitka Text",Cambria,Georgia,serif;
+  --font-ui:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-code:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --r-sm:6px; --r-md:12px; --r-lg:20px;
+  --s1:.25rem; --s2:.5rem; --s3:.75rem; --s4:1rem; --s5:1.5rem; --s6:2rem; --s7:3rem; --s8:4.5rem;
+  --measure:70ch;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#12151F;
+    --surface:#1A1F2D;
+    --sunk:#222839;
+    --ink:#E7EAF3;
+    --ink-soft:#AEB5C8;
+    --line:#343B50;
+    --accent:#A99DFF;
+    --accent-soft:#2B2654;
+    --accent-ink:#12151F;
+    --audio:#5FD0CD;
+    --audio-soft:#123433;
+    --video:#F5A47A;
+    --video-soft:#3A2218;
+    --caution:#F2C45A;
+    --caution-soft:#3A2E12;
+    --ok:#7DD89A;
+    --focus:#7FB2FF;
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:clamp(1rem,.96rem + .2vw,1.1rem);line-height:1.65}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--accent);text-underline-offset:.18em}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:4px}
+.skip-link{position:absolute;left:-999px;top:0;background:var(--ink);color:var(--paper);padding:var(--s3) var(--s4);z-index:100;font-family:var(--font-ui)}
+.skip-link:focus{left:var(--s4);top:var(--s4)}
+h1,h2,h3,h4{font-family:var(--font-head);line-height:1.2;letter-spacing:-.01em;margin:0 0 var(--s3)}
+h2{font-size:clamp(1.6rem,1.3rem + 1.2vw,2.2rem);font-weight:700}
+h3{font-size:clamp(1.15rem,1.05rem + .4vw,1.35rem);font-weight:650;margin-top:var(--s6)}
+h4{font-size:1rem;font-weight:650;margin-top:var(--s5)}
+p,ul,ol{margin:0 0 var(--s4)}
+li{margin-bottom:var(--s2)}
+code,kbd{font-family:var(--font-code);font-size:.88em;background:var(--sunk);padding:.1em .35em;border-radius:4px}
+button{font:inherit}
+
+/* ---------- Top bar ---------- */
+.topbar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);font-family:var(--font-ui)}
+.topbar-inner{display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s4);max-width:1320px;margin:0 auto}
+.brand{font-weight:650;font-size:.95rem;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.progress-wrap{flex:0 0 auto;display:flex;align-items:center;gap:var(--s2);font-size:.85rem;color:var(--ink-soft)}
+@media (max-width:480px){.progress-track{display:none}}
+.progress-track{width:110px;height:8px;background:var(--sunk);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;width:0;background:var(--accent);transition:width .3s}
+.menu-btn{min-height:44px;min-width:44px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--r-sm);padding:0 var(--s3);cursor:pointer}
+@media (min-width:1080px){.menu-btn{display:none}}
+
+/* ---------- Layout ---------- */
+.shell{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:0}
+@media (min-width:1080px){.shell{grid-template-columns:270px minmax(0,1fr)}}
+.sidenav{display:none;font-family:var(--font-ui);font-size:.9rem}
+.sidenav.open{display:block;position:fixed;inset:57px 0 0 0;background:var(--paper);z-index:15;overflow:auto;padding:var(--s4)}
+@media (min-width:1080px){
+  .sidenav,.sidenav.open{display:block;position:sticky;top:42px;height:calc(100vh - 42px);overflow:auto;padding:var(--s5) var(--s4);border-right:1px solid var(--line);right:auto;bottom:auto;left:auto;background:transparent;align-self:start}
+}
+.sidenav ol{list-style:none;padding:0;margin:0}
+.sidenav li{margin:0}
+.sidenav a{display:flex;align-items:center;gap:var(--s2);min-height:44px;padding:var(--s1) var(--s3);border-radius:var(--r-sm);color:var(--ink-soft);text-decoration:none}
+.sidenav a:hover{background:var(--sunk);color:var(--ink)}
+.sidenav a[aria-current="true"]{background:var(--accent-soft);color:var(--ink);font-weight:600}
+.sidenav .tick{flex:0 0 1.2rem;height:1.2rem;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:.7rem;color:transparent}
+.sidenav a.done .tick{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.sidenav .time{margin-left:auto;font-variant-numeric:tabular-nums;font-size:.78rem;color:var(--ink-soft)}
+.nav-label{font-size:.8rem;color:var(--ink-soft);margin:0 0 var(--s2) var(--s3)}
+
+main{padding:0 var(--s4) var(--s8);min-width:0}
+@media (min-width:720px){main{padding:0 var(--s6) var(--s8)}}
+.section{max-width:880px;margin:0 auto;padding-top:var(--s7);scroll-margin-top:60px}
+.section > p,.section > ul,.section > ol,.prose{max-width:var(--measure)}
+.sec-head{display:flex;align-items:baseline;gap:var(--s3);flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:var(--s2);margin-bottom:var(--s5)}
+.sec-head h2{margin:0;flex:1 1 auto}
+.sec-time{font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.lede{font-size:1.12em;color:var(--ink-soft)}
+
+/* ---------- Hero ---------- */
+.hero{max-width:880px;margin:0 auto;padding:var(--s7) 0 var(--s5)}
+.hero-kicker{font-family:var(--font-ui);font-size:.95rem;color:var(--ink-soft);margin-bottom:var(--s3)}
+.hero h1{font-size:clamp(2.2rem,1.4rem + 3.6vw,4rem);font-weight:750;letter-spacing:-.025em;line-height:1.02;margin-bottom:var(--s4)}
+.hero h1 small{display:block;font-size:.42em;font-weight:500;letter-spacing:0;color:var(--ink-soft);margin-top:var(--s3)}
+.transform{margin:var(--s6) 0 var(--s5);display:grid;grid-template-columns:1fr;gap:var(--s3);align-items:stretch}
+.t-arrow{align-self:center}
+@media (min-width:640px){.transform{grid-template-columns:1fr auto 1.2fr auto 1.2fr}}
+.t-block{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4);font-family:var(--font-ui);min-height:132px}
+.t-block b{display:block;font-size:.95rem;margin-bottom:var(--s2)}
+.t-block span{font-size:.82rem;color:var(--ink-soft)}
+.t-arrow{font-family:var(--font-ui);color:var(--ink-soft);text-align:center;font-size:1.4rem}
+@media (max-width:639px){.t-arrow{transform:rotate(90deg)}}
+.docs{display:flex;gap:6px;margin-bottom:var(--s2)}
+.docs i{width:22px;height:28px;border:2px solid var(--ink-soft);border-radius:3px;display:block;background:linear-gradient(var(--line) 0 0) 4px 6px/12px 2px no-repeat,linear-gradient(var(--line) 0 0) 4px 11px/10px 2px no-repeat,linear-gradient(var(--line) 0 0) 4px 16px/12px 2px no-repeat}
+.wave{display:flex;align-items:center;gap:3px;height:34px;margin-bottom:var(--s2)}
+.wave i{display:block;width:5px;border-radius:3px;background:var(--audio);height:30%;transform-origin:center;animation:wv 1.2s ease-in-out 3 alternate}
+.film{display:flex;gap:4px;margin-bottom:var(--s2);padding:4px 0;border-top:4px dotted var(--video);border-bottom:4px dotted var(--video)}
+.film i{display:block;width:30px;height:20px;border-radius:2px;background:var(--video-soft);border:1px solid var(--video);opacity:.25;animation:fr .4s ease-out forwards}
+@keyframes wv{from{transform:scaleY(.4)}to{transform:scaleY(1.6)}}
+@keyframes fr{to{opacity:1}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .wave i,.film i{animation:none;opacity:1}
+  .progress-fill{transition:none}
+}
+.hero-meta{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);font-family:var(--font-ui);font-size:.9rem;color:var(--ink-soft)}
+.hero-meta strong{color:var(--ink)}
+
+/* ---------- Callouts ---------- */
+.callout{border-left:5px solid var(--accent);background:var(--accent-soft);padding:var(--s4) var(--s5);border-radius:0 var(--r-md) var(--r-md) 0;margin:var(--s5) 0;max-width:var(--measure)}
+.callout p:last-child,.callout ul:last-child{margin-bottom:0}
+.callout .c-title{font-family:var(--font-ui);font-weight:650;margin-bottom:var(--s2);display:flex;gap:var(--s2);align-items:center}
+.callout.caution{border-color:var(--caution);background:var(--caution-soft)}
+.callout.audio{border-color:var(--audio);background:var(--audio-soft)}
+.callout.video{border-color:var(--video);background:var(--video-soft)}
+.facil{border:2px dashed var(--line);border-radius:var(--r-md);padding:var(--s3) var(--s4);font-family:var(--font-ui);font-size:.9rem;color:var(--ink-soft);margin:var(--s4) 0;max-width:var(--measure)}
+.facil strong{color:var(--ink)}
+body:not(.show-facil) .facil{display:none}
+
+/* ---------- Screenshot slots ---------- */
+.shot{margin:var(--s5) 0;max-width:100%}
+.shot-frame{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;background:var(--surface)}
+.shot-frame .chrome{display:flex;gap:6px;align-items:center;padding:8px 12px;background:var(--sunk);border-bottom:1px solid var(--line)}
+.shot-frame .chrome i{width:10px;height:10px;border-radius:50%;background:var(--line);display:block}
+.shot-frame .chrome span{margin-left:8px;font-family:var(--font-ui);font-size:.75rem;color:var(--ink-soft)}
+.placeholder{aspect-ratio:16/9;display:grid;place-content:center;gap:var(--s2);text-align:center;padding:var(--s5);font-family:var(--font-ui);color:var(--ink-soft);background:repeating-linear-gradient(135deg,var(--surface) 0 14px,var(--sunk) 14px 28px)}
+.placeholder .ph-num{font-size:1.6rem;font-weight:700;color:var(--ink)}
+.placeholder .ph-what{max-width:46ch;font-size:.9rem;margin:0 auto}
+.placeholder code{font-size:.8rem}
+.shot.has-image .placeholder{display:none}
+.shot.has-image .shot-frame{width:fit-content;max-width:100%;min-width:min(280px,100%);margin-inline:auto}
+.shot.has-image .shot-frame img{width:100%}
+.shot.has-image figcaption{text-align:center}
+.shot figcaption{font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft);margin-top:var(--s2)}
+.shot figcaption b{color:var(--ink)}
+
+/* ---------- Interface schematic ---------- */
+.schematic{display:grid;grid-template-columns:1fr;gap:var(--s3);margin:var(--s5) 0;font-family:var(--font-ui)}
+@media (min-width:720px){.schematic{grid-template-columns:1fr 1.6fr 1fr}}
+.panel-btn{text-align:left;border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--r-md);padding:var(--s4);cursor:pointer;min-height:160px;display:flex;flex-direction:column;gap:var(--s2)}
+.panel-btn:hover{border-color:var(--ink-soft)}
+.panel-btn[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.panel-btn b{font-size:1.05rem}
+.panel-btn .mini{display:flex;flex-direction:column;gap:5px;margin-top:auto}
+.panel-btn .mini i{display:block;height:9px;border-radius:3px;background:var(--sunk)}
+.panel-btn .mini i:nth-child(2){width:80%}.panel-btn .mini i:nth-child(3){width:60%}
+.panel-detail{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4) var(--s5);min-height:120px}
+.panel-detail h4{margin-top:0}
+
+/* ---------- Generic cards & tables ---------- */
+.grid{display:grid;gap:var(--s3);grid-template-columns:repeat(auto-fill,minmax(230px,1fr));margin:var(--s4) 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4)}
+.card h4{margin:0 0 var(--s2);font-size:1rem}
+.card p{font-size:.95rem;margin-bottom:var(--s2)}
+.card .tagline{font-family:var(--font-ui);font-size:.78rem;color:var(--ink-soft)}
+.card.feature-audio{border-top:5px solid var(--audio)}
+.card.feature-video{border-top:5px solid var(--video)}
+.card.feature-other{border-top:5px solid var(--accent)}
+.table-wrap{overflow-x:auto;margin:var(--s4) 0;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-family:var(--font-ui);font-size:.9rem;min-width:560px}
+th,td{padding:var(--s3) var(--s4);text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--sunk);font-weight:650}
+tbody tr:last-child td{border-bottom:0}
+.small{font-size:.85rem;color:var(--ink-soft);font-family:var(--font-ui)}
+
+/* ---------- Tabs ---------- */
+.tabs{margin:var(--s5) 0}
+.tablist{display:flex;flex-wrap:wrap;gap:var(--s2);border-bottom:1px solid var(--line);margin-bottom:var(--s4)}
+.tab{min-height:44px;padding:0 var(--s4);border:1px solid transparent;border-bottom:none;border-radius:var(--r-sm) var(--r-sm) 0 0;background:transparent;color:var(--ink-soft);cursor:pointer;font-family:var(--font-ui);font-weight:600;margin-bottom:-1px}
+.tab[aria-selected="true"]{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.tabpanel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s5)}
+.tabpanel[hidden]{display:none}
+.tabpanel h4:first-child{margin-top:0}
+
+/* ---------- Steps / labs ---------- */
+.steps{counter-reset:st;list-style:none;padding:0;max-width:var(--measure)}
+.steps > li{counter-increment:st;position:relative;padding-left:3rem;margin-bottom:var(--s4)}
+.steps > li::before{content:counter(st);position:absolute;left:0;top:-.1rem;width:2.1rem;height:2.1rem;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-family:var(--font-ui);font-weight:700;font-size:.9rem}
+.lab{background:var(--surface);border:2px solid var(--ink);border-radius:var(--r-lg);padding:var(--s5);margin:var(--s6) 0}
+.lab-head{display:flex;flex-wrap:wrap;gap:var(--s2);justify-content:space-between;align-items:baseline;margin-bottom:var(--s3)}
+.lab-head h3{margin:0}
+.lab-count{font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft)}
+.checklist{list-style:none;padding:0;margin:0}
+.checklist li{margin:0;border-top:1px solid var(--line)}
+.checklist label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) 0;cursor:pointer;min-height:44px}
+.checklist input{width:22px;height:22px;margin-top:.2rem;flex:0 0 auto;accent-color:var(--accent)}
+.checklist input:checked + span{color:var(--ink-soft);text-decoration:line-through;text-decoration-color:var(--line)}
+
+/* ---------- Buttons & forms ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);min-height:44px;min-width:44px;padding:0 var(--s4);border-radius:var(--r-sm);border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font-family:var(--font-ui);font-weight:600;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn-row{display:flex;flex-wrap:wrap;gap:var(--s2);margin:var(--s3) 0}
+.form-grid{display:grid;gap:var(--s3);grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.field label{display:block;font-family:var(--font-ui);font-size:.85rem;font-weight:600;margin-bottom:var(--s1)}
+.field select,.field input,.field textarea{width:100%;min-height:44px;padding:var(--s2) var(--s3);border:1px solid var(--line);border-radius:var(--r-sm);background:var(--paper);color:var(--ink);font-family:var(--font-ui);font-size:.95rem}
+.output{white-space:pre-wrap;font-family:var(--font-code);font-size:.88rem;background:var(--sunk);border-radius:var(--r-sm);padding:var(--s4);margin-top:var(--s3);border:1px solid var(--line);min-height:5rem}
+.chooser{display:flex;flex-wrap:wrap;gap:var(--s2);margin:var(--s3) 0}
+.chip{min-height:44px;padding:0 var(--s4);border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font-family:var(--font-ui);font-size:.9rem}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.result{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4) var(--s5);min-height:90px}
+
+/* ---------- After the workshop ---------- */
+.after-controls{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s6);margin-top:var(--s4)}
+.ctrl-label{font-family:var(--font-ui);font-size:.85rem;font-weight:600;margin:0}
+.key{background:var(--sunk);border-radius:var(--r-sm);padding:var(--s3) var(--s4);line-height:2}
+.pill.who-f{background:var(--accent-soft);color:var(--ink)}
+.pill.who-s{background:var(--audio-soft);color:var(--audio)}
+.act-group h3{margin-top:var(--s6)}
+.act-grid{display:grid;gap:var(--s3);grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));align-items:start}
+.act{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4)}
+.act.is-done{border-color:var(--ok)}
+.act.is-done h4::after{content:" \2713";color:var(--ok)}
+.act-head{display:flex;justify-content:space-between;gap:var(--s2);align-items:flex-start}
+.act-head h4{margin:0;font-size:1.02rem}
+.act-done{display:flex;align-items:center;gap:6px;min-height:44px;font-family:var(--font-ui);font-size:.85rem;white-space:nowrap;cursor:pointer;margin-top:-10px}
+.act-done input{width:20px;height:20px;accent-color:var(--accent)}
+.act-tags{display:flex;flex-wrap:wrap;gap:6px;margin:var(--s1) 0 var(--s2)}
+.act p{font-size:.95rem}
+.act .acct{font-family:var(--font-ui);font-size:.82rem;padding:var(--s2) var(--s3);border-radius:var(--r-sm);background:var(--sunk)}
+.act .acct.need{border-left:4px solid var(--video)}
+.act .acct.none{border-left:4px solid var(--ok)}
+.act details summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-family:var(--font-ui);font-size:.9rem;font-weight:600;color:var(--accent);margin:0;padding:0}
+.act-steps{padding-left:1.3rem;font-size:.93rem}
+.act-steps li{margin-bottom:var(--s1)}
+.act .prompt{margin-bottom:var(--s2)}
+.act-note{border-left:3px solid var(--line);padding-left:var(--s3)}
+
+/* ---------- Prompt library ---------- */
+.prompt{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4);margin-bottom:var(--s3)}
+.prompt-top{display:flex;justify-content:space-between;align-items:center;gap:var(--s2);flex-wrap:wrap}
+.prompt-top b{font-family:var(--font-ui);font-size:.95rem}
+.prompt blockquote{margin:var(--s2) 0 0;font-family:var(--font-code);font-size:.85rem;background:var(--sunk);padding:var(--s3);border-radius:var(--r-sm)}
+.pill{font-family:var(--font-ui);font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--sunk);color:var(--ink-soft)}
+.pill.a{background:var(--audio-soft);color:var(--audio)}
+.pill.v{background:var(--video-soft);color:var(--video)}
+
+/* ---------- Quiz ---------- */
+.q{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4) var(--s5);margin-bottom:var(--s4)}
+.q fieldset{border:0;padding:0;margin:0}
+.q legend{font-family:var(--font-head);font-weight:650;margin-bottom:var(--s3);padding:0}
+.q label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) var(--s3);border-radius:var(--r-sm);cursor:pointer;min-height:44px}
+.q label:hover{background:var(--sunk)}
+.q input{margin-top:.35rem;accent-color:var(--accent)}
+.q .fb{margin:var(--s2) 0 0;font-family:var(--font-ui);font-size:.9rem;padding:var(--s2) var(--s3);border-radius:var(--r-sm)}
+.q .fb.right{background:color-mix(in srgb,var(--ok) 15%,transparent)}
+.q .fb.wrong{background:var(--caution-soft)}
+.score{font-family:var(--font-head);font-size:1.3rem;font-weight:700}
+
+/* ---------- Agenda ---------- */
+.agenda{list-style:none;padding:0;margin:var(--s5) 0;border-left:3px solid var(--ink);max-width:var(--measure)}
+.agenda li{position:relative;padding:0 0 var(--s4) var(--s5);margin:0}
+.agenda li::before{content:"";position:absolute;left:-9px;top:.45rem;width:15px;height:15px;border-radius:50%;background:var(--paper);border:3px solid var(--ink)}
+.agenda li.hot::before{background:var(--audio);border-color:var(--audio)}
+.agenda li.hot2::before{background:var(--video);border-color:var(--video)}
+.agenda .at{font-family:var(--font-ui);font-weight:700;font-variant-numeric:tabular-nums;margin-right:var(--s2)}
+.agenda .what{font-family:var(--font-ui);font-weight:600}
+.agenda .desc{display:block;color:var(--ink-soft);font-size:.95rem}
+
+details.ref{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);margin-bottom:var(--s2)}
+details.ref summary{cursor:pointer;padding:var(--s3) var(--s4);font-family:var(--font-ui);font-weight:600;min-height:44px;display:flex;align-items:center}
+details.ref > div{padding:0 var(--s4) var(--s4)}
+
+.toggle-line{display:flex;align-items:center;gap:var(--s2);font-family:var(--font-ui);font-size:.9rem;margin-top:var(--s4)}
+.toggle-line input{width:22px;height:22px;accent-color:var(--accent)}
+
+.shotlist li.found{color:var(--ok)}
+.shotlist{list-style:none;padding-left:0}.shotlist li{padding-left:1.4rem;position:relative}.shotlist li::before{content:"○";position:absolute;left:0}.shotlist li.found::before{content:"✓"}
+
+footer{border-top:1px solid var(--line);margin-top:var(--s8);padding:var(--s5) var(--s4);text-align:center;font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media print{
+  .topbar,.sidenav,.btn,.menu-btn{display:none!important}
+  .shell{display:block}
+  .tabpanel[hidden]{display:block!important}
+  .section{padding-top:var(--s5)}
+}
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="sidenav">Sections</button>
+    <span class="brand">Gemini Notebook workshop</span>
+    <div class="progress-wrap">
+      <span id="progressText">0 of 14 done</span>
+      <div class="progress-track" role="progressbar" aria-label="Sections completed" aria-valuemin="0" aria-valuemax="14" aria-valuenow="0" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+<nav class="sidenav" id="sidenav" aria-label="Tutorial sections">
+  <p class="nav-label">Tap a circle to mark a section done</p>
+  <ol id="navList"></ol>
+</nav>
+
+<main id="main">
+
+<!-- ================= HERO ================= -->
+<div class="hero">
+  <p class="hero-kicker">A self-paced tutorial and 90-minute hands-on workshop</p>
+  <h1>Turn your documents into podcasts and videos
+    <small>Gemini Notebook, the tool formerly called NotebookLM</small></h1>
+  <p class="lede">You bring the sources. Gemini Notebook reads only those sources, answers questions about them with citations, and turns them into audio conversations, narrated videos, slides, quizzes, and more. This page walks you through all of it, with most of our time spent on audio and video.</p>
+
+  <div class="transform" aria-hidden="true">
+    <div class="t-block"><div class="docs"><i></i><i></i><i></i></div><b>Your sources</b><span>PDFs, Docs, slides, websites, YouTube, audio</span></div>
+    <div class="t-arrow">→</div>
+    <div class="t-block"><div class="wave" id="wave"></div><b>Audio Overview</b><span>Two AI hosts discuss your material</span></div>
+    <div class="t-arrow">→</div>
+    <div class="t-block"><div class="film" id="film"></div><b>Video Overview</b><span>Narrated visuals built from the same sources</span></div>
+  </div>
+
+  <div class="hero-meta">
+    <span><strong>Length:</strong> 90 minutes</span>
+    <span><strong>You need:</strong> a Google account (personal or school) and 2–4 files you are allowed to share</span>
+    <span><strong>Current as of:</strong> September 2026</span>
+  </div>
+  <label class="toggle-line"><input type="checkbox" id="facilToggle"> Show facilitator notes</label>
+</div>
+
+<!-- ================= 1. AGENDA ================= -->
+<section class="section" id="s-agenda" data-title="Agenda and setup" data-time="0:00">
+  <div class="sec-head"><h2>Agenda and setup</h2><span class="sec-time">0:00 – 0:05</span></div>
+  <p>The workshop moves from understanding the tool to making things with it. If you're working through this page on your own, follow the same order and take as long as you need.</p>
+  <ol class="agenda">
+    <li><span class="at">0:00</span><span class="what">Welcome and setup</span><span class="desc">Sign in, open a notebook, gather sources.</span></li>
+    <li><span class="at">0:05</span><span class="what">What Gemini Notebook is</span><span class="desc">The name change, where to find it, and why "source-grounded" matters.</span></li>
+    <li><span class="at">0:10</span><span class="what">Choosing an account</span><span class="desc">Personal Google, a Google school account, or a Microsoft school: what changes for each.</span></li>
+    <li><span class="at">0:14</span><span class="what">The interface and your sources</span><span class="desc">Three panels. Adding, selecting, and discovering sources.</span></li>
+    <li class="hot2"><span class="at">0:25</span><span class="what">Start a video generating</span><span class="desc">Videos can take a long time, so we start one early and come back to it.</span></li>
+    <li><span class="at">0:28</span><span class="what">Chat with your sources</span><span class="desc">Citations, chat styles, saving notes.</span></li>
+    <li><span class="at">0:38</span><span class="what">Tour of the Studio</span><span class="desc">Every output you can create, at a glance.</span></li>
+    <li class="hot"><span class="at">0:45</span><span class="what">Audio Overviews, hands-on</span><span class="desc">Formats, custom prompts, Interactive mode, sharing.</span></li>
+    <li class="hot2"><span class="at">1:05</span><span class="what">Video Overviews, hands-on</span><span class="desc">Formats, visual styles, steering, reviewing the result.</span></li>
+    <li><span class="at">1:20</span><span class="what">Sharing, plans, and responsible use</span><span class="desc">Who can see what, usage limits, and classroom cautions.</span></li>
+    <li><span class="at">1:25</span><span class="what">Knowledge check and wrap-up</span><span class="desc">Nine quick questions and a prompt library to take with you.</span></li>
+  </ol>
+
+  <h3>Before you start</h3>
+  <ul>
+    <li>Sign in with a Google account. If your school provides Google accounts, use that one. If your school uses Microsoft 365, you'll use a free personal Google account. See <a href="#s-accounts">Choosing an account</a> for what this means for privacy and sharing.</li>
+    <li>Pick 2–4 sources on one topic: a syllabus, an open textbook chapter, lecture notes, or an article. A focused set gives better results than a pile of unrelated files.</li>
+    <li>Use only material you have the right to upload. On a personal account, never upload student records or other private information.</li>
+    <li>Headphones help during the audio lab.</li>
+  </ul>
+  <div class="facil"><strong>Facilitator:</strong> Keep a ready-made sample notebook in case someone's files fail to upload. An open-licensed chapter works well because everyone can use it freely. Build it on a personal Google account so you can share it with a public link regardless of what accounts participants use. Ask participants to create a personal Google account before the session if their school doesn't provide one.</div>
+</section>
+
+<!-- ================= 2. WHAT IT IS ================= -->
+<section class="section" id="s-what" data-title="What Gemini Notebook is" data-time="0:05">
+  <div class="sec-head"><h2>What Gemini Notebook is</h2><span class="sec-time">0:05 – 0:10</span></div>
+  <p class="lede">A research and study tool that works only from the sources you give it.</p>
+  <p>Google renamed NotebookLM to <strong>Gemini Notebook</strong> on July 16, 2026. It is the same product with the same notebooks: only the name and logo changed, along with a few new features. Old NotebookLM links redirect automatically, so nothing you built before is lost. Many help articles and videos still use the old name, so you'll see both.</p>
+
+  <h3>Where to find it</h3>
+  <ul>
+    <li><strong>On the web:</strong> <a href="https://notebook.google.com">notebook.google.com</a> (the older <code>notebooklm.google.com</code> address still works).</li>
+    <li><strong>On your phone:</strong> the Gemini Notebook app for Android and iOS. Some Studio features are limited on mobile.</li>
+    <li><strong>Inside the Gemini app:</strong> the Notebooks section syncs with Gemini Notebook, so a notebook you build on the web can be used in a Gemini chat.</li>
+  </ul>
+
+  <figure class="shot" data-src="img/01-home-notebooks.png" data-alt="Gemini Notebook home screen showing a grid of notebooks and the Create new button">
+    <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>notebook.google.com</span></div>
+      <div class="placeholder"><span class="ph-num">Screenshot 1</span><p class="ph-what">Home screen: your list of notebooks and the <b>Create new</b> button.</p><code>img/01-home-notebooks.png</code></div>
+    </div>
+    <figcaption><b>Home screen.</b> Each tile is a separate notebook with its own sources, chat, and Studio outputs.</figcaption>
+  </figure>
+
+  <h3>The big idea: source-grounded AI</h3>
+  <p>A general chatbot answers from everything it learned in training. Gemini Notebook answers from <em>your</em> sources. Every answer includes numbered citations you can click to see the exact passage. If the answer isn't in your sources, it will usually say so instead of guessing.</p>
+  <div class="callout">
+    <p class="c-title">Why this matters for teaching</p>
+    <p>Because outputs are tied to your materials, a podcast or video it makes will reflect <em>your</em> course content and terminology, not a generic version of the topic. That makes it far more useful for class than a general-purpose chatbot, but you should still review everything before sharing it.</p>
+  </div>
+
+  <h3>New since the rename</h3>
+  <ul>
+    <li><strong>Code execution:</strong> notebooks can write and run code in a secure cloud computer to analyze data in your sources. It rolled out to the top plans first.</li>
+    <li><strong>Gemini app sync:</strong> notebooks appear in the Gemini app's Notebooks section.</li>
+    <li><strong>Newer model:</strong> the tool runs on Google's current Gemini models, which improves reasoning across several sources.</li>
+  </ul>
+</section>
+
+<!-- ================= 2b. ACCOUNTS ================= -->
+<section class="section" id="s-accounts" data-title="Choosing an account" data-time="0:10">
+  <div class="sec-head"><h2>Choosing an account</h2><span class="sec-time">0:10 – 0:14</span></div>
+  <p class="lede">The tool works the same everywhere, but the account you sign in with changes your privacy protections and sharing options.</p>
+  <p>Select the situation that matches your school.</p>
+
+  <div class="tabs" data-tabs>
+    <div class="tablist" role="tablist" aria-label="Account situations">
+      <button class="tab" role="tab" id="t-ms" aria-controls="p-ms" aria-selected="true" tabindex="0">Microsoft 365 school</button>
+      <button class="tab" role="tab" id="t-gs" aria-controls="p-gs" aria-selected="false" tabindex="-1">Google Workspace school</button>
+      <button class="tab" role="tab" id="t-pe" aria-controls="p-pe" aria-selected="false" tabindex="-1">Personal use</button>
+    </div>
+
+    <div class="tabpanel" role="tabpanel" id="p-ms" aria-labelledby="t-ms">
+      <h4>Your school uses Microsoft 365</h4>
+      <p>Your school email is a Microsoft account, so it can't sign in to Gemini Notebook. You'll use a <strong>free personal Google account</strong> instead. That works fine for building course materials, with a few habits to follow.</p>
+      <ul>
+        <li><strong>Check your school's AI policy first.</strong> Some institutions limit which AI tools employees may use for course work.</li>
+        <li><strong>Keep it to shareable material.</strong> Your school's data agreements don't cover a personal Google account. Use your own content, openly licensed resources, and public materials. Never upload student names, work, grades, or records.</li>
+        <li><strong>Deliver files, not logins.</strong> Download the audio, video, slides, or infographic and post them in your LMS, OneDrive, or Teams. Students can then use them without creating Google accounts.</li>
+        <li><strong>Think before asking students to sign up.</strong> Requiring students to create personal accounts with an outside company raises privacy and equity questions. Make it optional, or check with your institution.</li>
+        <li><strong>Skip the feedback buttons</strong> on anything sensitive. On personal accounts, thumbs up or down sends that conversation for human review.</li>
+        <li><strong>Public links work.</strong> Personal accounts can share a notebook or overview with "Anyone with a link."</li>
+      </ul>
+      <div class="callout">
+        <p class="c-title">A Microsoft option to know about</p>
+        <p>Microsoft offers a similar tool, <strong>Copilot Notebooks</strong>, in the Microsoft 365 Copilot app and OneNote. It also grounds answers in files you add and can create audio overviews, and it works with work or school accounts under your institution's Microsoft agreement. It has fewer output types than Gemini Notebook, and which features you get depends on your school's licenses, so ask your IT department what's turned on.</p>
+      </div>
+    </div>
+
+    <div class="tabpanel" role="tabpanel" id="p-gs" aria-labelledby="t-gs" hidden>
+      <h4>Your school uses Google Workspace for Education</h4>
+      <p>Sign in with your school Google account. Gemini Notebook is a <strong>Core Service</strong> in every Workspace for Education edition, including the free one, so it's covered by your school's existing Google agreement.</p>
+      <ul>
+        <li><strong>Stronger data protection.</strong> Uploads, questions, and responses aren't reviewed by humans or used to train AI models, even if you click the feedback buttons. Google states it supports compliance with regulations such as FERPA and COPPA.</li>
+        <li><strong>Your admin controls access.</strong> Administrators can turn Gemini Notebook on or off for everyone or for specific groups. If you can't open it, contact your IT department.</li>
+        <li><strong>Public sharing is off.</strong> Education accounts can't make notebooks public. Share with specific people in your school, or download files to post.</li>
+        <li><strong>Drive files are copied.</strong> Adding a Drive file creates a copy stored with your notebook, and your school's Drive sharing and data-region settings don't apply to that copy.</li>
+        <li><strong>Classroom connection.</strong> If your admin allows it, Gemini features also appear in Google Classroom.</li>
+        <li><strong>Age limits still apply.</strong> Some features, such as Cinematic and Short videos, are limited to users 18 and older.</li>
+      </ul>
+      <p class="small">Even with these protections, follow your school's rules about what student information may be used with AI.</p>
+    </div>
+
+    <div class="tabpanel" role="tabpanel" id="p-pe" aria-labelledby="t-pe" hidden>
+      <h4>Using a personal Google account</h4>
+      <p>Anyone with a Google account can use Gemini Notebook free, with paid Google AI plans raising the limits.</p>
+      <ul>
+        <li>Google says your notebook content isn't used to directly train its AI models unless you give feedback.</li>
+        <li>Clicking thumbs up or down sends the related content for review by trained people. Avoid it on anything private.</li>
+        <li>You get every sharing option, including public links.</li>
+        <li>Treat it like any consumer service: don't upload confidential or personal information.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>At a glance</h3>
+  <div class="table-wrap">
+    <table>
+      <caption class="sr-only">Comparison of account types</caption>
+      <thead><tr><th scope="col"></th><th scope="col">Personal Google account</th><th scope="col">Google Workspace for Education</th></tr></thead>
+      <tbody>
+        <tr><td>Who uses it</td><td>Anyone, including staff at Microsoft schools</td><td>Schools that provide Google accounts</td></tr>
+        <tr><td>Human review of content</td><td>Only if you submit feedback</td><td>Never, even with feedback</td></tr>
+        <tr><td>Used to train AI models</td><td>Not directly, unless you submit feedback</td><td>No</td></tr>
+        <tr><td>Covered by school agreement</td><td>No</td><td>Yes, as a Core Service</td></tr>
+        <tr><td>Public "anyone with a link" sharing</td><td>Yes</td><td>No</td></tr>
+        <tr><td>Student data</td><td>Don't upload it</td><td>Follow your school's policy</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small">Summarized from Google's <a href="https://support.google.com/gemininotebook/answer/17004255">Privacy and Terms of Use</a> and <a href="https://knowledge.workspace.google.com/admin/generative-ai/generative-ai-in-google-workspace-privacy-hub">Workspace privacy hub</a> pages, September 2026.</p>
+  <div class="facil"><strong>Facilitator:</strong> Ask for a show of hands on account type at the start. In a mixed room, pair people so anyone without a Google account can follow along on a partner's screen.</div>
+</section>
+
+<!-- ================= 3. INTERFACE + SOURCES ================= -->
+<section class="section" id="s-sources" data-title="The interface and sources" data-time="0:14">
+  <div class="sec-head"><h2>The interface and your sources</h2><span class="sec-time">0:14 – 0:25</span></div>
+  <p>Every notebook has three panels. Select one below to see what it does.</p>
+
+  <div class="schematic" role="group" aria-label="The three panels of a notebook">
+    <button class="panel-btn" data-panel="sources" aria-pressed="true"><b>Sources</b><span class="small">Left panel</span><span class="mini"><i></i><i></i><i></i></span></button>
+    <button class="panel-btn" data-panel="chat" aria-pressed="false"><b>Chat</b><span class="small">Center panel</span><span class="mini"><i></i><i></i><i></i></span></button>
+    <button class="panel-btn" data-panel="studio" aria-pressed="false"><b>Studio</b><span class="small">Right panel</span><span class="mini"><i></i><i></i><i></i></span></button>
+  </div>
+  <div class="panel-detail" id="panelDetail" aria-live="polite"></div>
+
+  <figure class="shot" data-src="img/02-notebook-three-panels.png" data-alt="A notebook with the Sources panel on the left, Chat in the center, and Studio on the right">
+    <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>A notebook</span></div>
+      <div class="placeholder"><span class="ph-num">Screenshot 2</span><p class="ph-what">A full notebook with a few sources loaded, showing Sources, Chat, and Studio side by side.</p><code>img/02-notebook-three-panels.png</code></div>
+    </div>
+    <figcaption><b>The three-panel layout.</b> Sources on the left feed the Chat in the middle and the Studio on the right.</figcaption>
+  </figure>
+
+  <h3>Adding sources</h3>
+  <ol class="steps">
+    <li>Open a notebook, or select <strong>Create new</strong> on the home screen.</li>
+    <li>Select <strong>+ Add sources</strong>.</li>
+    <li>Upload a file, pick one from Google Drive, paste a link, or paste text.</li>
+    <li>Wait a moment. Each source gets an automatic summary and key topics.</li>
+  </ol>
+
+  <figure class="shot" data-src="img/03-add-sources-dialog.png" data-alt="The Add sources dialog with upload, Google Drive, link, and paste text options">
+    <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>Add sources</span></div>
+      <div class="placeholder"><span class="ph-num">Screenshot 3</span><p class="ph-what">The <b>Add sources</b> dialog showing upload, Drive, link, and paste-text options.</p><code>img/03-add-sources-dialog.png</code></div>
+    </div>
+    <figcaption><b>Add sources dialog.</b> Mix file types freely within one notebook.</figcaption>
+  </figure>
+
+  <h4>What you can add</h4>
+  <div class="table-wrap">
+    <table>
+      <caption class="sr-only">Supported source types</caption>
+      <thead><tr><th scope="col">Type</th><th scope="col">Examples</th><th scope="col">Good to know</th></tr></thead>
+      <tbody>
+        <tr><td>Documents</td><td>PDF, Word (.docx), PowerPoint (.pptx), text, Markdown, CSV, EPUB</td><td>Google Docs, Slides, and Sheets can come straight from Drive.</td></tr>
+        <tr><td>Web</td><td>Public web pages, YouTube videos</td><td>YouTube works through the video's captions, so the video must be public with captions.</td></tr>
+        <tr><td>Audio</td><td>MP3, WAV, and similar</td><td>Transcribed to text when imported. Great for recorded lectures you own.</td></tr>
+        <tr><td>Images</td><td>PNG, JPEG, GIF, WEBP, TIFF</td><td>Useful for diagrams, handouts, and whiteboard photos.</td></tr>
+        <tr><td>Your own notes</td><td>Notes you write or save from chat</td><td>A note can be converted into a source so the AI uses your ideas too.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small">The free plan allows 50 sources per notebook. Very large single files have size and word limits. Paid plans raise the source count.</p>
+
+  <h3>Choosing which sources to use</h3>
+  <p>Each source has a checkbox. Only checked sources are used by the Chat and by anything you generate in the Studio. Unchecking unrelated sources is the single easiest way to get more focused results, and it's how you make, for example, an Audio Overview of just one chapter.</p>
+
+  <figure class="shot" data-src="img/04-source-guide.png" data-alt="An opened source showing its automatic summary and key topics, with checkboxes beside each source in the list">
+    <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>Source guide</span></div>
+      <div class="placeholder"><span class="ph-num">Screenshot 4</span><p class="ph-what">A source opened to show its automatic summary and key topics. Include the source checkboxes in view.</p><code>img/04-source-guide.png</code></div>
+    </div>
+    <figcaption><b>Source guide and checkboxes.</b> Read the summary to confirm the file imported correctly before you generate anything.</figcaption>
+  </figure>
+
+  <h3>No sources yet? Let it find some</h3>
+  <p>The source panel can search the web for you.</p>
+  <ul>
+    <li><strong>Fast Research</strong> does a quick scan and suggests sources you can import.</li>
+    <li><strong>Deep Research</strong> takes several minutes, browses many sites, and returns a cited report plus a list of sources to add with one click.</li>
+  </ul>
+  <div class="callout caution">
+    <p class="c-title">Check what it finds</p>
+    <p>Discovered sources are a starting point, not a vetted reading list. Open each one and remove anything low-quality before you build audio or video on top of it.</p>
+  </div>
+
+  <figure class="shot" data-src="img/05-discover-research.png" data-alt="The source discovery box with Fast Research and Deep Research options">
+    <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>Discover sources</span></div>
+      <div class="placeholder"><span class="ph-num">Screenshot 5</span><p class="ph-what">The discovery search box with the Fast Research / Deep Research choice visible.</p><code>img/05-discover-research.png</code></div>
+    </div>
+    <figcaption><b>Discovering sources.</b> Type a topic and choose how deep the search should go.</figcaption>
+  </figure>
+
+  <h4>Walkthrough: a Deep Research run</h4>
+  <ol class="steps">
+    <li><strong>Describe what you need.</strong> Be specific about topic, audience, and the kind of sources you trust. For example: <em>"Open-access and .edu sources explaining how solar panels convert light to electricity, suitable for first-year college students."</em></li>
+    <li><strong>Choose Deep Research</strong> and start the search.</li>
+    <li><strong>Keep working while it runs.</strong> It can take several minutes. You can chat with your existing sources in the meantime.</li>
+    <li><strong>Read the report.</strong> It summarizes what was found, with citations to the sites it used.</li>
+    <li><strong>Import what you want.</strong> Add the sources that look useful to your notebook. You can also add the report itself as a source.</li>
+    <li><strong>Vet before you build.</strong> Open each imported source and delete or uncheck anything off-topic, outdated, or unreliable.</li>
+  </ol>
+
+  <figure class="shot" data-src="img/05b-deep-research-results.png" data-alt="Completed Deep Research results showing a cited report and a list of discovered sources with options to import them">
+    <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>Deep Research results</span></div>
+      <div class="placeholder"><span class="ph-num">Screenshot 5b</span><p class="ph-what">A finished Deep Research run showing the report and the list of discovered sources ready to import.</p><code>img/05b-deep-research-results.png</code></div>
+    </div>
+    <figcaption><b>Deep Research results.</b> Review the report and the source list, then import only what you would assign to students yourself.</figcaption>
+  </figure>
+
+  <div class="facil"><strong>Facilitator:</strong> Deep Research takes several minutes, so run it before the session and show your finished results rather than waiting live. Participants can start their own run and come back to it later.</div>
+
+  <div class="callout video">
+    <p class="c-title">Workshop checkpoint: start a video now</p>
+    <p>Video Overviews can take a long time to generate, sometimes more than 30 minutes. Once your sources are loaded, open the Studio, select <strong>Video Overview</strong>, and generate one with default settings. It builds in the background while we keep going. We'll review it in the video lab.</p>
+  </div>
+</section>
+
+<!-- ================= 4. CHAT ================= -->
+<section class="section" id="s-chat" data-title="Chat with your sources" data-time="0:28">
+  <div class="sec-head"><h2>Chat with your sources</h2><span class="sec-time">0:28 – 0:38</span></div>
+  <p>The chat is where you ask questions and give instructions in plain language. It answers from the sources you have checked.</p>
+
+  <h3>Citations</h3>
+  <p>Answers contain small numbered markers. Hover over one to see the quoted passage; click it to jump to that spot in the source. Use citations to check accuracy, especially before you reuse an answer with students.</p>
+
+  <figure class="shot" data-src="img/06-chat-citations.png" data-alt="A chat answer with numbered citation markers and a hover card showing the quoted source passage">
+    <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>Chat</span></div>
+      <div class="placeholder"><span class="ph-num">Screenshot 6</span><p class="ph-what">A chat answer with citation numbers, one citation hovered so the source quote shows.</p><code>img/06-chat-citations.png</code></div>
+    </div>
+    <figcaption><b>Citations in chat.</b> Every claim can be traced back to a specific passage.</figcaption>
+  </figure>
+
+  <h3>Configure the chat</h3>
+  <p>Open the chat settings (<strong>Configure chat</strong>) to change how it responds.</p>
+  <div class="grid">
+    <div class="card feature-other"><h4>Default</h4><p>General research and brainstorming.</p></div>
+    <div class="card feature-other"><h4>Learning Guide</h4><p>Acts like a tutor: asks questions and breaks concepts into steps instead of just giving answers.</p></div>
+    <div class="card feature-other"><h4>Custom</h4><p>Write your own role and goal, for example "a lab instructor who quizzes me before explaining."</p></div>
+  </div>
+  <p>You can also choose a shorter, default, or longer response length.</p>
+
+  <figure class="shot" data-src="img/07-configure-chat.png" data-alt="The Configure chat dialog with Default, Learning Guide, and Custom options and a response length setting">
+    <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>Configure chat</span></div>
+      <div class="placeholder"><span class="ph-num">Screenshot 7</span><p class="ph-what">The <b>Configure chat</b> dialog showing the style options and response length.</p><code>img/07-configure-chat.png</code></div>
+    </div>
+    <figcaption><b>Chat settings.</b> A custom role is the most powerful five minutes of setup in the tool.</figcaption>
+  </figure>
+
+  <h3>Keep what's useful</h3>
+  <ul>
+    <li><strong>Save to note</strong> keeps a response, with its citations, in the Studio panel.</li>
+    <li>Notes can be turned into sources, so your own summaries become part of the notebook.</li>
+    <li>Chat history is private to you and saved between sessions until you clear it.</li>
+    <li>Suggested chips under the chat box can start a Mind Map or other outputs directly.</li>
+  </ul>
+
+  <h3>Try it</h3>
+  <p>Paste one of these into your notebook's chat.</p>
+  <div class="prompt"><div class="prompt-top"><b>Find the main ideas</b><button class="btn ghost copy" data-copy="What are the five most important ideas across these sources? For each, give a one-sentence explanation and cite where it appears.">Copy</button></div><blockquote>What are the five most important ideas across these sources? For each, give a one-sentence explanation and cite where it appears.</blockquote></div>
+  <div class="prompt"><div class="prompt-top"><b>Spot disagreements</b><button class="btn ghost copy" data-copy="Where do these sources disagree or emphasize different things? Quote the relevant passages.">Copy</button></div><blockquote>Where do these sources disagree or emphasize different things? Quote the relevant passages.</blockquote></div>
+  <div class="prompt"><div class="prompt-top"><b>Find the hard parts</b><button class="btn ghost copy" data-copy="Which concepts in these sources would a first-year student most likely misunderstand, and why?">Copy</button></div><blockquote>Which concepts in these sources would a first-year student most likely misunderstand, and why?</blockquote></div>
+</section>
+
+<!-- ================= 5. STUDIO TOUR ================= -->
+<section class="section" id="s-studio" data-title="Tour of the Studio" data-time="0:38">
+  <div class="sec-head"><h2>Tour of the Studio</h2><span class="sec-time">0:38 – 0:45</span></div>
+  <p>The Studio panel turns your checked sources into finished materials. Each item generates in the background, so you can start several at once and keep working.</p>
+
+  <figure class="shot" data-src="img/08-studio-panel.png" data-alt="The Studio panel listing Audio Overview, Video Overview, Mind Map, Reports, Flashcards, Quiz, Infographic, Slide Deck, and Data Table">
+    <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>Studio</span></div>
+      <div class="placeholder"><span class="ph-num">Screenshot 8</span><p class="ph-what">The full Studio panel showing all output tiles, plus a few generated items listed below them.</p><code>img/08-studio-panel.png</code></div>
+    </div>
+    <figcaption><b>The Studio panel.</b> Select a tile to generate, or the pencil icon on a tile to customize first.</figcaption>
+  </figure>
+
+  <h3>Everything you can create</h3>
+  <div class="grid">
+    <div class="card feature-audio"><h4>Audio Overview</h4><p>A podcast-style conversation about your sources, in four formats and 80+ languages.</p><span class="tagline">Covered in depth below</span></div>
+    <div class="card feature-video"><h4>Video Overview</h4><p>A narrated video with generated visuals: Explainer, Short, or Cinematic.</p><span class="tagline">Covered in depth below</span></div>
+    <div class="card feature-other"><h4>Mind Map</h4><p>A branching diagram of the main themes. Expand branches, or click a node to ask the chat about it.</p></div>
+    <div class="card feature-other"><h4>Reports</h4><p>Written documents from templates such as a briefing doc or study guide, or an interactive Learning Overview on the web.</p></div>
+    <div class="card feature-other"><h4>Flashcards</h4><p>Study cards with adjustable difficulty. Tracks what you miss and can be downloaded as CSV.</p></div>
+    <div class="card feature-other"><h4>Quiz</h4><p>Multiple-choice questions with explanations, difficulty settings, and progress tracking.</p></div>
+    <div class="card feature-other"><h4>Slide Deck</h4><p>A detailed deck for reading or presenter slides for speaking. Revise single slides by prompt; download as PDF or PowerPoint.</p></div>
+    <div class="card feature-other"><h4>Infographic</h4><p>One visual summary. Choose detail level, orientation, and style; download as PNG.</p></div>
+    <div class="card feature-other"><h4>Data Table</h4><p>Pulls facts from your sources into a comparison table you can export to Google Sheets.</p></div>
+  </div>
+  <p class="small">Every Studio item has a three-dot menu. Use <strong>View custom prompt</strong> there to see the instructions an item was made with.</p>
+
+  <div class="tabs" data-tabs>
+    <div class="tablist" role="tablist" aria-label="More Studio outputs">
+      <button class="tab" role="tab" id="t-mm" aria-controls="p-mm" aria-selected="true" tabindex="0">Mind Map</button>
+      <button class="tab" role="tab" id="t-rep" aria-controls="p-rep" aria-selected="false" tabindex="-1">Reports</button>
+      <button class="tab" role="tab" id="t-fq" aria-controls="p-fq" aria-selected="false" tabindex="-1">Flashcards &amp; Quiz</button>
+      <button class="tab" role="tab" id="t-sd" aria-controls="p-sd" aria-selected="false" tabindex="-1">Slides</button>
+      <button class="tab" role="tab" id="t-ig" aria-controls="p-ig" aria-selected="false" tabindex="-1">Infographic</button>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-mm" aria-labelledby="t-mm">
+      <h4>Mind Map</h4>
+      <p>Good for seeing how a topic fits together before you study the details. Mind maps are saved as notes in the Studio.</p>
+      <figure class="shot" data-src="img/13-mind-map.png" data-alt="An expanded mind map with a central topic and branching subtopics">
+        <div class="shot-frame"><div class="placeholder"><span class="ph-num">Screenshot 13</span><p class="ph-what">An expanded Mind Map with a few branches open.</p><code>img/13-mind-map.png</code></div></div>
+      </figure>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-rep" aria-labelledby="t-rep" hidden>
+      <h4>Reports</h4>
+      <p>Choose <strong>Reports</strong>, then <strong>Document</strong> for a written report from a template or suggested format, or <strong>Interactive</strong> for a Learning Overview that can embed other Studio items. Select the pencil icon beside a template to customize it before generating. Interactive reports are web-only.</p>
+      <figure class="shot" data-src="img/14-reports-menu.png" data-alt="The Reports menu showing Document and Interactive options with templates">
+        <div class="shot-frame"><div class="placeholder"><span class="ph-num">Screenshot 14</span><p class="ph-what">The Reports menu with Document and Interactive options and the template list.</p><code>img/14-reports-menu.png</code></div></div>
+      </figure>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-fq" aria-labelledby="t-fq" hidden>
+      <h4>Flashcards and Quiz</h4>
+      <p>Set difficulty to Easy, Medium, or Hard, and add a prompt to focus the questions. Both track your progress and let you review only what you missed. Retrieval practice like this usually does more for learning than passive listening, so pair it with your audio and video.</p>
+      <figure class="shot" data-src="img/15-flashcards-quiz.png" data-alt="A generated quiz question with answer choices and an explanation">
+        <div class="shot-frame"><div class="placeholder"><span class="ph-num">Screenshot 15</span><p class="ph-what">A quiz question after answering, showing the explanation, or a flashcard mid-review.</p><code>img/15-flashcards-quiz.png</code></div></div>
+      </figure>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-sd" aria-labelledby="t-sd" hidden>
+      <h4>Slide Deck</h4>
+      <p>Pick <strong>Detailed deck</strong> for a standalone handout or <strong>Presenter slides</strong> to talk over. To fix one slide, describe the change and only that slide is regenerated. Download as PDF or PowerPoint, or present full screen.</p>
+      <figure class="shot" data-src="img/16-slide-deck.png" data-alt="A generated slide deck open in the viewer with the revise slide option">
+        <div class="shot-frame"><div class="placeholder"><span class="ph-num">Screenshot 16</span><p class="ph-what">A generated slide deck in the viewer, with the revise-slide option visible.</p><code>img/16-slide-deck.png</code></div></div>
+      </figure>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-ig" aria-labelledby="t-ig" hidden>
+      <h4>Infographic</h4>
+      <p>Choose a level of detail (Concise, Standard, Detailed), an orientation (Square, Portrait, Landscape), and a style. Share by link or download a PNG. Always proofread the text in generated images.</p>
+      <figure class="shot" data-src="img/17-infographic.png" data-alt="A generated infographic summarizing a topic">
+        <div class="shot-frame"><div class="placeholder"><span class="ph-num">Screenshot 17</span><p class="ph-what">A finished infographic from your sample notebook.</p><code>img/17-infographic.png</code></div></div>
+      </figure>
+    </div>
+  </div>
+
+  <h3>Which output should I make?</h3>
+  <p>Choose what you want learners to do.</p>
+  <div class="chooser" id="chooser" role="group" aria-label="Learning goals">
+    <button class="chip" data-goal="commute" aria-pressed="false">Review on the go</button>
+    <button class="chip" data-goal="visual" aria-pressed="false">See a concept explained</button>
+    <button class="chip" data-goal="practice" aria-pressed="false">Practice and self-test</button>
+    <button class="chip" data-goal="bigpicture" aria-pressed="false">See how ideas connect</button>
+    <button class="chip" data-goal="present" aria-pressed="false">Present in class</button>
+    <button class="chip" data-goal="compare" aria-pressed="false">Compare sources</button>
+    <button class="chip" data-goal="feedback" aria-pressed="false">Get feedback on a draft</button>
+  </div>
+  <div class="result" id="chooserResult" aria-live="polite"><p class="small">Choose a goal to see a recommendation.</p></div>
+</section>
+
+<!-- ================= 6. AUDIO ================= -->
+<section class="section" id="s-audio" data-title="Audio Overviews" data-time="0:45">
+  <div class="sec-head"><h2>Audio Overviews</h2><span class="sec-time">0:45 – 1:05</span></div>
+  <p class="lede">Podcast-style audio that discusses your sources, generated in a few minutes.</p>
+  <p>Audio Overviews are designed to reflect what's in your sources rather than the hosts' opinions. You can listen in the browser, keep exploring your notebook while it plays, download it, or share a link.</p>
+
+  <h3>The four formats</h3>
+  <div class="tabs" data-tabs>
+    <div class="tablist" role="tablist" aria-label="Audio formats">
+      <button class="tab" role="tab" id="t-dd" aria-controls="p-dd" aria-selected="true" tabindex="0">Deep Dive</button>
+      <button class="tab" role="tab" id="t-br" aria-controls="p-br" aria-selected="false" tabindex="-1">The Brief</button>
+      <button class="tab" role="tab" id="t-cr" aria-controls="p-cr" aria-selected="false" tabindex="-1">The Critique</button>
+      <button class="tab" role="tab" id="t-db" aria-controls="p-db" aria-selected="false" tabindex="-1">The Debate</button>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-dd" aria-labelledby="t-dd">
+      <h4>Deep Dive (default)</h4>
+      <p>Two hosts unpack and connect the ideas in a lively conversation. This is the classic format and the only one that currently supports Interactive mode.</p>
+      <p><strong>Use it for:</strong> introducing a unit, reviewing a chapter, making dense reading approachable.</p>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-br" aria-labelledby="t-br" hidden>
+      <h4>The Brief</h4>
+      <p>One speaker delivers the key takeaways in under two minutes.</p>
+      <p><strong>Use it for:</strong> a quick recap before class, a "what you missed" summary, an announcement-length overview.</p>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-cr" aria-labelledby="t-cr" hidden>
+      <h4>The Critique</h4>
+      <p>Two hosts give a constructive evaluation of the material, as an expert reviewer would.</p>
+      <p><strong>Use it for:</strong> feedback on your own draft syllabus, grant narrative, or assignment prompt. It works best when the source is something you wrote.</p>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-db" aria-labelledby="t-db" hidden>
+      <h4>The Debate</h4>
+      <p>Two hosts take opposing positions in a formal back-and-forth.</p>
+      <p><strong>Use it for:</strong> discussion starters, ethics cases, policy questions, or showing students how to argue from evidence.</p>
+    </div>
+  </div>
+
+  <h3>Customization options</h3>
+  <p>Select the pencil icon on the Audio Overview tile to open these settings before generating.</p>
+  <div class="table-wrap">
+    <table>
+      <caption class="sr-only">Audio Overview settings</caption>
+      <thead><tr><th scope="col">Setting</th><th scope="col">Choices</th><th scope="col">Tip</th></tr></thead>
+      <tbody>
+        <tr><td>Format</td><td>Deep Dive, Brief, Critique, Debate</td><td>Pick the format first, then shape it with a prompt.</td></tr>
+        <tr><td>Language</td><td>80+ languages</td><td>Defaults to your Google account's preferred language.</td></tr>
+        <tr><td>Length</td><td>Shorter, Default, Longer</td><td>Length control is English only.</td></tr>
+        <tr><td>Custom prompt</td><td>Free text</td><td>Name the audience, the focus, and the level of expertise.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <figure class="shot" data-src="img/09-audio-customize.png" data-alt="The Audio Overview customization panel with format, language, length, and prompt fields">
+    <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>Customize Audio Overview</span></div>
+      <div class="placeholder"><span class="ph-num">Screenshot 9</span><p class="ph-what">The Audio Overview customize panel: format choices, language, length, and the prompt box.</p><code>img/09-audio-customize.png</code></div>
+    </div>
+    <figcaption><b>Customizing audio.</b> The prompt box is where most of the quality comes from.</figcaption>
+  </figure>
+
+  <h3>Build a custom audio prompt</h3>
+  <div class="card">
+    <div class="form-grid">
+      <div class="field"><label for="aFormat">Format</label>
+        <select id="aFormat"><option>Deep Dive</option><option>The Brief</option><option>The Critique</option><option>The Debate</option></select></div>
+      <div class="field"><label for="aAudience">Audience</label>
+        <select id="aAudience"><option>first-year college students new to this topic</option><option>students reviewing before an exam</option><option>faculty colleagues</option><option>a general public audience</option><option>working professionals in the field</option></select></div>
+      <div class="field"><label for="aLength">Length</label>
+        <select id="aLength"><option>Default</option><option>Shorter</option><option>Longer</option></select></div>
+      <div class="field"><label for="aFocus">Focus on (optional)</label>
+        <input id="aFocus" type="text" placeholder="e.g., the three types of firewalls"></div>
+    </div>
+    <div class="field" style="margin-top:var(--s3)"><label for="aExtra">Anything to add (optional)</label>
+      <input id="aExtra" type="text" placeholder="e.g., end with two questions for reflection"></div>
+    <div class="output" id="aOut" aria-live="polite"></div>
+    <div class="btn-row"><button class="btn" id="aCopy">Copy audio prompt</button></div>
+    <p class="small" id="aNote"></p>
+  </div>
+
+  <h3>Interactive mode: join the conversation</h3>
+  <p>In Interactive mode you can interrupt the hosts with your voice and ask a question. They answer from your sources, then pick the conversation back up.</p>
+  <ol class="steps">
+    <li>Generate a <strong>new</strong> Deep Dive Audio Overview. Interactive mode only works on newly generated overviews.</li>
+    <li>Select <strong>Interactive mode</strong> on the audio player.</li>
+    <li>Press play, then select <strong>Join</strong> while it plays.</li>
+    <li>When a host calls on you, ask your question out loud. Allow your browser to use the microphone.</li>
+  </ol>
+  <div class="callout audio">
+    <p class="c-title">Know the limits</p>
+    <ul>
+      <li>Interactive mode is English only.</li>
+      <li>Expect a short delay after you join or speak, and occasional voice glitches.</li>
+      <li>Your voice and the interaction aren't stored or shared. People you share the audio with hear the original version and can't join it themselves.</li>
+    </ul>
+  </div>
+
+  <figure class="shot" data-src="img/10-audio-player-interactive.png" data-alt="The Audio Overview player with play, share, download, and the Interactive mode Join button">
+    <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>Audio player</span></div>
+      <div class="placeholder"><span class="ph-num">Screenshot 10</span><p class="ph-what">The audio player in Interactive mode with the <b>Join</b> button visible, plus share and download controls.</p><code>img/10-audio-player-interactive.png</code></div>
+    </div>
+    <figcaption><b>Audio player.</b> Playback speed lives in the More menu.</figcaption>
+  </figure>
+
+  <h3>Sharing audio</h3>
+  <ul>
+    <li><strong>Download</strong> the audio file and post it in your LMS, OneDrive, Teams, or Classroom. This is the most reliable option, and students don't need a Google account.</li>
+    <li><strong>Share a link</strong> from the player. The notebook must be shared with the listener, or public, with access to the full notebook.</li>
+    <li><strong>Share the whole notebook</strong> so others find the audio in their Studio panel.</li>
+  </ul>
+  <p class="small">Deleting an Audio Overview breaks any link you shared to it.</p>
+
+  <div class="lab" data-lab="audio">
+    <div class="lab-head"><h3>Hands-on lab: make two audio versions</h3><span class="lab-count" aria-live="polite"></span></div>
+    <p>About 15 minutes. You'll compare how format and prompt change the result.</p>
+    <ul class="checklist">
+      <li><label><input type="checkbox"><span>In the Sources panel, check only the sources you want the audio to cover.</span></label></li>
+      <li><label><input type="checkbox"><span>Select the pencil icon on <strong>Audio Overview</strong> and choose <strong>The Brief</strong>. Generate it.</span></label></li>
+      <li><label><input type="checkbox"><span>While it builds, use the prompt builder above to write a Deep Dive prompt for a specific audience.</span></label></li>
+      <li><label><input type="checkbox"><span>Generate a <strong>Deep Dive</strong> with your prompt.</span></label></li>
+      <li><label><input type="checkbox"><span>Listen to the first two minutes of each. Note one thing the prompt changed.</span></label></li>
+      <li><label><input type="checkbox"><span>Open the Deep Dive in <strong>Interactive mode</strong>, select <strong>Join</strong>, and ask one question.</span></label></li>
+      <li><label><input type="checkbox"><span>Check one claim the hosts made against the source using the chat's citations.</span></label></li>
+      <li><label><input type="checkbox"><span>Download the audio you'd actually use with students.</span></label></li>
+    </ul>
+  </div>
+  <div class="facil"><strong>Facilitator:</strong> Ask two or three people to share what their prompt changed. Differences in audience and focus are usually the most noticeable. If rooms are noisy, have people use Interactive mode in pairs with one headset.</div>
+</section>
+
+<!-- ================= 7. VIDEO ================= -->
+<section class="section" id="s-video" data-title="Video Overviews" data-time="1:05">
+  <div class="sec-head"><h2>Video Overviews</h2><span class="sec-time">1:05 – 1:20</span></div>
+  <p class="lede">Narrated videos with generated visuals, built from the same sources.</p>
+  <p>Where audio talks through your material, video shows it: diagrams, key quotes, and illustrations assembled into a narrated walkthrough. Generation happens in the background and can take a while, sometimes more than 30 minutes, so plan ahead.</p>
+
+  <h3>The three formats</h3>
+  <div class="grid">
+    <div class="card feature-video"><h4>Explainer</h4><p>A structured, comprehensive overview that connects the ideas in your sources. Supports visual styles and many languages.</p><span class="tagline">Available on all plans</span></div>
+    <div class="card feature-video"><h4>Short</h4><p>A vertical video of roughly 60 seconds covering the key concepts. Made for phones.</p><span class="tagline">Ages 18+; rolled out to paid plans first</span></div>
+    <div class="card feature-video"><h4>Cinematic</h4><p>An immersive, animated, story-driven video. The AI decides the narrative and look.</p><span class="tagline">Ages 18+, English only; higher-tier paid plans</span></div>
+  </div>
+
+  <h3>Visual styles (Explainer)</h3>
+  <p>Choose a style to set the look. Select one to see where it tends to fit.</p>
+  <div class="chooser" id="styleChooser" role="group" aria-label="Visual styles">
+    <button class="chip" data-style="Classic" aria-pressed="false">Classic</button>
+    <button class="chip" data-style="Whiteboard" aria-pressed="false">Whiteboard</button>
+    <button class="chip" data-style="Watercolor" aria-pressed="false">Watercolor</button>
+    <button class="chip" data-style="Retro Print" aria-pressed="false">Retro Print</button>
+    <button class="chip" data-style="Heritage" aria-pressed="false">Heritage</button>
+    <button class="chip" data-style="Paper-craft" aria-pressed="false">Paper-craft</button>
+    <button class="chip" data-style="Kawaii" aria-pressed="false">Kawaii</button>
+    <button class="chip" data-style="Anime" aria-pressed="false">Anime</button>
+    <button class="chip" data-style="Auto" aria-pressed="false">Auto-select</button>
+    <button class="chip" data-style="Custom" aria-pressed="false">Custom</button>
+  </div>
+  <div class="result" id="styleResult" aria-live="polite"><p class="small">Choose a style.</p></div>
+  <p class="small">Visual style choices apply to Explainer videos for users 18 and older. Cinematic and Short videos choose their own look.</p>
+
+  <h3>Customization options</h3>
+  <div class="table-wrap">
+    <table>
+      <caption class="sr-only">Video Overview settings</caption>
+      <thead><tr><th scope="col">Setting</th><th scope="col">Choices</th><th scope="col">Tip</th></tr></thead>
+      <tbody>
+        <tr><td>Format</td><td>Cinematic, Explainer, Short</td><td>Explainer is the dependable choice for course content.</td></tr>
+        <tr><td>Language</td><td>Dozens of languages for Explainer and Short</td><td>Cinematic is English only.</td></tr>
+        <tr><td>Visual style</td><td>Eight presets, Auto-select, or Custom</td><td>Custom takes a text description of the look you want.</td></tr>
+        <tr><td>Steering prompt</td><td>A suggested topic or your own</td><td>Tell it what to focus on and who is watching.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <figure class="shot" data-src="img/11-video-customize.png" data-alt="The Video Overview customization panel with format, language, visual style, and steering prompt">
+    <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>Customize Video Overview</span></div>
+      <div class="placeholder"><span class="ph-num">Screenshot 11</span><p class="ph-what">The Video Overview customize panel: format, language, visual style tiles, and steering prompt.</p><code>img/11-video-customize.png</code></div>
+    </div>
+    <figcaption><b>Customizing video.</b> Pick format and style, then steer the topic.</figcaption>
+  </figure>
+
+  <h3>Build a steering prompt</h3>
+  <div class="card">
+    <div class="form-grid">
+      <div class="field"><label for="vFormat">Format</label>
+        <select id="vFormat"><option>Explainer</option><option>Short</option><option>Cinematic</option></select></div>
+      <div class="field"><label for="vStyle">Visual style</label>
+        <select id="vStyle"><option>Classic</option><option>Whiteboard</option><option>Watercolor</option><option>Retro Print</option><option>Heritage</option><option>Paper-craft</option><option>Kawaii</option><option>Anime</option><option>Auto-select</option><option>Custom</option></select></div>
+      <div class="field"><label for="vAudience">Viewers</label>
+        <select id="vAudience"><option>first-year college students</option><option>students reviewing before an exam</option><option>new employees in training</option><option>faculty colleagues</option><option>a general public audience</option></select></div>
+      <div class="field"><label for="vFocus">Focus on (optional)</label>
+        <input id="vFocus" type="text" placeholder="e.g., how the water cycle works step by step"></div>
+    </div>
+    <div class="field" style="margin-top:var(--s3)"><label for="vExtra">Anything to add (optional)</label>
+      <input id="vExtra" type="text" placeholder="e.g., include one real-world example"></div>
+    <div class="output" id="vOut" aria-live="polite"></div>
+    <div class="btn-row"><button class="btn" id="vCopy">Copy video prompt</button></div>
+    <p class="small" id="vNote"></p>
+  </div>
+
+  <h3>Watch, review, and share</h3>
+  <p>Open the video from the Studio panel. The player has playback speed, a scrub bar, skip buttons, full screen, and feedback buttons.</p>
+  <figure class="shot" data-src="img/12-video-player.png" data-alt="A Video Overview playing in the player with speed, full screen, share, and download controls">
+    <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>Video player</span></div>
+      <div class="placeholder"><span class="ph-num">Screenshot 12</span><p class="ph-what">A Video Overview mid-playback with the speed, full screen, share, and download controls visible.</p><code>img/12-video-player.png</code></div>
+    </div>
+    <figcaption><b>Video player.</b> Treat the result as a strong first draft.</figcaption>
+  </figure>
+
+  <div class="callout caution">
+    <p class="c-title">Review before you publish</p>
+    <p>Voices and visuals are AI-generated and can contain mistakes or glitches. Watch the whole video, check facts and on-screen text against your sources, and confirm captions or a transcript are available before posting it to a course. If the story is wrong, change your sources or prompt and regenerate. If only a small part is off, you can edit the downloaded file in a video editor.</p>
+  </div>
+
+  <p>Share a video the same three ways as audio: download the file, share a link (the notebook must be shared or public), or share the whole notebook.</p>
+
+  <div class="lab" data-lab="video">
+    <div class="lab-head"><h3>Hands-on lab: review and steer a video</h3><span class="lab-count" aria-live="polite"></span></div>
+    <p>About 15 minutes. Your first video should be ready from the checkpoint earlier.</p>
+    <ul class="checklist">
+      <li><label><input type="checkbox"><span>Open the default video you started earlier and watch the first two minutes.</span></label></li>
+      <li><label><input type="checkbox"><span>Write down one thing it covered well and one thing you'd change.</span></label></li>
+      <li><label><input type="checkbox"><span>Use the steering prompt builder to address what you'd change.</span></label></li>
+      <li><label><input type="checkbox"><span>Select the pencil on <strong>Video Overview</strong>, choose <strong>Explainer</strong>, pick a different visual style, paste your prompt, and generate.</span></label></li>
+      <li><label><input type="checkbox"><span>While it builds, generate a Quiz from the same sources to pair with the video.</span></label></li>
+      <li><label><input type="checkbox"><span>Use <strong>View custom prompt</strong> in the three-dot menu to confirm your instructions were applied.</span></label></li>
+      <li><label><input type="checkbox"><span>Plan how you'd share it: download, link, or notebook.</span></label></li>
+    </ul>
+  </div>
+  <div class="facil"><strong>Facilitator:</strong> Second-round videos may not finish before the session ends. Tell participants their video will be waiting in the notebook later, and show a finished example you prepared in advance.</div>
+</section>
+
+<!-- ================= 8. SHARING, PLANS, RESPONSIBLE USE ================= -->
+<section class="section" id="s-share" data-title="Sharing, plans, responsible use" data-time="1:20">
+  <div class="sec-head"><h2>Sharing, plans, and responsible use</h2><span class="sec-time">1:20 – 1:25</span></div>
+
+  <h3>Sharing a notebook</h3>
+  <ul>
+    <li><strong>Privately:</strong> add people by email. They can explore your sources, chat, and see Studio items.</li>
+    <li><strong>Publicly:</strong> "Anyone with a link" access. This works on personal Google accounts but is turned off for Google Workspace for Education and Enterprise accounts.</li>
+    <li><strong>By file:</strong> download audio, video, slides, or infographics and post them wherever your students already are, such as your LMS, OneDrive, Teams, or Google Classroom. This is the best option when students don't have Google accounts.</li>
+    <li>You need edit access to a notebook to generate or delete Audio and Video Overviews.</li>
+  </ul>
+  <figure class="shot" data-src="img/18-share-dialog.png" data-alt="The notebook Share dialog with people, access level, and link options">
+    <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>Share</span></div>
+      <div class="placeholder"><span class="ph-num">Screenshot 18</span><p class="ph-what">The <b>Share</b> dialog showing people, access level, and the link setting.</p><code>img/18-share-dialog.png</code></div>
+    </div>
+    <figcaption><b>Sharing a notebook.</b> Check the access level before sending a link to students.</figcaption>
+  </figure>
+
+  <h3>Gemini app connection</h3>
+  <p>Notebooks sync with the Notebooks section of the Gemini app, so you can build a notebook on the web and use it for quick chats on your phone.</p>
+  <figure class="shot" data-src="img/19-gemini-app-notebooks.png" data-alt="The Notebooks section in the Gemini app showing synced notebooks">
+    <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>Gemini app</span></div>
+      <div class="placeholder"><span class="ph-num">Screenshot 19</span><p class="ph-what">The Notebooks section in the Gemini app with a synced notebook.</p><code>img/19-gemini-app-notebooks.png</code></div>
+    </div>
+    <figcaption><b>Notebooks in Gemini.</b> The same notebook, available from the Gemini app.</figcaption>
+  </figure>
+
+  <h3>Plans and daily limits</h3>
+  <p>Gemini Notebook is free with a Google account. Paid Google AI plans raise the limits and unlock some newer features first.</p>
+  <div class="table-wrap">
+    <table>
+      <caption class="sr-only">Plan limits as reported in August 2026</caption>
+      <thead><tr><th scope="col">Limit</th><th scope="col">Free</th><th scope="col">Plus</th><th scope="col">Pro</th><th scope="col">Ultra</th></tr></thead>
+      <tbody>
+        <tr><td>Notebooks</td><td>100</td><td>200</td><td>500</td><td>500</td></tr>
+        <tr><td>Sources per notebook</td><td>50</td><td>100</td><td>300</td><td>500+</td></tr>
+        <tr><td>Chat questions per day</td><td>50</td><td>200</td><td>500</td><td>2,500+</td></tr>
+        <tr><td>Audio Overviews per day</td><td>3</td><td>6</td><td>20</td><td>100+</td></tr>
+        <tr><td>Video Overviews per day</td><td>3</td><td>6</td><td>20</td><td>Includes Cinematic</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small">Limits and prices change often. Check Google's <a href="https://support.google.com/gemininotebook/answer/17670842">Manage your usage limits</a> page for the current numbers. In a workshop, three free audio and video generations a day goes quickly, so plan which ones matter.</p>
+
+  <h3>Responsible use</h3>
+  <div class="grid">
+    <div class="card"><h4>Check accuracy</h4><p>Outputs can contain errors even with good sources. Verify claims with citations before sharing.</p></div>
+    <div class="card"><h4>Protect privacy</h4><p>Your account type sets your protections. On a personal account, never upload student records or personal information. On a school Google account, follow your institution's data rules.</p></div>
+    <div class="card"><h4>Respect copyright</h4><p>Upload only material you own, openly licensed content, or items you have permission to use.</p></div>
+    <div class="card"><h4>Be transparent</h4><p>Tell students when audio or video was AI-generated, and explain how you reviewed it.</p></div>
+    <div class="card"><h4>Make it accessible</h4><p>Provide a transcript for audio and captions for video before posting to a course.</p></div>
+    <div class="card"><h4>Mind age limits</h4><p>Cinematic and Short videos, and custom visual styles, are for users 18 and older.</p></div>
+  </div>
+  <div class="callout">
+    <p class="c-title">A useful habit</p>
+    <p>Listening and watching feel productive but are passive. Pair each audio or video with a quiz, flashcards, or a discussion question so students actually use what they heard.</p>
+  </div>
+</section>
+
+<!-- ================= 9. QUIZ ================= -->
+<section class="section" id="s-quiz" data-title="Knowledge check" data-time="1:25">
+  <div class="sec-head"><h2>Knowledge check</h2><span class="sec-time">1:25 – 1:30</span></div>
+  <p>Nine questions. You get feedback as soon as you choose an answer.</p>
+  <div id="quiz"></div>
+  <p class="score" id="quizScore" aria-live="polite"></p>
+  <div class="btn-row"><button class="btn ghost" id="quizReset">Shuffle and restart</button></div>
+</section>
+
+<!-- ================= 10. PROMPT LIBRARY ================= -->
+<section class="section" id="s-prompts" data-title="Prompt library" data-time="">
+  <div class="sec-head"><h2>Prompt library</h2><span class="sec-time">Take-away</span></div>
+  <p>Ready-to-use prompts for the custom prompt or steering box. Replace the words in brackets.</p>
+  <div id="promptLib"></div>
+</section>
+
+<!-- ================= 11. QUICK REFERENCE ================= -->
+<section class="section" id="s-ref" data-title="Quick reference" data-time="">
+  <div class="sec-head"><h2>Quick reference</h2><span class="sec-time">Take-away</span></div>
+
+  <details class="ref"><summary>Glossary</summary><div>
+    <p><strong>Notebook:</strong> a project containing its own sources, chat, notes, and Studio outputs.</p>
+    <p><strong>Source:</strong> a file, link, or text you add. The AI answers only from checked sources.</p>
+    <p><strong>Source-grounded:</strong> answers come from your sources and include citations.</p>
+    <p><strong>Studio:</strong> the panel that generates audio, video, and other materials.</p>
+    <p><strong>Audio Overview:</strong> AI-generated spoken discussion of your sources.</p>
+    <p><strong>Video Overview:</strong> AI-generated narrated video of your sources.</p>
+    <p><strong>Interactive mode:</strong> lets you ask the audio hosts questions by voice.</p>
+    <p><strong>Steering prompt:</strong> instructions that focus what a video covers.</p>
+    <p><strong>Fast / Deep Research:</strong> built-in tools that find web sources for you.</p>
+    <p><strong>Core Service:</strong> a Google Workspace for Education tool covered by the school's Google agreement. Gemini Notebook is one.</p>
+  </div></details>
+
+  <details class="ref"><summary>Troubleshooting</summary><div>
+    <p><strong>The audio or video ignored part of my material.</strong> Check which sources are selected, and name the topic in your prompt.</p>
+    <p><strong>A source didn't import well.</strong> Open it and read the summary. Scanned PDFs and videos without captions often fail; try a text version.</p>
+    <p><strong>There's no Join button.</strong> Interactive mode needs a newly generated Deep Dive in English.</p>
+    <p><strong>My video is taking forever.</strong> That's normal. Leave the page and come back; it keeps generating.</p>
+    <p><strong>I can't make a public link.</strong> Google Workspace for Education and work accounts block public sharing. Share with specific people, or download the file.</p>
+    <p><strong>My school Google account can't open Gemini Notebook.</strong> Your administrator may have turned it off. Contact your IT department.</p>
+    <p><strong>My school email won't sign in.</strong> Microsoft school accounts can't sign in to Google services. Use a personal Google account.</p>
+    <p><strong>I hit a daily limit.</strong> Limits reset daily. Choose carefully which items to regenerate.</p>
+  </div></details>
+
+  <details class="ref"><summary>Official help articles</summary><div>
+    <ul>
+      <li><a href="https://support.google.com/gemininotebook/answer/16164461">Learn about Gemini Notebook</a></li>
+      <li><a href="https://support.google.com/gemininotebook/answer/16215270">Add or discover new sources</a></li>
+      <li><a href="https://support.google.com/gemininotebook/answer/16179559">Use chat in Gemini Notebook</a></li>
+      <li><a href="https://support.google.com/gemininotebook/answer/16212820">Generate Audio Overview</a></li>
+      <li><a href="https://support.google.com/gemininotebook/answer/16454555">Generate Video Overviews</a></li>
+      <li><a href="https://support.google.com/gemininotebook/answer/16958963">Flashcards and Quizzes</a></li>
+      <li><a href="https://support.google.com/gemininotebook/answer/16757456">Slide Decks</a> and <a href="https://support.google.com/gemininotebook/answer/16758265">Infographics</a></li>
+      <li><a href="https://support.google.com/gemininotebook/answer/18323649">Reports</a></li>
+      <li><a href="https://support.google.com/gemininotebook/answer/17003757">Notebooks in Gemini Apps</a></li>
+      <li><a href="https://support.google.com/gemininotebook/answer/17004255">Privacy and Terms of Use in Gemini Notebook</a></li>
+      <li><a href="https://knowledge.workspace.google.com/admin/getting-started/editions/quickstart-guide-to-gemini-and-gemini-notebook-for-education">Quickstart for Gemini and Gemini Notebook in education</a> (for Google schools and their admins)</li>
+      <li><a href="https://support.microsoft.com/en-us/microsoft-365-copilot/get-an-audio-overview-of-your-microsoft-365-copilot-notebook">Microsoft Copilot Notebooks audio overviews</a> (for Microsoft schools)</li>
+      <li><a href="https://blog.google/innovation-and-ai/products/gemini-notebook/notebooklm-gemini-notebook/">Google's announcement of the name change</a></li>
+    </ul>
+  </div></details>
+
+  <div class="facil" id="shotPanel">
+    <strong>Facilitator: screenshot checklist.</strong> Save each image in a folder named <code>img</code> next to this HTML file, using the exact filename below. Images appear automatically when the page loads; missing ones stay as labeled placeholders. Found images are marked with a check.
+    <ol class="shotlist" id="shotList"></ol>
+  </div>
+</section>
+
+<!-- ================= 12. WRAP ================= -->
+<section class="section" id="s-wrap" data-title="Wrap-up" data-time="1:30">
+  <div class="sec-head"><h2>Wrap-up</h2><span class="sec-time">1:30</span></div>
+  <p>You've added sources, chatted with them, toured every Studio output, and made both audio and video. Before you leave, pick one thing to try with a real course this week.</p>
+  <div class="field" style="max-width:var(--measure)"><label for="nextStep">My next step (saved in this browser)</label>
+    <textarea id="nextStep" rows="3" placeholder="e.g., Make a Brief audio recap of Week 3 and pair it with a 10-question quiz."></textarea></div>
+  <p>Need ideas? See <a href="#s-after">After the workshop</a> for activities you can try this week or over the next month.</p>
+  <div class="btn-row"><button class="btn ghost" id="resetAll">Reset my progress on this page</button></div>
+</section>
+
+<!-- ================= AFTER THE WORKSHOP ================= -->
+<section class="section" id="s-after" data-title="After the workshop" data-time="">
+  <div class="sec-head"><h2>After the workshop: try it in your course</h2><span class="sec-time">Take-away</span></div>
+  <p class="lede">Activities for any discipline, from 20-minute quick wins to semester projects.</p>
+  <p>Choose how you want to browse them. Each activity includes steps and a prompt to copy. Activities that involve students also include assignment language you can paste into your LMS. Check off activities as you finish them; your progress saves in this browser.</p>
+
+  <div class="after-controls">
+    <div>
+      <p class="ctrl-label" id="viewLbl">Browse by</p>
+      <div class="chooser" role="group" aria-labelledby="viewLbl">
+        <button class="chip" data-view="time" aria-pressed="true">Time needed</button>
+        <button class="chip" data-view="goal" aria-pressed="false">Goal</button>
+        <button class="chip" data-view="week" aria-pressed="false">30-day challenge</button>
+      </div>
+    </div>
+    <div>
+      <p class="ctrl-label" id="whoLbl">Show</p>
+      <div class="chooser" role="group" aria-labelledby="whoLbl">
+        <button class="chip" data-who="all" aria-pressed="true">All</button>
+        <button class="chip" data-who="f" aria-pressed="false">For your prep</button>
+        <button class="chip" data-who="s" aria-pressed="false">With students</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="key small">
+    <span class="pill who-f">For your prep</span> You use Gemini Notebook to build materials. Students only see the files you share.
+    <br><span class="pill who-s">With students</span> Students take part. Each one says whether students need a Google account.
+  </div>
+
+  <p class="small" id="afterCount" aria-live="polite"></p>
+  <div id="afterList"></div>
+
+  <div class="callout">
+    <p class="c-title">Before you involve students</p>
+    <p>Check your institution's AI policy and tell students how AI is being used in your course. At a Microsoft school, don't require students to create personal Google accounts; the "no student accounts needed" activities work for everyone. On any personal account, never upload student work or records.</p>
+  </div>
+  <div class="facil"><strong>Facilitator:</strong> Point people here during the wrap-up. The 30-day challenge works well as a follow-up email series or a check-in meeting a month later.</div>
+</section>
+
+</main>
+</div>
+
+<footer>
+  <p>Gemini Notebook workshop tutorial, 2026. Features, limits, and privacy terms reflect Google's documentation as of September 2026 and may change.</p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var KEY = "gemini-notebook-workshop-v1";
+  var state = {done:{}, labs:{}, next:"", facil:false};
+  try { var saved = JSON.parse(localStorage.getItem(KEY)); if (saved) state = Object.assign(state, saved); } catch(e){}
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+
+  /* ---------- Hero animation shapes ---------- */
+  var wave = document.getElementById("wave");
+  var heights = [30,55,80,45,95,60,35,75,50,85,40,65,30,70,45];
+  heights.forEach(function(h,i){ var b=document.createElement("i"); b.style.height=h+"%"; b.style.animationDelay=(i*0.07)+"s"; wave.appendChild(b); });
+  var film = document.getElementById("film");
+  for (var f=0; f<5; f++){ var fr=document.createElement("i"); fr.style.animationDelay=(1.2+f*0.25)+"s"; film.appendChild(fr); }
+
+  /* ---------- Navigation + progress ---------- */
+  var sections = Array.prototype.slice.call(document.querySelectorAll(".section"));
+  var navList = document.getElementById("navList");
+  var total = sections.length;
+  document.getElementById("progressBar").setAttribute("aria-valuemax", total);
+  sections.forEach(function(sec){
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    a.href = "#" + sec.id;
+    a.dataset.id = sec.id;
+    var tick = document.createElement("span");
+    tick.className = "tick"; tick.setAttribute("role","checkbox"); tick.setAttribute("tabindex","0");
+    tick.setAttribute("aria-label","Mark " + sec.dataset.title + " done");
+    tick.textContent = "✓";
+    var label = document.createElement("span"); label.textContent = sec.dataset.title;
+    a.appendChild(tick); a.appendChild(label);
+    if (sec.dataset.time){ var t=document.createElement("span"); t.className="time"; t.textContent=sec.dataset.time; a.appendChild(t); }
+    li.appendChild(a); navList.appendChild(li);
+    function toggle(ev){ ev.preventDefault(); ev.stopPropagation(); state.done[sec.id] = !state.done[sec.id]; save(); renderProgress(); }
+    tick.addEventListener("click", toggle);
+    tick.addEventListener("keydown", function(ev){ if (ev.key===" "||ev.key==="Enter") toggle(ev); });
+    a.addEventListener("click", function(){ closeMenu(); });
+  });
+  function renderProgress(){
+    var n = 0;
+    navList.querySelectorAll("a").forEach(function(a){
+      var d = !!state.done[a.dataset.id];
+      a.classList.toggle("done", d);
+      a.querySelector(".tick").setAttribute("aria-checked", d ? "true" : "false");
+      if (d) n++;
+    });
+    document.getElementById("progressFill").style.width = (n/total*100) + "%";
+    document.getElementById("progressBar").setAttribute("aria-valuenow", n);
+    document.getElementById("progressText").textContent = n + " of " + total + " done";
+  }
+  renderProgress();
+
+  if ("IntersectionObserver" in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.isIntersecting){
+          navList.querySelectorAll("a").forEach(function(a){ a.setAttribute("aria-current", a.dataset.id===en.target.id ? "true" : "false"); });
+        }
+      });
+    }, {rootMargin:"-40% 0px -55% 0px"});
+    sections.forEach(function(s){ io.observe(s); });
+  }
+
+  var menuBtn = document.getElementById("menuBtn");
+  var sidenav = document.getElementById("sidenav");
+  function closeMenu(){ sidenav.classList.remove("open"); menuBtn.setAttribute("aria-expanded","false"); }
+  menuBtn.addEventListener("click", function(){
+    var open = sidenav.classList.toggle("open");
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  document.addEventListener("keydown", function(e){ if (e.key==="Escape" && sidenav.classList.contains("open")){ closeMenu(); menuBtn.focus(); } });
+
+  /* ---------- Facilitator toggle ---------- */
+  var facil = document.getElementById("facilToggle");
+  facil.checked = !!state.facil;
+  document.body.classList.toggle("show-facil", facil.checked);
+  facil.addEventListener("change", function(){ state.facil = facil.checked; document.body.classList.toggle("show-facil", facil.checked); save(); });
+
+  /* ---------- Screenshots: auto-load from img/ ---------- */
+  var shotList = document.getElementById("shotList");
+  var shots = Array.prototype.slice.call(document.querySelectorAll("figure.shot[data-src]"));
+  shots.sort(function(a,b){ return a.dataset.src.localeCompare(b.dataset.src); });
+  shots.forEach(function(fig){
+    var li = document.createElement("li");
+    var what = fig.querySelector(".ph-what");
+    li.innerHTML = "<code></code> ";
+    li.firstChild.textContent = fig.dataset.src;
+    li.appendChild(document.createTextNode(what ? what.textContent : ""));
+    shotList.appendChild(li);
+    var img = new Image();
+    img.addEventListener("load", function(){
+      img.alt = fig.dataset.alt || "";
+      img.loading = "lazy";
+      /* Screenshots are assumed to be Retina (2x) captures; add data-scale="1" to a figure for 1x images. */
+      var scale = parseFloat(fig.dataset.scale) || 2;
+      img.style.maxWidth = Math.round(img.naturalWidth / scale) + "px";
+      var frame = fig.querySelector(".shot-frame");
+      frame.appendChild(img);
+      fig.classList.add("has-image");
+      li.classList.add("found");
+    });
+    img.src = fig.dataset.src;
+  });
+
+  /* ---------- Panel explorer ---------- */
+  var panelInfo = {
+    sources: "<h4>Sources panel</h4><p>Holds everything the AI is allowed to use: files, links, pasted text, and notes you convert. Check or uncheck sources to control what the chat and Studio draw from. Use Fast or Deep Research here to discover new sources.</p>",
+    chat: "<h4>Chat panel</h4><p>Ask questions in plain language and get answers with clickable citations. Change the style to Default, Learning Guide, or Custom, adjust length, and save good answers as notes.</p>",
+    studio: "<h4>Studio panel</h4><p>Generates finished materials from your checked sources: Audio and Video Overviews, Mind Maps, Reports, Flashcards, Quizzes, Slide Decks, Infographics, and Data Tables. Saved notes live here too.</p>"
+  };
+  var panelBtns = document.querySelectorAll(".panel-btn");
+  var panelDetail = document.getElementById("panelDetail");
+  function showPanel(k){
+    panelBtns.forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.panel===k ? "true" : "false"); });
+    panelDetail.innerHTML = panelInfo[k];
+  }
+  panelBtns.forEach(function(b){ b.addEventListener("click", function(){ showPanel(b.dataset.panel); }); });
+  showPanel("sources");
+
+  /* ---------- Tabs ---------- */
+  document.querySelectorAll("[data-tabs]").forEach(function(group){
+    var tabs = Array.prototype.slice.call(group.querySelectorAll('[role="tab"]'));
+    function activate(tab, focus){
+      tabs.forEach(function(t){
+        var sel = t===tab;
+        t.setAttribute("aria-selected", sel ? "true" : "false");
+        t.tabIndex = sel ? 0 : -1;
+        document.getElementById(t.getAttribute("aria-controls")).hidden = !sel;
+      });
+      if (focus) tab.focus();
+    }
+    tabs.forEach(function(t,i){
+      t.addEventListener("click", function(){ activate(t,false); });
+      t.addEventListener("keydown", function(e){
+        var idx = null;
+        if (e.key==="ArrowRight") idx=(i+1)%tabs.length;
+        else if (e.key==="ArrowLeft") idx=(i-1+tabs.length)%tabs.length;
+        else if (e.key==="Home") idx=0;
+        else if (e.key==="End") idx=tabs.length-1;
+        if (idx!==null){ e.preventDefault(); activate(tabs[idx],true); }
+      });
+    });
+  });
+
+  /* ---------- Output chooser ---------- */
+  var goals = {
+    commute: ["Audio Overview (The Brief or Deep Dive)", "Download the audio so students can listen offline. Use The Brief for a two-minute recap, or Deep Dive for a fuller walk-through."],
+    visual: ["Video Overview (Explainer)", "An Explainer video shows diagrams and key points alongside narration. Choose Whiteboard or Classic for a clean instructional look."],
+    practice: ["Quiz and Flashcards", "Both track progress and let students review only what they missed. Set difficulty to match where students are."],
+    bigpicture: ["Mind Map", "A branching map of themes. Students can click any node to ask the chat about that topic."],
+    present: ["Slide Deck (Presenter slides)", "Revise individual slides by prompt, then download as PowerPoint to edit or present."],
+    compare: ["Data Table or a Report", "A Data Table lines up facts across sources and exports to Sheets. A Document report gives a written comparison."],
+    feedback: ["Audio Overview (The Critique)", "Upload your own draft as the source. Two hosts give a constructive review you can listen to."]
+  };
+  var chips = document.querySelectorAll("#chooser .chip");
+  var chooserResult = document.getElementById("chooserResult");
+  chips.forEach(function(c){
+    c.addEventListener("click", function(){
+      chips.forEach(function(x){ x.setAttribute("aria-pressed", x===c ? "true" : "false"); });
+      var g = goals[c.dataset.goal];
+      chooserResult.innerHTML = "<h4 style=\"margin-top:0\"></h4><p style=\"margin:0\"></p>";
+      chooserResult.querySelector("h4").textContent = "Try: " + g[0];
+      chooserResult.querySelector("p").textContent = g[1];
+    });
+  });
+
+  /* ---------- Visual style chooser ---------- */
+  var styles = {
+    "Classic": "Clean, conventional explainer visuals. A safe default for most course content.",
+    "Whiteboard": "Hand-drawn diagram look, like a teacher sketching. Good for processes and step-by-step concepts.",
+    "Watercolor": "Soft painted illustrations. Suits humanities, history, and reflective topics.",
+    "Retro Print": "Vintage printed-poster look. Adds personality to history or design topics.",
+    "Heritage": "Classic, archival feel. Works for historical or cultural material.",
+    "Paper-craft": "Cut-paper, layered look. Friendly and approachable for introductory topics.",
+    "Kawaii": "Cute, rounded characters. Playful; test with your audience before using in class.",
+    "Anime": "Anime-inspired illustration. Can boost engagement for some audiences.",
+    "Auto": "Let Gemini Notebook pick a style based on your sources.",
+    "Custom": "Describe your own look in words, for example \"flat icons in navy and gold, minimal text.\""
+  };
+  var sChips = document.querySelectorAll("#styleChooser .chip");
+  var styleResult = document.getElementById("styleResult");
+  sChips.forEach(function(c){
+    c.addEventListener("click", function(){
+      sChips.forEach(function(x){ x.setAttribute("aria-pressed", x===c ? "true" : "false"); });
+      styleResult.innerHTML = "<p style=\"margin:0\"><strong></strong> <span></span></p>";
+      styleResult.querySelector("strong").textContent = (c.dataset.style==="Auto" ? "Auto-select" : c.dataset.style) + ":";
+      styleResult.querySelector("span").textContent = styles[c.dataset.style];
+    });
+  });
+
+  /* ---------- Prompt builders ---------- */
+  function val(id){ return document.getElementById(id).value.trim(); }
+  function buildAudio(){
+    var fmt = val("aFormat"), aud = val("aAudience"), focus = val("aFocus"), extra = val("aExtra"), len = val("aLength");
+    var lines = [];
+    if (fmt==="The Brief") lines.push("Give a quick summary for " + aud + ".");
+    else if (fmt==="The Critique") lines.push("Review this material as experienced reviewers would, for " + aud + ". Point out strengths first, then the most important improvements.");
+    else if (fmt==="The Debate") lines.push("Hold a respectful debate for " + aud + ", with each host arguing a different position using evidence from the sources.");
+    else lines.push("Explain these sources to " + aud + ". Define key terms the first time they come up and use one concrete example.");
+    if (focus) lines.push("Focus mainly on " + focus + ".");
+    lines.push("Stick closely to what the sources say.");
+    if (extra) lines.push(extra.charAt(0).toUpperCase() + extra.slice(1) + (/[.!?]$/.test(extra) ? "" : "."));
+    document.getElementById("aOut").textContent = lines.join(" ");
+    var notes = ["Choose \"" + fmt + "\" and length \"" + len + "\" in the customize panel, then paste this prompt."];
+    if (len!=="Default") notes.push("Length control is English only.");
+    if (fmt!=="Deep Dive") notes.push("Interactive mode needs a Deep Dive.");
+    document.getElementById("aNote").textContent = notes.join(" ");
+  }
+  function buildVideo(){
+    var fmt = val("vFormat"), style = val("vStyle"), aud = val("vAudience"), focus = val("vFocus"), extra = val("vExtra");
+    var lines = [];
+    if (fmt==="Short") lines.push("Make a quick, punchy summary of the single most important idea for " + aud + ".");
+    else if (fmt==="Cinematic") lines.push("Tell the story of these sources for " + aud + ", building from the problem to the key insight.");
+    else lines.push("Create a clear, structured explainer for " + aud + ". Use diagrams for processes and show key terms on screen.");
+    if (focus) lines.push("Focus on " + focus + ".");
+    lines.push("Keep on-screen text short and accurate to the sources.");
+    if (extra) lines.push(extra.charAt(0).toUpperCase() + extra.slice(1) + (/[.!?]$/.test(extra) ? "" : "."));
+    document.getElementById("vOut").textContent = lines.join(" ");
+    var n = [];
+    if (fmt==="Explainer") n.push("Choose Explainer and the " + style + " style, then paste this into the steering prompt.");
+    else n.push(fmt + " videos choose their own look, so the style setting won't apply. Available to users 18+" + (fmt==="Cinematic" ? ", English only, on higher-tier plans." : "; rolled out to paid plans first."));
+    if (style==="Custom" && fmt==="Explainer") n.push("For Custom, also describe the look in the style box.");
+    document.getElementById("vNote").textContent = n.join(" ");
+  }
+  ["aFormat","aAudience","aLength","aFocus","aExtra"].forEach(function(id){ var el=document.getElementById(id); el.addEventListener("input", buildAudio); el.addEventListener("change", buildAudio); });
+  ["vFormat","vStyle","vAudience","vFocus","vExtra"].forEach(function(id){ var el=document.getElementById(id); el.addEventListener("input", buildVideo); el.addEventListener("change", buildVideo); });
+  buildAudio(); buildVideo();
+
+  /* ---------- Copy helper ---------- */
+  function copyText(text, btn){
+    var original = btn.textContent;
+    function done(ok){ btn.textContent = ok ? "Copied" : "Select and copy manually"; setTimeout(function(){ btn.textContent = original; }, 1800); }
+    if (navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(text).then(function(){ done(true); }, function(){ fallback(); });
+    } else fallback();
+    function fallback(){
+      try {
+        var ta = document.createElement("textarea");
+        ta.value = text; ta.setAttribute("readonly",""); ta.style.position="absolute"; ta.style.left="-9999px";
+        document.body.appendChild(ta); ta.select();
+        var ok = document.execCommand("copy");
+        document.body.removeChild(ta); done(ok);
+      } catch(e){ done(false); }
+    }
+  }
+  document.getElementById("aCopy").addEventListener("click", function(){ copyText(document.getElementById("aOut").textContent, this); });
+  document.getElementById("vCopy").addEventListener("click", function(){ copyText(document.getElementById("vOut").textContent, this); });
+
+  /* ---------- Prompt library ---------- */
+  var library = [
+    ["a","Audio","Beginner-friendly Deep Dive","Explain these sources to students who have never studied [topic]. Define every technical term, use an everyday analogy for the hardest idea, and end with a one-sentence summary."],
+    ["a","Audio","Exam review","Act as tutors helping students review for an exam on [topic]. Emphasize the concepts most likely to be tested and common mistakes to avoid."],
+    ["a","Audio","Critique my draft","Review this draft [syllabus / assignment / proposal] as experienced instructors. Start with strengths, then give the three most important, specific improvements."],
+    ["a","Audio","Structured debate","Debate whether [claim]. Each host should use evidence from the sources and acknowledge the strongest point on the other side."],
+    ["a","Audio","Career connection","Discuss how the ideas in these sources are used on the job by [role]. Include two realistic workplace scenarios."],
+    ["a","Audio","Other-language recap","Give a clear summary for students learning in [language] as a second language. Speak plainly and repeat key terms."],
+    ["v","Video","Step-by-step process","Create an explainer that walks through [process] one step at a time, with a simple diagram for each step."],
+    ["v","Video","Compare and contrast","Compare [A] and [B] side by side. Show the similarities first, then the key differences in a table-style visual."],
+    ["v","Video","Case-based intro","Open with a short real-world problem about [topic], then explain the concepts from the sources that solve it."],
+    ["v","Video","60-second hook","Summarize the single most surprising idea in these sources in a way that makes a student want to learn more."],
+    ["o","Chat","Build a lesson plan","Using only these sources, draft a 50-minute lesson plan on [topic] with objectives, an opening question, an activity, and an exit ticket."],
+    ["o","Quiz","Application questions","Write questions that ask students to apply concepts to new situations rather than recall definitions."]
+  ];
+  var lib = document.getElementById("promptLib");
+  library.forEach(function(p){
+    var d = document.createElement("div"); d.className="prompt";
+    var top = document.createElement("div"); top.className="prompt-top";
+    var b = document.createElement("b"); b.textContent = p[2] + " ";
+    var pill = document.createElement("span"); pill.className = "pill " + p[0]; pill.textContent = p[1];
+    b.appendChild(pill);
+    var btn = document.createElement("button"); btn.className="btn ghost copy"; btn.textContent="Copy"; btn.dataset.copy = p[3];
+    btn.setAttribute("aria-label","Copy prompt: " + p[2]);
+    top.appendChild(b); top.appendChild(btn);
+    var q = document.createElement("blockquote"); q.textContent = p[3];
+    d.appendChild(top); d.appendChild(q); lib.appendChild(d);
+  });
+  document.querySelectorAll(".copy").forEach(function(btn){
+    btn.addEventListener("click", function(){ copyText(btn.dataset.copy, btn); });
+  });
+
+  /* ---------- Labs ---------- */
+  document.querySelectorAll("[data-lab]").forEach(function(lab){
+    var id = lab.dataset.lab;
+    var boxes = Array.prototype.slice.call(lab.querySelectorAll('input[type="checkbox"]'));
+    var count = lab.querySelector(".lab-count");
+    var saved = state.labs[id] || [];
+    boxes.forEach(function(b,i){ b.checked = !!saved[i]; });
+    function update(){
+      var vals = boxes.map(function(b){ return b.checked; });
+      state.labs[id] = vals; save();
+      var n = vals.filter(Boolean).length;
+      count.textContent = n + " of " + boxes.length + " steps done";
+    }
+    boxes.forEach(function(b){ b.addEventListener("change", update); });
+    var n0 = boxes.filter(function(b){ return b.checked; }).length;
+    count.textContent = n0 + " of " + boxes.length + " steps done";
+  });
+
+  /* ---------- Quiz ---------- */
+  var questions = [
+    {q:"What is the relationship between NotebookLM and Gemini Notebook?", a:"They're the same product; NotebookLM was renamed in July 2026.", w:["Gemini Notebook replaced NotebookLM, and old notebooks must be migrated.","NotebookLM is the free version and Gemini Notebook is the paid version.","They are separate tools that share a login."], e:"It's a rename. Existing notebooks and links keep working."},
+    {q:"You want an Audio Overview of only Chapter 3, but your notebook has five chapters. What should you do?", a:"Check only the Chapter 3 source before generating.", w:["Delete the other four sources permanently.","Create the audio, then trim it in an editor.","Ask the chat to forget the other chapters."], e:"Studio outputs use only the sources that are checked."},
+    {q:"Which audio format gives a single-speaker summary in under two minutes?", a:"The Brief", w:["Deep Dive","The Critique","The Debate"], e:"The Brief uses one speaker for a quick overview."},
+    {q:"You uploaded your own draft syllabus and want feedback on it. Which audio format fits best?", a:"The Critique", w:["The Brief","The Debate","Deep Dive"], e:"The Critique gives a constructive evaluation of material like your own draft."},
+    {q:"Why might the Join button be missing from an Audio Overview?", a:"Interactive mode needs a newly generated Deep Dive in English.", w:["Join only appears on the mobile app.","You must download the audio first.","Join only works on Video Overviews."], e:"Interactive mode currently works on new Deep Dive overviews, in English."},
+    {q:"Which video format lets you choose a visual style such as Whiteboard or Watercolor?", a:"Explainer", w:["Cinematic","Short","All three formats"], e:"Cinematic and Short choose their own look; style presets apply to Explainer."},
+    {q:"Your Video Overview is still generating after 20 minutes. What's the best move?", a:"Keep working or leave; it continues in the background.", w:["Refresh the page repeatedly to speed it up.","Delete it and start over.","Stay on the video tile or it will cancel."], e:"Videos generate in the background and can take more than 30 minutes."},
+    {q:"Your school uses Microsoft 365 and students don't have Google accounts. What's the best way to give them an Audio Overview?", a:"Download it and post the file in your LMS, OneDrive, or Teams.", w:["Have every student create a Google account to open the notebook.","Share a public link from your school Microsoft account.","Upload your class roster so Gemini Notebook can invite students."], e:"Downloading lets students listen without a Google account, and no student data leaves your systems."},
+    {q:"Which is the most responsible way to use a generated video with students?", a:"Watch it fully, verify facts against sources, add captions, and tell students it's AI-generated.", w:["Post it right away because it only uses your sources.","Use it only if it has no visual glitches.","Share the notebook publicly so students can regenerate it."], e:"Grounding reduces errors but doesn't eliminate them, so review and disclose."}
+  ];
+  function shuffle(arr){ var a=arr.slice(); for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+  var quizEl = document.getElementById("quiz");
+  var scoreEl = document.getElementById("quizScore");
+  var answered, correct;
+  function renderQuiz(){
+    quizEl.innerHTML = ""; answered = 0; correct = 0; scoreEl.textContent = "";
+    shuffle(questions).forEach(function(item, qi){
+      var box = document.createElement("div"); box.className="q";
+      var fs = document.createElement("fieldset");
+      var lg = document.createElement("legend"); lg.textContent = (qi+1) + ". " + item.q;
+      fs.appendChild(lg);
+      var opts = shuffle([item.a].concat(item.w));
+      var fb = document.createElement("p"); fb.className="fb"; fb.hidden = true; fb.setAttribute("aria-live","polite");
+      opts.forEach(function(o, oi){
+        var lab = document.createElement("label");
+        var inp = document.createElement("input"); inp.type="radio"; inp.name="q"+qi; inp.value=o;
+        var sp = document.createElement("span"); sp.textContent = o;
+        lab.appendChild(inp); lab.appendChild(sp); fs.appendChild(lab);
+        inp.addEventListener("change", function(){
+          var right = o===item.a;
+          fs.querySelectorAll("input").forEach(function(x){ x.disabled = true; });
+          fb.hidden = false;
+          fb.className = "fb " + (right ? "right" : "wrong");
+          fb.textContent = (right ? "Correct. " : "Not quite. The answer is: " + item.a + " ") + item.e;
+          answered++; if (right) correct++;
+          if (answered===questions.length) scoreEl.textContent = "You scored " + correct + " out of " + questions.length + ".";
+        });
+      });
+      fs.appendChild(fb); box.appendChild(fs); quizEl.appendChild(box);
+    });
+  }
+  renderQuiz();
+  document.getElementById("quizReset").addEventListener("click", renderQuiz);
+
+
+  /* ---------- After the workshop activities ---------- */
+  var TIME = {quick:"Under 30 minutes", build:"1–2 hours", project:"Half a day or ongoing"};
+  var GOAL = {prep:"Course preparation", access:"Student support and access", assess:"Assessment and practice", active:"Active learning", pro:"Professional practice"};
+  var WEEK = {1:"Week 1: Quick wins", 2:"Week 2: Build a home base", 3:"Week 3: Go deeper", 4:"Week 4: Bring students in"};
+  var NOACCT = "No student accounts needed. Students only use files you post.";
+  var ACCT = "Students need a Google account. At a Microsoft school, make this optional or use a no-account activity instead. At a Google school, share the notebook with students inside your domain.";
+  var acts = [
+    {id:"f-recap", who:"f", time:"quick", goal:"access", week:1, t:"Post a weekly audio recap",
+     d:"Turn one week's notes or slides into a short audio summary students can play on the commute or at work.",
+     steps:["Create a notebook with one week's lecture notes, slides, or readings.","In Studio, customize an Audio Overview and choose The Brief.","Paste the prompt below, generate, and listen once for accuracy.","Download the file and post it in your LMS with the note below."],
+     p:"Summarize this week's material for community college students who missed class or want a review. Focus on the three ideas they need for next week, and define any technical terms in plain language.",
+     tell:"This week's audio recap (about 2 minutes) covers the key ideas you need before our next class. It was generated with AI from our course materials and checked by me. If anything sounds different from what we covered in class, go with the class notes and let me know."},
+    {id:"f-quiz", who:"f", time:"quick", goal:"assess", week:1, t:"Draft a practice quiz, then fix it",
+     d:"Generate a practice quiz from a reading and edit it. You'll learn quickly where the AI gets things right and wrong.",
+     steps:["Add one reading or chapter as a source.","In Studio, create a Quiz and choose Medium difficulty.","Use the prompt below in the customize box.","Rewrite or delete questions that test trivia or miss the point, then rebuild the quiz in your LMS."],
+     p:"Write questions that ask students to apply the main concepts to new, realistic situations from everyday life or the workplace, rather than recall definitions. Include one question about a common misconception.",
+     tell:"This ungraded practice quiz helps you check your understanding before the exam. Take it as many times as you like."},
+    {id:"f-map", who:"f", time:"quick", goal:"prep", week:0, t:"Map a unit to find gaps",
+     d:"A mind map of a whole unit shows how topics connect and what might be missing or out of order.",
+     steps:["Add all materials for one unit: syllabus section, slides, readings.","Generate a Mind Map from Studio.","Compare the branches to your course outcomes. Note any outcome with no branch, or a branch you never assess.","Ask the chat the prompt below to check your sequence."],
+     p:"Based on these sources, what order should a beginner learn these topics in, and which topics depend on others? Flag anything that seems to be missing for a first-year student."},
+    {id:"f-companion", who:"f", time:"build", goal:"prep", week:2, t:"Build a course companion notebook",
+     d:"One notebook per course becomes your home base for making study guides, FAQs, and review materials all semester.",
+     steps:["Add your syllabus, course outcomes, open textbook chapters, and your own notes. Leave out anything with student information.","Configure chat with the Custom style and paste the prompt below.","Ask it for a study guide for the first unit, and save good answers as notes.","Add new materials as the semester goes on."],
+     p:"You are helping an instructor at a two-year college prepare materials for this course. Answer only from the sources, use plain language suited to first-year students, and always point out which source an idea came from.",
+     tell:"I've prepared study guides for each unit using an AI tool built on our course materials. I review each one before posting, but if you find an error, please tell me."},
+    {id:"f-oer", who:"f", time:"build", goal:"prep", week:3, t:"Find open resources with Deep Research",
+     d:"Look for free, openly licensed readings to replace or supplement a costly text for one unit.",
+     steps:["In the Sources panel, choose Deep Research and use the prompt below.","Read the report, then import only the sources that look promising.","Open each one and confirm its license (for example, Creative Commons) and accuracy before adopting it.","Check with your library or OER coordinator for help reviewing options."],
+     p:"Find openly licensed or free-to-use educational resources (OER, open textbooks, .edu and .gov materials) that teach [topic] at an introductory college level. Include the license where it's stated.",
+     note:"Deep Research finds candidates; it doesn't guarantee licensing. Always confirm the license on the original site."},
+    {id:"f-video", who:"f", time:"build", goal:"access", week:3, t:"Explain the toughest concept on video",
+     d:"Every course has one concept students struggle with. Give them a narrated visual explanation to watch as many times as they need.",
+     steps:["Add only the sources about that one concept, plus notes on where students usually get stuck.","Create an Explainer Video Overview and pick a visual style (Whiteboard works well for step-by-step ideas).","Use the steering prompt below. Generation can take 30 minutes or more.","Watch it all the way through, then download and post it with captions if your LMS supports them."],
+     p:"Explain [concept] step by step for students seeing it for the first time. Use one concrete everyday example throughout, and address this common misunderstanding: [misconception].",
+     tell:"Here's a short video on [concept], one of the trickiest ideas in this course. It was made with AI from our course materials and reviewed by me. Watch it before class and bring one question."},
+    {id:"f-debate", who:"f", time:"quick", goal:"active", week:0, t:"Open a discussion with a debate",
+     d:"A Debate Audio Overview gives students two positions to react to before a class discussion or discussion board.",
+     steps:["Add sources that present different views on a question in your field.","Create an Audio Overview in The Debate format with the prompt below.","Listen for balance and accuracy, then download and post it.","Pair it with the student assignment in the 'Respond to a debate' activity."],
+     p:"Debate the question: [question]. Each host should use evidence from the sources, acknowledge the strongest point on the other side, and avoid personal attacks."},
+    {id:"f-lang", who:"f", time:"quick", goal:"access", week:0, t:"Offer an overview in another language",
+     d:"Support students who are still building English skills by giving them a summary in their stronger language, alongside the English original.",
+     steps:["Pick a unit overview you've already made in English.","Generate the same Audio Overview or Infographic with the output language set to [language].","Ask a colleague or student who speaks the language to spot-check it if you can.","Post both versions together."],
+     p:"Explain the main ideas for students who are learning English, and keep the key technical terms in English with a short explanation so students learn the vocabulary used in class.",
+     tell:"This summary is also available in [language]. Use it to preview the ideas, then use the English version to learn the terms we'll use in class and on exams."},
+    {id:"f-refresher", who:"f", time:"build", goal:"access", week:0, t:"Create a prerequisite refresher",
+     d:"Help students who have been away from school fill gaps in the skills your course assumes, like algebra, lab safety, or citation basics.",
+     steps:["List the prerequisite skills your course relies on.","Add open resources that teach those skills.","Generate Flashcards and a short Brief audio for each skill.","Post them as an optional 'start here' module in week 1."],
+     p:"Create a review for adult learners returning to school after a long break. Assume no recent practice, build confidence, and use one worked example per skill.",
+     tell:"If it's been a while since you've used [skill], start with this optional refresher. It's there to help, not to grade you."},
+    {id:"f-guide", who:"f", time:"quick", goal:"prep", week:0, t:"Turn your notes into a study guide and glossary",
+     d:"Use Reports to turn your own lecture notes into a clean study guide with key terms.",
+     steps:["Add your lecture notes for one unit.","In Studio, open Reports and choose the Study Guide template.","Add the prompt below, then edit the result for accuracy and tone.","Export or copy it into your LMS page."],
+     p:"Include a glossary of key terms with plain-language definitions, three short-answer review questions, and one real-world example for each main idea."},
+    {id:"f-program", who:"f", time:"project", goal:"pro", week:0, t:"Ask questions across program documents",
+     d:"Program reviews, advisory board minutes, and transfer agreements are long. Load them together and ask questions across all of them.",
+     steps:["Gather non-confidential program documents, such as course outlines, outcome maps, advisory minutes, and transfer guides.","Create one notebook for the program.","Ask the prompt below and follow the citations to check each answer.","Save useful answers as notes for your next program review."],
+     p:"Which program outcomes are mentioned most and least across these documents? Which industry or transfer needs raised in the advisory minutes are not clearly addressed in the course outlines?",
+     note:"Leave out anything with student names, grades, or personnel information, especially on a personal account."},
+    {id:"f-colleague", who:"f", time:"project", goal:"pro", week:0, t:"Build materials with a colleague",
+     d:"Share a notebook with someone who teaches the same course so you can build a common set of review materials.",
+     steps:["Create a notebook with the shared course outline and common readings.","Share it with your colleague with Editor access.","Agree on one output each to create, such as a quiz and an audio recap.","Compare results and agree on what to post in both sections."],
+     p:"Compare how these sources treat [topic] and suggest a common set of five key ideas that every section of this course should cover.",
+     note:"Your colleague needs a Google account too. On personal accounts you can also share by link; school Google accounts share only inside the school."},
+    {id:"f-test", who:"f", time:"quick", goal:"assess", week:4, t:"Test your own assignment against AI",
+     d:"See what AI can produce from your course materials, then adjust assignments so they reward thinking students have to show.",
+     steps:["Add your assignment instructions and the readings it uses.","Ask the chat to complete the assignment with the prompt below.","Compare its answer to your rubric. Where would it score well?","Revise the assignment to add personal reflection, local context, in-class steps, or a process checkpoint."],
+     p:"Complete this assignment using only these sources, as a strong student would. Then list which parts of the assignment were easiest and hardest for you to complete from the sources alone."},
+    {id:"s-critique", who:"s", time:"quick", goal:"assess", week:2, acct:false, t:"Students critique an Audio Overview",
+     d:"Students listen to an AI summary of material they know and find what it got wrong, oversimplified, or left out.",
+     steps:["Generate an Audio Overview of a reading students have already done.","Post the audio file with the assignment below.","In class or on a discussion board, compare what students found.","Talk about why AI summaries need checking."],
+     p:"Summarize this reading for students, and include at least one simplification a specialist might question.",
+     assign:"Listen to the attached AI-generated audio summary of [reading]. Then write 200–300 words that answer: (1) What did the summary get right? (2) Identify at least two places where it oversimplified, left something out, or got something wrong. Quote the reading to support each point. (3) Would you trust this summary to study from? Why or why not?"},
+    {id:"s-compare", who:"s", time:"build", goal:"active", week:4, acct:false, t:"Compare an AI summary with the source",
+     d:"Students read a source and an AI-generated report side by side, building close-reading and information-literacy skills.",
+     steps:["Generate a Briefing Doc report from one source.","Post both the source and the report.","Students complete the assignment below.","Debrief on what readers lose when they rely on summaries."],
+     p:"Write a one-page briefing on this source for a busy reader.",
+     assign:"Read [source] and the attached AI-generated briefing. Create a two-column table: in the left column, list five important points from the original; in the right, note whether the briefing includes each one accurately, partly, or not at all. End with a short paragraph on what a reader would miss if they read only the briefing."},
+    {id:"s-debate", who:"s", time:"quick", goal:"active", week:0, acct:false, t:"Respond to a debate",
+     d:"Students listen to a Debate Audio Overview and build their own argument, using evidence from the original sources.",
+     steps:["Create the debate audio (see 'Open a discussion with a debate').","Post it with the assignment below.","Use responses to seed a class discussion."],
+     p:"Debate the question: [question], using evidence from the sources.",
+     assign:"Listen to the attached debate on [question]. Choose the position you find more convincing, or propose a third. In 250 words, explain your position using at least two pieces of evidence from the course readings (not from the audio), and respond to the strongest point on the other side."},
+    {id:"s-tutor", who:"s", time:"build", goal:"assess", week:0, acct:true, t:"Study with a shared Learning Guide notebook",
+     d:"Share a course notebook set to the Learning Guide style so students can ask questions and get guided help grounded in your materials.",
+     steps:["Build a course companion notebook (see that activity) with only materials you're comfortable sharing.","Configure chat to Learning Guide.","Share the notebook with students as Viewers.","Post the assignment below and review student reflections."],
+     p:"Help students work through problems step by step. Ask a guiding question before giving the answer, and point to the source for each idea.",
+     assign:"Before the exam, use the course study notebook for at least 20 minutes. Ask it about two topics you find difficult. Then write a short reflection: What did you ask? Which answer helped most, and did you check it against the cited source? What do you still need help with?"},
+    {id:"s-build", who:"s", time:"project", goal:"active", week:0, acct:true, t:"Students build and evaluate their own notebook",
+     d:"Students gather sources on a project topic, create an output, and evaluate it. This builds research, source evaluation, and AI literacy skills together.",
+     steps:["Students choose a topic and find three to five credible sources.","They create a notebook and generate one output: an audio overview, video, or infographic.","They check it against their sources.","They submit the output file plus the reflection below."],
+     p:"Create an overview of these sources for classmates who haven't read them. Point out where the sources agree and disagree.",
+     assign:"For your project topic, find 3–5 credible sources and add them to a Gemini Notebook. Generate one output (audio, video, or infographic) and download it. Submit: (1) the output, (2) a list of your sources with one sentence on why each is credible, and (3) a 300-word evaluation of the output: what it got right, what you had to correct, and what you learned that the AI didn't capture. Don't upload any personal information about yourself or others."}
+  ];
+
+  var afterList = document.getElementById("afterList");
+  var afterCount = document.getElementById("afterCount");
+  var view = "time", who = "all";
+  state.acts = state.acts || {};
+
+  function el(tag, cls, text){ var e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
+  function copyBlock(label, text){
+    var d = el("div","prompt");
+    var top = el("div","prompt-top");
+    top.appendChild(el("b",null,label));
+    var btn = el("button","btn ghost act-copy","Copy");
+    btn.dataset.copy = text; btn.setAttribute("aria-label","Copy " + label.toLowerCase());
+    top.appendChild(btn); d.appendChild(top);
+    d.appendChild(el("blockquote",null,text));
+    return d;
+  }
+  function card(a){
+    var c = el("article","act" + (state.acts[a.id] ? " is-done" : ""));
+    var head = el("div","act-head");
+    var h = el("h4",null,a.t);
+    head.appendChild(h);
+    var lab = el("label","act-done");
+    var cb = document.createElement("input"); cb.type="checkbox"; cb.checked=!!state.acts[a.id];
+    cb.setAttribute("aria-label","Mark done: " + a.t);
+    cb.addEventListener("change", function(){ state.acts[a.id]=cb.checked; c.classList.toggle("is-done", cb.checked); save(); updateCount(); });
+    lab.appendChild(cb); lab.appendChild(document.createTextNode(" Done"));
+    head.appendChild(lab);
+    c.appendChild(head);
+    var tags = el("div","act-tags");
+    tags.appendChild(el("span","pill who-" + a.who, a.who==="f" ? "For your prep" : "With students"));
+    tags.appendChild(el("span","pill",TIME[a.time]));
+    tags.appendChild(el("span","pill",GOAL[a.goal]));
+    c.appendChild(tags);
+    c.appendChild(el("p",null,a.d));
+    if (a.who==="s") c.appendChild(el("p","acct " + (a.acct ? "need" : "none"), a.acct ? ACCT : NOACCT));
+    var det = document.createElement("details");
+    det.appendChild(el("summary",null,"Steps, prompt" + (a.assign ? ", and assignment" : a.tell ? ", and note to students" : "")));
+    var ol = el("ol","act-steps");
+    a.steps.forEach(function(s){ ol.appendChild(el("li",null,s)); });
+    det.appendChild(ol);
+    det.appendChild(copyBlock("Prompt", a.p));
+    if (a.assign) det.appendChild(copyBlock("Assignment language", a.assign));
+    if (a.tell) det.appendChild(copyBlock("Note to students (for your LMS)", a.tell));
+    if (a.note) det.appendChild(el("p","small act-note",a.note));
+    c.appendChild(det);
+    return c;
+  }
+  function updateCount(){
+    var shown = acts.filter(function(a){ return who==="all" || a.who===who; });
+    if (view==="week") shown = shown.filter(function(a){ return a.week; });
+    var done = shown.filter(function(a){ return state.acts[a.id]; }).length;
+    afterCount.textContent = "Showing " + shown.length + " activities. " + done + " done.";
+  }
+  function renderActs(){
+    afterList.innerHTML = "";
+    var keys = view==="time" ? Object.keys(TIME) : view==="goal" ? Object.keys(GOAL) : ["1","2","3","4"];
+    var labels = view==="time" ? TIME : view==="goal" ? GOAL : WEEK;
+    keys.forEach(function(k){
+      var items = acts.filter(function(a){
+        var match = view==="time" ? a.time===k : view==="goal" ? a.goal===k : String(a.week)===k;
+        return match && (who==="all" || a.who===who);
+      });
+      if (!items.length) return;
+      var grp = el("div","act-group");
+      grp.appendChild(el("h3",null,labels[k]));
+      var grid = el("div","act-grid");
+      items.forEach(function(a){ grid.appendChild(card(a)); });
+      grp.appendChild(grid);
+      afterList.appendChild(grp);
+    });
+    if (view==="week") afterList.appendChild(el("p","small","The challenge uses eight of the activities, two per week. Switch to Time needed or Goal to see them all."));
+    if (!afterList.children.length) afterList.appendChild(el("p",null,"No activities match this filter."));
+    updateCount();
+  }
+  afterList.addEventListener("click", function(e){
+    var btn = e.target.closest(".act-copy");
+    if (btn) copyText(btn.dataset.copy, btn);
+  });
+  document.querySelectorAll("[data-view]").forEach(function(b){
+    b.addEventListener("click", function(){
+      view = b.dataset.view;
+      document.querySelectorAll("[data-view]").forEach(function(x){ x.setAttribute("aria-pressed", String(x===b)); });
+      renderActs();
+    });
+  });
+  document.querySelectorAll("[data-who]").forEach(function(b){
+    b.addEventListener("click", function(){
+      who = b.dataset.who;
+      document.querySelectorAll("[data-who]").forEach(function(x){ x.setAttribute("aria-pressed", String(x===b)); });
+      renderActs();
+    });
+  });
+  renderActs();
+
+  /* ---------- Next step + reset ---------- */
+  var nextStep = document.getElementById("nextStep");
+  nextStep.value = state.next || "";
+  nextStep.addEventListener("input", function(){ state.next = nextStep.value; save(); });
+  document.getElementById("resetAll").addEventListener("click", function(){
+    state = {done:{}, labs:{}, next:"", acts:{}, facil:state.facil}; save();
+    document.querySelectorAll('[data-lab] input[type="checkbox"]').forEach(function(b){ b.checked=false; });
+    document.querySelectorAll(".lab-count").forEach(function(c){ var n=c.closest("[data-lab]").querySelectorAll('input[type="checkbox"]').length; c.textContent = "0 of " + n + " steps done"; });
+    nextStep.value = ""; renderProgress(); renderQuiz(); renderActs();
+  });
+})();
+</script>
+</body>
+</html>
