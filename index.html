@@ -9,9 +9,8 @@
   HOW TO UPDATE THIS PAGE
   Each workshop is an <article class="ws"> below.
   - When materials are ready: set data-ready="true", replace the "coming soon" <span> with a link
-    (<a class="btn" href="your-file.html">Open workshop materials</a>), and update the "In this session" list.
+    (<a class="btn" href="your-file.html" target="_blank" rel="noopener">Open workshop materials <span class="newtab">(opens in new tab)</span> <span aria-hidden="true">↗</span></a>), and update the "In this session" list.
   - data-date (YYYY-MM-DD) drives the automatic "Next up" and "Completed" labels.
-  - Replace the TBA text in the series details bar when time and location are set.
   Keep this file in the same folder as the workshop HTML files.
 -->
 <style>
@@ -102,6 +101,7 @@ h2{font-family:var(--font-head);font-size:clamp(1.4rem,1.2rem + .8vw,1.8rem);mar
 .ws ul.placeholder{list-style:none;padding:0}
 .ws ul.placeholder li{background:repeating-linear-gradient(135deg,var(--sunk) 0 10px,transparent 10px 20px);border:1px dashed var(--line);border-radius:var(--r-sm);padding:var(--s2) var(--s3);color:var(--ink-soft);font-family:var(--font-ui);font-size:.85rem}
 .btn{display:inline-flex;align-items:center;gap:var(--s2);min-height:44px;padding:0 var(--s5);border-radius:var(--r-sm);background:var(--accent);color:var(--accent-ink);font-family:var(--font-ui);font-weight:650;text-decoration:none}
+.btn .newtab{font-weight:400;font-size:.8rem;opacity:.85}
 .btn:hover{filter:brightness(1.08)}
 .btn.soon{background:var(--sunk);color:var(--ink-soft);cursor:default}
 @media (max-width:600px){
@@ -129,8 +129,8 @@ html{scroll-behavior:smooth}
     <p class="lede">Four hands-on sessions on using AI to create course materials for any discipline. Each workshop has a self-paced tutorial you can follow during the session or on your own afterward.</p>
 
     <dl class="details-bar">
-      <div><dt>Time:</dt><dd><span class="tba">To be announced</span></dd></div>
-      <div><dt>Location:</dt><dd><span class="tba">To be announced</span></dd></div>
+      <div><dt>Time:</dt><dd>11:45 a.m. – 1:15 p.m.</dd></div>
+      <div><dt>Location:</dt><dd>Gorman Hall South (Cybersecurity Center)</dd></div>
       <div><dt>Length:</dt><dd>90 minutes</dd></div>
       <div><dt>Bring:</dt><dd>A laptop and a few course files you're allowed to share</dd></div>
     </dl>
@@ -163,7 +163,7 @@ html{scroll-behavior:smooth}
         <li>Quizzes, flashcards, mind maps, and other interactive outputs</li>
         <li>Choosing an account and sharing materials with students</li>
       </ul>
-      <a class="btn" href="gemini-notebook-workshop.html">Open workshop materials <span aria-hidden="true">→</span></a>
+      <a class="btn" href="gemini-notebook-workshop.html" target="_blank" rel="noopener">Open workshop materials <span class="newtab">(opens in new tab)</span> <span aria-hidden="true">↗</span></a>
     </div>
   </article>
 
