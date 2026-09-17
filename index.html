@@ -114,6 +114,10 @@ h2{font-family:var(--font-head);font-size:clamp(1.4rem,1.2rem + .8vw,1.8rem);mar
   .date .dd{font-size:1.4rem}
 }
 
+.register{display:flex;flex-wrap:wrap;gap:var(--s4);align-items:center;justify-content:space-between;margin:var(--s4) 0 0;padding:var(--s4) var(--s5);background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--r-md)}
+.register h2{margin:0 0 var(--s2);font-size:1.2rem}
+.register p{margin:0;max-width:60ch;font-size:.97rem}
+.register .btn{flex:0 0 auto}
 .getting-there{display:grid;grid-template-columns:1fr;gap:var(--s4);margin:var(--s4) 0 0;padding:var(--s4);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);scroll-margin-top:var(--s4)}
 @media (min-width:760px){.getting-there{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);align-items:center}}
 .map{margin:0}
@@ -149,6 +153,14 @@ html{scroll-behavior:smooth}
       <div><dt>Length:</dt><dd>90 minutes</dd></div>
       <div><dt>Bring:</dt><dd>A laptop and a few course files you're allowed to share</dd></div>
     </dl>
+
+    <section class="register" aria-labelledby="reg-h">
+      <div>
+        <h2 id="reg-h">Registration is required</h2>
+        <p>Each workshop is limited to <strong>25 participants</strong>, so sign up early. Register once for each session you plan to attend. You will most likely be asked to sign in with your Brookdale credentials.</p>
+      </div>
+      <a class="btn" href="https://brookdalecommcollege.sharepoint.com/:u:/r/sites/TLC/SitePages/AI-Workshops.aspx?d=we7679db8c2f245e791f29cf7927bff31&amp;csf=1&amp;web=1&amp;e=8XhKVl" target="_blank" rel="noopener">Register for a workshop <span class="newtab">(opens in new tab)</span> <span aria-hidden="true">↗</span></a>
+    </section>
 
     <section class="getting-there" id="getting-there" aria-labelledby="gt-h">
       <figure class="map">
