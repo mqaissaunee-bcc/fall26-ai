@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generating Images and Infographics: AI Teaching Workshop Tutorial</title>
+<meta name="description" content="A self-paced, 90-minute tutorial on making accurate, accessible teaching graphics with ChatGPT and Gemini: image generators versus code, prompt anatomy, hands-on labs, review, copyright, and activities to try afterward.">
+<style>
+:root{
+  --paper:#F6F7FB;
+  --surface:#FFFFFF;
+  --sunk:#ECEEF6;
+  --ink:#1A2032;
+  --ink-soft:#4A5268;
+  --line:#D5D9E6;
+  --accent:#4536C9;
+  --accent-soft:#E8E5FB;
+  --accent-ink:#FFFFFF;
+  --audio:#0B6E6D;
+  --audio-soft:#DDF1F0;
+  --video:#9A3412;
+  --video-soft:#FBE9DF;
+  --code:#1D5FA8;
+  --code-soft:#E0ECFA;
+  --bad:#A4262C;
+  --demo-red:#D62728;
+  --demo-green:#2CA02C;
+  --demo-sea:#9CC7E8;
+  --demo-land:#C9B48A;
+  --demo-sun:#F2C14E;
+  --caution:#8A5A00;
+  --caution-soft:#FFF3D6;
+  --ok:#1D6B34;
+  --focus:#1F6FEB;
+  --font-head:"Avenir Next","Segoe UI Variable Display","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+  --font-body:Charter,"Bitstream Charter","Iowan Old Style","Sitka Text",Cambria,Georgia,serif;
+  --font-ui:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-code:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --r-sm:6px; --r-md:12px; --r-lg:20px;
+  --s1:.25rem; --s2:.5rem; --s3:.75rem; --s4:1rem; --s5:1.5rem; --s6:2rem; --s7:3rem; --s8:4.5rem;
+  --measure:70ch;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#12151F;
+    --surface:#1A1F2D;
+    --sunk:#222839;
+    --ink:#E7EAF3;
+    --ink-soft:#AEB5C8;
+    --line:#343B50;
+    --accent:#A99DFF;
+    --accent-soft:#2B2654;
+    --accent-ink:#12151F;
+    --audio:#5FD0CD;
+    --audio-soft:#123433;
+    --video:#F5A47A;
+    --video-soft:#3A2218;
+    --code:#8CBDF5;
+    --code-soft:#172A40;
+    --bad:#FF8A8F;
+    --demo-sea:#2C5B80;
+    --demo-land:#6B5A3A;
+    --demo-sun:#C99A2E;
+    --caution:#F2C45A;
+    --caution-soft:#3A2E12;
+    --ok:#7DD89A;
+    --focus:#7FB2FF;
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:clamp(1rem,.96rem + .2vw,1.1rem);line-height:1.65}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--accent);text-underline-offset:.18em}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:4px}
+.skip-link{position:absolute;left:-999px;top:0;background:var(--ink);color:var(--paper);padding:var(--s3) var(--s4);z-index:100;font-family:var(--font-ui)}
+.skip-link:focus{left:var(--s4);top:var(--s4)}
+h1,h2,h3,h4{font-family:var(--font-head);line-height:1.2;letter-spacing:-.01em;margin:0 0 var(--s3)}
+h2{font-size:clamp(1.6rem,1.3rem + 1.2vw,2.2rem);font-weight:700}
+h3{font-size:clamp(1.15rem,1.05rem + .4vw,1.35rem);font-weight:650;margin-top:var(--s6)}
+h4{font-size:1rem;font-weight:650;margin-top:var(--s5)}
+p,ul,ol{margin:0 0 var(--s4)}
+li{margin-bottom:var(--s2)}
+code,kbd{font-family:var(--font-code);font-size:.88em;background:var(--sunk);padding:.1em .35em;border-radius:4px}
+button{font:inherit}
+
+/* ---------- Top bar ---------- */
+.topbar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);font-family:var(--font-ui)}
+.topbar-inner{display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s4);max-width:1320px;margin:0 auto}
+.brand{font-weight:650;font-size:.95rem;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.progress-wrap{flex:0 0 auto;display:flex;align-items:center;gap:var(--s2);font-size:.85rem;color:var(--ink-soft)}
+@media (max-width:480px){.progress-track{display:none}}
+.progress-track{width:110px;height:8px;background:var(--sunk);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;width:0;background:var(--accent);transition:width .3s}
+.menu-btn{min-height:44px;min-width:44px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--r-sm);padding:0 var(--s3);cursor:pointer}
+@media (min-width:1080px){.menu-btn{display:none}}
+
+/* ---------- Layout ---------- */
+.shell{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:0}
+@media (min-width:1080px){.shell{grid-template-columns:270px minmax(0,1fr)}}
+.sidenav{display:none;font-family:var(--font-ui);font-size:.9rem}
+.sidenav.open{display:block;position:fixed;inset:57px 0 0 0;background:var(--paper);z-index:15;overflow:auto;padding:var(--s4)}
+@media (min-width:1080px){
+  .sidenav,.sidenav.open{display:block;position:sticky;top:42px;height:calc(100vh - 42px);overflow:auto;padding:var(--s5) var(--s4);border-right:1px solid var(--line);right:auto;bottom:auto;left:auto;background:transparent;align-self:start}
+}
+.sidenav ol{list-style:none;padding:0;margin:0}
+.sidenav li{margin:0}
+.sidenav a{display:flex;align-items:center;gap:var(--s2);min-height:44px;padding:var(--s1) var(--s3);border-radius:var(--r-sm);color:var(--ink-soft);text-decoration:none}
+.sidenav a:hover{background:var(--sunk);color:var(--ink)}
+.sidenav a[aria-current="true"]{background:var(--accent-soft);color:var(--ink);font-weight:600}
+.sidenav .tick{flex:0 0 1.2rem;height:1.2rem;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:.7rem;color:transparent}
+.sidenav a.done .tick{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.sidenav .time{margin-left:auto;font-variant-numeric:tabular-nums;font-size:.78rem;color:var(--ink-soft)}
+.nav-label{font-size:.8rem;color:var(--ink-soft);margin:0 0 var(--s2) var(--s3)}
+
+main{padding:0 var(--s4) var(--s8);min-width:0}
+@media (min-width:720px){main{padding:0 var(--s6) var(--s8)}}
+.section{max-width:880px;margin:0 auto;padding-top:var(--s7);scroll-margin-top:60px}
+.section > p,.section > ul,.section > ol,.prose{max-width:var(--measure)}
+.sec-head{display:flex;align-items:baseline;gap:var(--s3);flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:var(--s2);margin-bottom:var(--s5)}
+.sec-head h2{margin:0;flex:1 1 auto}
+.sec-time{font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.lede{font-size:1.12em;color:var(--ink-soft)}
+
+/* ---------- Hero ---------- */
+.hero{max-width:880px;margin:0 auto;padding:var(--s7) 0 var(--s5)}
+.hero-kicker{font-family:var(--font-ui);font-size:.95rem;color:var(--ink-soft);margin-bottom:var(--s3)}
+.hero h1{font-size:clamp(2.2rem,1.4rem + 3.6vw,4rem);font-weight:750;letter-spacing:-.025em;line-height:1.02;margin-bottom:var(--s4)}
+.hero h1 small{display:block;font-size:.42em;font-weight:500;letter-spacing:0;color:var(--ink-soft);margin-top:var(--s3)}
+.transform{margin:var(--s6) 0 var(--s5);display:grid;grid-template-columns:1fr;gap:var(--s3);align-items:stretch}
+.t-arrow{align-self:center}
+@media (min-width:640px){.transform{grid-template-columns:1fr auto 1.2fr auto 1.2fr}}
+.t-block{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4);font-family:var(--font-ui);min-height:132px}
+.t-block b{display:block;font-size:.95rem;margin-bottom:var(--s2)}
+.t-block span{font-size:.82rem;color:var(--ink-soft)}
+.t-arrow{font-family:var(--font-ui);color:var(--ink-soft);text-align:center;font-size:1.4rem}
+@media (max-width:639px){.t-arrow{transform:rotate(90deg)}}
+.docs{display:flex;gap:6px;margin-bottom:var(--s2)}
+.docs i{width:22px;height:28px;border:2px solid var(--ink-soft);border-radius:3px;display:block;background:linear-gradient(var(--line) 0 0) 4px 6px/12px 2px no-repeat,linear-gradient(var(--line) 0 0) 4px 11px/10px 2px no-repeat,linear-gradient(var(--line) 0 0) 4px 16px/12px 2px no-repeat}
+.wave{display:flex;align-items:center;gap:3px;height:34px;margin-bottom:var(--s2)}
+.wave i{display:block;width:5px;border-radius:3px;background:var(--audio);height:30%;transform-origin:center;animation:wv 1.2s ease-in-out 3 alternate}
+.film{display:flex;gap:4px;margin-bottom:var(--s2);padding:4px 0;border-top:4px dotted var(--video);border-bottom:4px dotted var(--video)}
+.film i{display:block;width:30px;height:20px;border-radius:2px;background:var(--video-soft);border:1px solid var(--video);opacity:.25;animation:fr .4s ease-out forwards}
+@keyframes wv{from{transform:scaleY(.4)}to{transform:scaleY(1.6)}}
+@keyframes fr{to{opacity:1}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .wave i,.film i{animation:none;opacity:1}
+  .progress-fill{transition:none}
+}
+.hero-meta{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);font-family:var(--font-ui);font-size:.9rem;color:var(--ink-soft)}
+.hero-meta strong{color:var(--ink)}
+
+/* ---------- Callouts ---------- */
+.callout{border-left:5px solid var(--accent);background:var(--accent-soft);padding:var(--s4) var(--s5);border-radius:0 var(--r-md) var(--r-md) 0;margin:var(--s5) 0;max-width:var(--measure)}
+.callout p:last-child,.callout ul:last-child{margin-bottom:0}
+.callout .c-title{font-family:var(--font-ui);font-weight:650;margin-bottom:var(--s2);display:flex;gap:var(--s2);align-items:center}
+.callout.caution{border-color:var(--caution);background:var(--caution-soft)}
+.callout.audio{border-color:var(--audio);background:var(--audio-soft)}
+.callout.video{border-color:var(--video);background:var(--video-soft)}
+.facil{border:2px dashed var(--line);border-radius:var(--r-md);padding:var(--s3) var(--s4);font-family:var(--font-ui);font-size:.9rem;color:var(--ink-soft);margin:var(--s4) 0;max-width:var(--measure)}
+.facil strong{color:var(--ink)}
+body:not(.show-facil) .facil{display:none}
+
+/* ---------- Screenshot slots ---------- */
+.shot{margin:var(--s5) 0;max-width:100%}
+.shot-frame{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;background:var(--surface)}
+.shot-frame .chrome{display:flex;gap:6px;align-items:center;padding:8px 12px;background:var(--sunk);border-bottom:1px solid var(--line)}
+.shot-frame .chrome i{width:10px;height:10px;border-radius:50%;background:var(--line);display:block}
+.shot-frame .chrome span{margin-left:8px;font-family:var(--font-ui);font-size:.75rem;color:var(--ink-soft)}
+.placeholder{aspect-ratio:16/9;display:grid;place-content:center;gap:var(--s2);text-align:center;padding:var(--s5);font-family:var(--font-ui);color:var(--ink-soft);background:repeating-linear-gradient(135deg,var(--surface) 0 14px,var(--sunk) 14px 28px)}
+.placeholder .ph-num{font-size:1.6rem;font-weight:700;color:var(--ink)}
+.placeholder .ph-what{max-width:46ch;font-size:.9rem;margin:0 auto}
+.placeholder code{font-size:.8rem}
+.shot.has-image .placeholder{display:none}
+.shot.has-image .shot-frame{width:fit-content;max-width:100%;min-width:min(280px,100%);margin-inline:auto}
+.shot.has-image .shot-frame img{width:100%}
+.shot.has-image figcaption{text-align:center}
+.zoom-btn{display:block;position:relative;width:100%;padding:0;margin:0;border:0;background:none;cursor:zoom-in;color:inherit}
+.zoom-btn img{width:100%}
+.zoom-hint{position:absolute;right:10px;bottom:10px;font-family:var(--font-ui);font-size:.78rem;font-weight:600;padding:4px 10px;border-radius:99px;background:var(--ink);color:var(--paper);opacity:.85;box-shadow:0 1px 4px rgba(0,0,0,.25);transition:opacity .15s}
+.zoom-btn:hover .zoom-hint,.zoom-btn:focus-visible .zoom-hint{opacity:1}
+.zoom-btn:focus-visible{outline:3px solid var(--focus);outline-offset:-3px}
+.lightbox{border:0;padding:0;width:min(96vw,1800px);max-width:96vw;max-height:94vh;border-radius:var(--r-md);background:var(--surface);color:var(--ink);overflow:hidden}
+.lightbox::backdrop{background:rgba(10,12,20,.8)}
+.lightbox[open]{display:flex;flex-direction:column}
+.lb-bar{display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s3) var(--s2) var(--s4);border-bottom:1px solid var(--line);font-family:var(--font-ui)}
+.lb-cap{margin:0;flex:1;font-size:.9rem;color:var(--ink-soft)}
+.lb-stage{overflow:auto;padding:var(--s3);display:flex;justify-content:center;align-items:flex-start;background:var(--sunk)}
+.lb-stage img{max-width:100%;height:auto;display:block}
+body.lb-open{overflow:hidden}
+@media print{.zoom-hint{display:none}}
+.shot figcaption{font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft);margin-top:var(--s2)}
+.shot figcaption b{color:var(--ink)}
+
+/* ---------- Interface schematic ---------- */
+.schematic{display:grid;grid-template-columns:1fr;gap:var(--s3);margin:var(--s5) 0;font-family:var(--font-ui)}
+@media (min-width:720px){.schematic{grid-template-columns:1fr 1.6fr 1fr}}
+.panel-btn{text-align:left;border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--r-md);padding:var(--s4);cursor:pointer;min-height:160px;display:flex;flex-direction:column;gap:var(--s2)}
+.panel-btn:hover{border-color:var(--ink-soft)}
+.panel-btn[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.panel-btn b{font-size:1.05rem}
+.panel-btn .mini{display:flex;flex-direction:column;gap:5px;margin-top:auto}
+.panel-btn .mini i{display:block;height:9px;border-radius:3px;background:var(--sunk)}
+.panel-btn .mini i:nth-child(2){width:80%}.panel-btn .mini i:nth-child(3){width:60%}
+.panel-detail{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4) var(--s5);min-height:120px}
+.panel-detail h4{margin-top:0}
+
+/* ---------- Generic cards & tables ---------- */
+.grid{display:grid;gap:var(--s3);grid-template-columns:repeat(auto-fill,minmax(230px,1fr));margin:var(--s4) 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4)}
+.card h4{margin:0 0 var(--s2);font-size:1rem}
+.card p{font-size:.95rem;margin-bottom:var(--s2)}
+.card .tagline{font-family:var(--font-ui);font-size:.78rem;color:var(--ink-soft)}
+.card.feature-audio{border-top:5px solid var(--audio)}
+.card.feature-video{border-top:5px solid var(--video)}
+.card.feature-other{border-top:5px solid var(--accent)}
+.table-wrap{overflow-x:auto;margin:var(--s4) 0;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-family:var(--font-ui);font-size:.9rem;min-width:560px}
+th,td{padding:var(--s3) var(--s4);text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--sunk);font-weight:650}
+tbody tr:last-child td{border-bottom:0}
+.small{font-size:.85rem;color:var(--ink-soft);font-family:var(--font-ui)}
+
+/* ---------- Tabs ---------- */
+.tabs{margin:var(--s5) 0}
+.tablist{display:flex;flex-wrap:wrap;gap:var(--s2);border-bottom:1px solid var(--line);margin-bottom:var(--s4)}
+.tab{min-height:44px;padding:0 var(--s4);border:1px solid transparent;border-bottom:none;border-radius:var(--r-sm) var(--r-sm) 0 0;background:transparent;color:var(--ink-soft);cursor:pointer;font-family:var(--font-ui);font-weight:600;margin-bottom:-1px}
+.tab[aria-selected="true"]{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.tabpanel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s5)}
+.tabpanel[hidden]{display:none}
+.tabpanel h4:first-child{margin-top:0}
+
+/* ---------- Steps / labs ---------- */
+.steps{counter-reset:st;list-style:none;padding:0;max-width:var(--measure)}
+.steps > li{counter-increment:st;position:relative;padding-left:3rem;margin-bottom:var(--s4)}
+.steps > li::before{content:counter(st);position:absolute;left:0;top:-.1rem;width:2.1rem;height:2.1rem;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-family:var(--font-ui);font-weight:700;font-size:.9rem}
+.lab{background:var(--surface);border:2px solid var(--ink);border-radius:var(--r-lg);padding:var(--s5);margin:var(--s6) 0}
+.lab-head{display:flex;flex-wrap:wrap;gap:var(--s2);justify-content:space-between;align-items:baseline;margin-bottom:var(--s3)}
+.lab-head h3{margin:0}
+.lab-count{font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft)}
+.checklist{list-style:none;padding:0;margin:0}
+.checklist li{margin:0;border-top:1px solid var(--line)}
+.checklist label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) 0;cursor:pointer;min-height:44px}
+.checklist input{width:22px;height:22px;margin-top:.2rem;flex:0 0 auto;accent-color:var(--accent)}
+.checklist input:checked + span{color:var(--ink-soft);text-decoration:line-through;text-decoration-color:var(--line)}
+
+/* ---------- Buttons & forms ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);min-height:44px;min-width:44px;padding:0 var(--s4);border-radius:var(--r-sm);border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font-family:var(--font-ui);font-weight:600;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn-row{display:flex;flex-wrap:wrap;gap:var(--s2);margin:var(--s3) 0}
+.form-grid{display:grid;gap:var(--s3);grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.field label{display:block;font-family:var(--font-ui);font-size:.85rem;font-weight:600;margin-bottom:var(--s1)}
+.field select,.field input,.field textarea{width:100%;min-height:44px;padding:var(--s2) var(--s3);border:1px solid var(--line);border-radius:var(--r-sm);background:var(--paper);color:var(--ink);font-family:var(--font-ui);font-size:.95rem}
+.output{white-space:pre-wrap;font-family:var(--font-code);font-size:.88rem;background:var(--sunk);border-radius:var(--r-sm);padding:var(--s4);margin-top:var(--s3);border:1px solid var(--line);min-height:5rem}
+.chooser{display:flex;flex-wrap:wrap;gap:var(--s2);margin:var(--s3) 0}
+.chip{min-height:44px;padding:0 var(--s4);border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font-family:var(--font-ui);font-size:.9rem}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.result{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4) var(--s5);min-height:90px}
+
+/* ---------- After the workshop ---------- */
+.after-controls{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s6);margin-top:var(--s4)}
+.ctrl-label{font-family:var(--font-ui);font-size:.85rem;font-weight:600;margin:0}
+.key{background:var(--sunk);border-radius:var(--r-sm);padding:var(--s3) var(--s4);line-height:2}
+.pill.who-f{background:var(--accent-soft);color:var(--ink)}
+.pill.who-s{background:var(--audio-soft);color:var(--audio)}
+.act-group h3{margin-top:var(--s6)}
+.act-grid{display:grid;gap:var(--s3);grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));align-items:start}
+.act{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4)}
+.act.is-done{border-color:var(--ok)}
+.act.is-done h4::after{content:" \2713";color:var(--ok)}
+.act-head{display:flex;justify-content:space-between;gap:var(--s2);align-items:flex-start}
+.act-head h4{margin:0;font-size:1.02rem}
+.act-done{display:flex;align-items:center;gap:6px;min-height:44px;font-family:var(--font-ui);font-size:.85rem;white-space:nowrap;cursor:pointer;margin-top:-10px}
+.act-done input{width:20px;height:20px;accent-color:var(--accent)}
+.act-tags{display:flex;flex-wrap:wrap;gap:6px;margin:var(--s1) 0 var(--s2)}
+.act p{font-size:.95rem}
+.act .acct{font-family:var(--font-ui);font-size:.82rem;padding:var(--s2) var(--s3);border-radius:var(--r-sm);background:var(--sunk)}
+.act .acct.need{border-left:4px solid var(--video)}
+.act .acct.none{border-left:4px solid var(--ok)}
+.act details summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-family:var(--font-ui);font-size:.9rem;font-weight:600;color:var(--accent);margin:0;padding:0}
+.act-steps{padding-left:1.3rem;font-size:.93rem}
+.act-steps li{margin-bottom:var(--s1)}
+.act .prompt{margin-bottom:var(--s2)}
+.act-note{border-left:3px solid var(--line);padding-left:var(--s3)}
+
+/* ---------- Prompt library ---------- */
+.prompt{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4);margin-bottom:var(--s3)}
+.prompt-top{display:flex;justify-content:space-between;align-items:center;gap:var(--s2);flex-wrap:wrap}
+.prompt-top b{font-family:var(--font-ui);font-size:.95rem}
+.prompt blockquote{margin:var(--s2) 0 0;font-family:var(--font-code);font-size:.85rem;background:var(--sunk);padding:var(--s3);border-radius:var(--r-sm)}
+.pill{font-family:var(--font-ui);font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--sunk);color:var(--ink-soft)}
+.pill.a{background:var(--audio-soft);color:var(--audio)}
+.pill.v{background:var(--video-soft);color:var(--video)}
+
+/* ---------- Quiz ---------- */
+.q{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4) var(--s5);margin-bottom:var(--s4)}
+.q fieldset{border:0;padding:0;margin:0}
+.q legend{font-family:var(--font-head);font-weight:650;margin-bottom:var(--s3);padding:0}
+.q label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) var(--s3);border-radius:var(--r-sm);cursor:pointer;min-height:44px}
+.q label:hover{background:var(--sunk)}
+.q input{margin-top:.35rem;accent-color:var(--accent)}
+.q .fb{margin:var(--s2) 0 0;font-family:var(--font-ui);font-size:.9rem;padding:var(--s2) var(--s3);border-radius:var(--r-sm)}
+.q .fb.right{background:color-mix(in srgb,var(--ok) 15%,transparent)}
+.q .fb.wrong{background:var(--caution-soft)}
+.score{font-family:var(--font-head);font-size:1.3rem;font-weight:700}
+
+/* ---------- Agenda ---------- */
+.agenda{list-style:none;padding:0;margin:var(--s5) 0;border-left:3px solid var(--ink);max-width:var(--measure)}
+.agenda li{position:relative;padding:0 0 var(--s4) var(--s5);margin:0}
+.agenda li::before{content:"";position:absolute;left:-9px;top:.45rem;width:15px;height:15px;border-radius:50%;background:var(--paper);border:3px solid var(--ink)}
+.agenda li.hot::before{background:var(--audio);border-color:var(--audio)}
+.agenda li.hot2::before{background:var(--video);border-color:var(--video)}
+.agenda .at{font-family:var(--font-ui);font-weight:700;font-variant-numeric:tabular-nums;margin-right:var(--s2)}
+.agenda .what{font-family:var(--font-ui);font-weight:600}
+.agenda .desc{display:block;color:var(--ink-soft);font-size:.95rem}
+
+details.ref{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);margin-bottom:var(--s2)}
+details.ref summary{cursor:pointer;padding:var(--s3) var(--s4);font-family:var(--font-ui);font-weight:600;min-height:44px;display:flex;align-items:center}
+details.ref > div{padding:0 var(--s4) var(--s4)}
+
+.toggle-line{display:flex;align-items:center;gap:var(--s2);font-family:var(--font-ui);font-size:.9rem;margin-top:var(--s4)}
+.toggle-line input{width:22px;height:22px;accent-color:var(--accent)}
+
+.shotlist li.found{color:var(--ok)}
+.shotlist{list-style:none;padding-left:0}.shotlist li{padding-left:1.4rem;position:relative}.shotlist li::before{content:"○";position:absolute;left:0}.shotlist li.found::before{content:"✓"}
+
+footer{border-top:1px solid var(--line);margin-top:var(--s8);padding:var(--s5) var(--s4);text-align:center;font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media print{
+  .topbar,.sidenav,.btn,.menu-btn{display:none!important}
+  .shell{display:block}
+  .tabpanel[hidden]{display:block!important}
+  .section{padding-top:var(--s5)}
+}
+
+/* ---------- Workshop 2 additions ---------- */
+.btn .newtab{font-weight:400;font-size:.8rem;opacity:.85}
+a.btn{text-decoration:none}
+.card.feature-img{border-top:5px solid var(--video)}
+.card.feature-code{border-top:5px solid var(--code)}
+.agenda li.hot::before{background:var(--code);border-color:var(--code)}
+.pill.c{background:var(--code-soft);color:var(--code)}
+.idea{display:flex;gap:6px;margin-bottom:var(--s2);height:34px;align-items:center}
+.idea i{display:block;width:26px;height:26px;border-radius:50%;border:3px solid var(--ink-soft)}
+.idea i:nth-child(2){background:var(--accent);border-color:var(--accent)}
+.lines{display:flex;flex-direction:column;gap:5px;margin-bottom:var(--s2);height:34px;justify-content:center}
+.lines i{display:block;height:5px;border-radius:3px;background:var(--accent);width:90%}
+.lines i:nth-child(2){width:70%}.lines i:nth-child(3){width:80%}.lines i:nth-child(4){width:50%}
+.mini-dia{height:34px;margin-bottom:var(--s2);display:flex;align-items:center;gap:14px}
+.mini-dia i{display:block;width:30px;height:22px;border-radius:4px;background:var(--code-soft);border:2px solid var(--code);position:relative}
+.mini-dia i+i::before{content:"";position:absolute;left:-16px;top:8px;width:12px;height:2px;background:var(--code)}
+.versus{display:grid;gap:var(--s4);grid-template-columns:1fr;margin:var(--s5) 0}
+@media (min-width:640px){.versus{grid-template-columns:1fr 1fr}}
+.versus figcaption{grid-column:1/-1;font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft)}
+.vs{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4)}
+.vs.img{border-top:5px solid var(--video)}
+.vs.cod{border-top:5px solid var(--code)}
+.vs-title{font-family:var(--font-ui);font-weight:650;font-size:.95rem;margin:0 0 var(--s2)}
+.vs svg{width:100%;height:auto;display:block;max-height:190px}
+.vs .loop{fill:none;stroke:var(--line);stroke-width:3;stroke-dasharray:6 6}
+.vs.img .node{fill:var(--video)}
+.vs.cod .node{fill:var(--code)}
+.vs text{font-family:var(--font-ui);font-size:15px;fill:var(--ink);font-weight:600}
+.vs.img text{font-style:italic;letter-spacing:.5px}
+.vs .wrongmark{fill:none;stroke:var(--bad);stroke-width:1.5}
+.sorter{display:grid;gap:var(--s3);max-width:var(--measure)}
+.sort-item{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s3) var(--s4)}
+.sort-q{font-weight:600;margin-bottom:var(--s2)}
+.sort-item .chooser{margin:0}
+.chip:disabled{cursor:default;opacity:.7}
+.chip[aria-pressed="true"]:disabled{opacity:1}
+.fb{margin:var(--s2) 0 0;font-family:var(--font-ui);font-size:.9rem;padding:var(--s2) var(--s3);border-radius:var(--r-sm)}
+.fb.right{background:color-mix(in srgb,var(--ok) 15%,transparent)}
+.fb.wrong{background:var(--caution-soft)}
+.anatomy{max-width:var(--measure)}
+.anatomy .parts{margin-bottom:var(--s3)}
+.lbl{display:block;font-family:var(--font-ui);font-size:.85rem;font-weight:600;margin-bottom:var(--s1)}
+.spot{margin:var(--s4) 0;max-width:720px}
+.spot svg{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:var(--r-md)}
+.spot figcaption{font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft);margin-top:var(--s2)}
+.sp-bg{fill:var(--surface)}
+.sp-title{font-family:var(--font-head);font-size:26px;font-weight:700;fill:var(--ink)}
+.sp-label{font-family:var(--font-ui);font-size:17px;font-weight:600;fill:var(--ink)}
+.sp-small{font-family:var(--font-ui);font-size:14px;fill:var(--ink)}
+.sp-sun{fill:var(--demo-sun)}
+.sp-cloud{fill:var(--sunk);stroke:var(--line);stroke-width:2}
+.sp-sea{fill:var(--demo-sea)}
+.sp-land{fill:var(--demo-land)}
+.sp-box{fill:var(--paper);stroke:var(--line);stroke-width:2}
+.sp-up{stroke:var(--demo-red);stroke-width:5}
+.sp-upf,.sp-k1{fill:var(--demo-red)}
+.sp-down{stroke:var(--demo-green);stroke-width:5}
+.sp-downf,.sp-k2{fill:var(--demo-green)}
+.spot-list li .fb{margin:0 0 var(--s2) 2.2rem}
+.output{white-space:pre-wrap}
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="sidenav">Sections</button>
+    <span class="brand">Images and infographics workshop</span>
+    <div class="progress-wrap">
+      <span id="progressText">0 of 14 done</span>
+      <div class="progress-track" role="progressbar" aria-label="Sections completed" aria-valuemin="0" aria-valuemax="14" aria-valuenow="0" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+<nav class="sidenav" id="sidenav" aria-label="Tutorial sections">
+  <p class="nav-label">Tap a circle to mark a section done</p>
+  <ol id="navList"></ol>
+</nav>
+
+<main id="main">
+
+<!-- ================= HERO ================= -->
+<div class="hero">
+  <p class="hero-kicker">A self-paced tutorial and 90-minute hands-on workshop</p>
+  <h1>Make teaching graphics that are actually right
+    <small>Generating images and infographics with ChatGPT and Gemini</small></h1>
+  <p class="lede">AI tools can draw a diagram, an infographic, or an illustration in seconds. Getting one you'd put in front of students takes a better prompt, the right way of making it, and a careful check afterward. This page walks you through all three for any discipline.</p>
+
+  <div class="transform" aria-hidden="true">
+    <div class="t-block"><div class="idea"><i></i><i></i><i></i></div><b>One clear idea</b><span>The concept, the audience, and the exact words it needs</span></div>
+    <div class="t-arrow">→</div>
+    <div class="t-block"><div class="lines"><i></i><i></i><i></i><i></i></div><b>A precise prompt</b><span>Built with the graphics prompt builder</span></div>
+    <div class="t-arrow">→</div>
+    <div class="t-block"><div class="mini-dia"><i></i><i></i><i></i></div><b>A checked graphic</b><span>Accurate, accessible, and ready to post</span></div>
+  </div>
+
+  <div class="hero-meta">
+    <span><strong>Length:</strong> 90 minutes</span>
+    <span><strong>You need:</strong> a ChatGPT or Gemini account (free works), PowerPoint or Google Slides, and one concept you teach</span>
+    <span><strong>Current as of:</strong> October 2026</span>
+  </div>
+  <p class="btn-row"><a class="btn" href="https://mqaissaunee-bcc.github.io/AI_Examples/graphics-prompt-builder.html" target="_blank" rel="noopener">Open the graphics prompt builder <span class="newtab">(opens in new tab)</span></a></p>
+  <label class="toggle-line"><input type="checkbox" id="facilToggle"> Show facilitator notes</label>
+</div>
+
+<!-- ================= 1. AGENDA ================= -->
+<section class="section" id="s-agenda" data-title="Agenda and setup" data-time="0:00">
+  <div class="sec-head"><h2>Agenda and setup</h2><span class="sec-time">0:00 – 0:05</span></div>
+  <p>The workshop moves from understanding why AI graphics go wrong to making two kinds of graphics and checking them. If you're working through this page on your own, follow the same order and take as long as you need.</p>
+  <ol class="agenda">
+    <li><span class="at">0:00</span><span class="what">Welcome and setup</span><span class="desc">Sign in, open the prompt builder, and pick a concept.</span></li>
+    <li><span class="at">0:05</span><span class="what">Why AI graphics go wrong</span><span class="desc">How image generators work, the text problem, and the image-or-code decision.</span></li>
+    <li><span class="at">0:12</span><span class="what">Choosing a tool and account</span><span class="desc">ChatGPT and Gemini at Microsoft and Google schools.</span></li>
+    <li><span class="at">0:17</span><span class="what">Anatomy of a good prompt</span><span class="desc">Six parts that turn a vague request into a usable graphic.</span></li>
+    <li class="hot2"><span class="at">0:27</span><span class="what">Lab 1: an illustration from an image generator</span><span class="desc">Generate, edit in conversation, and add your own labels.</span></li>
+    <li class="hot"><span class="at">0:45</span><span class="what">Lab 2: a diagram drawn with code</span><span class="desc">Exact labels, editable files, and getting SVG into your slides.</span></li>
+    <li><span class="at">1:02</span><span class="what">Check it: accuracy and accessibility</span><span class="desc">Spot the errors, then write alt text that teaches.</span></li>
+    <li><span class="at">1:12</span><span class="what">Copyright, provenance, and representation</span><span class="desc">Who owns it, how it's labeled as AI, and how people are shown.</span></li>
+    <li><span class="at">1:20</span><span class="what">Revise and share</span><span class="desc">Fixing one thing at a time, file formats, and posting to your LMS.</span></li>
+    <li><span class="at">1:25</span><span class="what">Knowledge check and wrap-up</span><span class="desc">Nine quick questions and a prompt library to take with you.</span></li>
+  </ol>
+
+  <h3>Before you start</h3>
+  <ul>
+    <li>Sign in to <strong>ChatGPT</strong> (<a href="https://chatgpt.com">chatgpt.com</a>) or <strong>Gemini</strong> (<a href="https://gemini.google.com">gemini.google.com</a>). A free account works for everything here. Having both open is useful for comparing results. See <a href="#s-accounts">Choosing a tool and account</a> if your school uses Microsoft 365.</li>
+    <li>Open the <a href="https://mqaissaunee-bcc.github.io/AI_Examples/graphics-prompt-builder.html" target="_blank" rel="noopener">graphics prompt builder <span class="newtab">(opens in new tab)</span></a> in another tab. You'll use it in both labs.</li>
+    <li>Pick <strong>one concept</strong> students struggle with, one you'd normally draw on the board. Narrow is better: "how a bill becomes law," not "American government."</li>
+    <li>Write down the exact terms the graphic must use. Spelling matters, and you'll paste these into the prompt.</li>
+    <li>Never upload photos of students, student work, or other private information to these tools.</li>
+  </ul>
+  <div class="facil"><strong>Facilitator:</strong> Free accounts have small daily image limits, so ask people to save their image generations for the labs rather than experimenting during the opening. Prepare finished examples of both labs in advance so anyone who hits a limit can still follow along. Pair people with a partner who uses the other tool so the room sees both.</div>
+</section>
+
+<!-- ================= 2. WHY ================= -->
+<section class="section" id="s-why" data-title="Why AI graphics go wrong" data-time="0:05">
+  <div class="sec-head"><h2>Why AI graphics go wrong</h2><span class="sec-time">0:05 – 0:12</span></div>
+  <p class="lede">Most problems come from asking one kind of tool to do another kind of tool's job.</p>
+  <p>An <strong>image generator</strong> creates a picture pixel by pixel, the way it learned from millions of images. It's very good at scenes, textures, lighting, and style. But it doesn't write words; it draws shapes that look like letters. That's why labels come out misspelled, arrows point the wrong way, and numbers on a chart don't match anything.</p>
+  <p>A chatbot can also <strong>write code</strong> that draws a graphic, usually as an SVG (a scalable vector graphic, the same kind of file many logos and icons use). Code places real text at exact positions, so every label is spelled the way you typed it and can be edited later. Code can't paint a realistic scene, though.</p>
+
+  <figure class="versus">
+    <div class="vs img">
+      <p class="vs-title">Drawn by an image generator</p>
+      <svg viewBox="0 0 300 170" role="img" aria-labelledby="vs1">
+        <title id="vs1">A cycle diagram with three misspelled labels: Condensaiton, Precipitaion, and Evaporaton.</title>
+        <circle class="loop" cx="150" cy="92" r="52"/>
+        <circle class="node" cx="150" cy="40" r="9"/><circle class="node" cx="195" cy="118" r="9"/><circle class="node" cx="105" cy="118" r="9"/>
+        <text x="150" y="22" text-anchor="middle">Condensaiton</text><text x="215" y="150" text-anchor="middle">Precipitaion</text><text x="85" y="150" text-anchor="middle">Evaporaton</text>
+        <path class="wrongmark" d="M103 26 L108 30 L113 26 L118 30 L123 26 L128 30 L133 26 L138 30 L143 26 L148 30 L153 26 L158 30 L163 26 L168 30 L173 26 L178 30 L183 26 L188 30 L193 26 L197 30"/>
+        <path class="wrongmark" d="M178 154 L183 158 L188 154 L193 158 L198 154 L203 158 L208 154 L213 158 L218 154 L223 158 L228 154 L233 158 L238 154 L243 158 L248 154 L252 158"/>
+        <path class="wrongmark" d="M50 154 L55 158 L60 154 L65 158 L70 154 L75 158 L80 154 L85 158 L90 154 L95 158 L100 154 L105 158 L110 154 L115 158 L120 154 L122 158"/>
+      </svg>
+    </div>
+    <div class="vs cod">
+      <p class="vs-title">Drawn with code (SVG)</p>
+      <svg viewBox="0 0 300 170" role="img" aria-labelledby="vs2">
+        <title id="vs2">The same cycle diagram with correctly spelled labels: Condensation, Precipitation, and Evaporation.</title>
+        <circle class="loop" cx="150" cy="92" r="52"/>
+        <circle class="node" cx="150" cy="40" r="9"/><circle class="node" cx="195" cy="118" r="9"/><circle class="node" cx="105" cy="118" r="9"/>
+        <text x="150" y="22" text-anchor="middle">Condensation</text><text x="215" y="150" text-anchor="middle">Precipitation</text><text x="85" y="150" text-anchor="middle">Evaporation</text>
+      </svg>
+    </div>
+    <figcaption>Image models have improved a lot at text, but they still slip, especially with many labels or technical terms. Code writes text exactly.</figcaption>
+  </figure>
+
+  <h3>Three ways to make a graphic</h3>
+  <div class="grid">
+    <div class="card feature-img"><h4>Image with text</h4><p>The image generator draws everything, labels included.</p><span class="tagline">Best for scenes, illustrations, and banners with little or no text</span></div>
+    <div class="card feature-img"><h4>Image, no text</h4><p>Generate a clean picture, then add labels yourself in PowerPoint, Google Slides, or Canva.</p><span class="tagline">Best for labeled illustrations that need a drawn look</span></div>
+    <div class="card feature-code"><h4>Code-drawn graphic</h4><p>The chatbot writes SVG or HTML that draws the graphic with exact text.</p><span class="tagline">Best for diagrams, flowcharts, charts, timelines, and reference sheets</span></div>
+  </div>
+
+  <h3>Try it: image or code?</h3>
+  <p>For each graphic, choose how you'd make it. You'll get feedback right away.</p>
+  <div id="sorter" class="sorter"></div>
+  <p class="score" id="sorterScore" aria-live="polite"></p>
+</section>
+
+<!-- ================= 3. ACCOUNTS ================= -->
+<section class="section" id="s-accounts" data-title="Choosing a tool and account" data-time="0:12">
+  <div class="sec-head"><h2>Choosing a tool and account</h2><span class="sec-time">0:12 – 0:17</span></div>
+  <p class="lede">The prompts in this workshop work in any of these tools. What changes is your privacy protection and how much you can generate each day.</p>
+  <p>Select the situation that matches your school.</p>
+
+  <div class="tabs" data-tabs>
+    <div class="tablist" role="tablist" aria-label="Account situations">
+      <button class="tab" role="tab" id="t-ms" aria-controls="p-ms" aria-selected="true" tabindex="0">Microsoft 365 school</button>
+      <button class="tab" role="tab" id="t-gs" aria-controls="p-gs" aria-selected="false" tabindex="-1">Google Workspace school</button>
+      <button class="tab" role="tab" id="t-pe" aria-controls="p-pe" aria-selected="false" tabindex="-1">Personal accounts</button>
+    </div>
+
+    <div class="tabpanel" role="tabpanel" id="p-ms" aria-labelledby="t-ms">
+      <h4>Your school uses Microsoft 365</h4>
+      <p>Your school email is a Microsoft account, so it can't sign in to Gemini, and ChatGPT isn't covered by your school's agreements. You'll use a <strong>personal ChatGPT or Gemini account</strong>. That works well for making course graphics, with a few habits to follow.</p>
+      <ul>
+        <li><strong>Check your school's AI policy first.</strong> Some institutions limit which AI tools employees may use for course work.</li>
+        <li><strong>Keep it to shareable material.</strong> Use your own content, openly licensed resources, and public information. A personal account isn't covered by any school data agreement.</li>
+        <li><strong>Never upload</strong> student photos, names, work, or records.</li>
+        <li><strong>Deliver files, not logins.</strong> Download the image or SVG and post it in your LMS, OneDrive, or Teams. Students never need an account.</li>
+        <li><strong>Don't require students to sign up.</strong> Asking students to create personal accounts with an AI company raises privacy and equity questions. Make it optional, or check with your institution.</li>
+      </ul>
+    </div>
+
+    <div class="tabpanel" role="tabpanel" id="p-gs" aria-labelledby="t-gs" hidden>
+      <h4>Your school uses Google Workspace for Education</h4>
+      <ul>
+        <li><strong>Use Gemini with your school account</strong> if your administrator has turned it on. It's covered by your school's Google agreement.</li>
+        <li><strong>Your admin controls access.</strong> If Gemini or image creation doesn't appear, contact your IT department.</li>
+        <li><strong>Some features vary by plan and age.</strong> Higher-quality image models and some editing features may depend on your school's edition or on users being 18 or older.</li>
+        <li><strong>ChatGPT needs a personal account,</strong> which isn't covered by your school agreement.</li>
+      </ul>
+      <p class="small">Even with these protections, follow your school's rules about what may be used with AI, and never upload photos of students.</p>
+    </div>
+
+    <div class="tabpanel" role="tabpanel" id="p-pe" aria-labelledby="t-pe" hidden>
+      <h4>Using personal ChatGPT or Gemini accounts</h4>
+      <ul>
+        <li><strong>Both are free to start.</strong> Free plans allow a small number of images per day, and paid plans raise the limits. Limits change often and vary by model.</li>
+        <li><strong>ChatGPT</strong> creates images with OpenAI's current image model (ChatGPT Images 2.0) and can open code in Canvas to preview it.</li>
+        <li><strong>Gemini</strong> creates images with Nano Banana 2 by default. Paid subscribers can choose <strong>Redo with Pro</strong>, which Google says handles text and infographics in more detail. Gemini can also preview code in Canvas.</li>
+        <li>Treat both like any consumer service: don't upload confidential or personal information.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>At a glance</h3>
+  <div class="table-wrap">
+    <table>
+      <caption class="sr-only">Comparison of image tools</caption>
+      <thead><tr><th scope="col"></th><th scope="col">ChatGPT</th><th scope="col">Gemini</th></tr></thead>
+      <tbody>
+        <tr><td>Account</td><td>Personal</td><td>Personal or Google school</td></tr>
+        <tr><td>Covered by school agreement</td><td>No</td><td>Only with a Google school account</td></tr>
+        <tr><td>Image model</td><td>ChatGPT Images 2.0</td><td>Nano Banana 2; Nano Banana Pro on paid plans</td></tr>
+        <tr><td>Edit by conversation</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>Preview code it writes</td><td>Canvas</td><td>Canvas</td></tr>
+        <tr><td>Marks images as AI-made</td><td>Content Credentials (C2PA) and SynthID</td><td>SynthID</td></tr>
+        <tr><td>Free daily images</td><td>A few</td><td>More, with limits</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small">Summarized from <a href="https://support.google.com/gemini/answer/14286560">Google's Gemini image help</a> and <a href="https://help.openai.com/en/articles/8912793">OpenAI's provenance help</a>, October 2026. Features and limits change often.</p>
+  <div class="facil"><strong>Facilitator:</strong> Ask for a show of hands on which tool people have open, and pair ChatGPT and Gemini users so each table sees both. Anyone without either account can sign up for a free one in a couple of minutes, or follow along on a partner's screen.</div>
+</section>
+
+<!-- ================= 4. ANATOMY ================= -->
+<section class="section" id="s-anatomy" data-title="Anatomy of a good prompt" data-time="0:17">
+  <div class="sec-head"><h2>Anatomy of a good prompt</h2><span class="sec-time">0:17 – 0:27</span></div>
+  <p class="lede">"Make an infographic about photosynthesis" leaves dozens of decisions to the AI. A good prompt makes them for it.</p>
+  <p>Every strong graphics prompt answers six questions. Add each part below to watch a vague request turn into a specific one.</p>
+
+  <div class="anatomy card">
+    <div class="field"><span class="lbl" id="exLbl">Example</span>
+      <div class="chooser" role="group" aria-labelledby="exLbl" id="exChooser">
+        <button class="chip" data-ex="nursing" aria-pressed="true">Nursing</button>
+        <button class="chip" data-ex="business" aria-pressed="false">Business</button>
+        <button class="chip" data-ex="history" aria-pressed="false">History</button>
+      </div>
+    </div>
+    <ul class="checklist parts" id="partList"></ul>
+    <p class="small" id="anaBase"></p>
+    <div class="output" id="anaOut" aria-live="polite"></div>
+    <div class="btn-row"><button class="btn ghost" id="anaCopy">Copy this prompt</button></div>
+  </div>
+
+  <h3>Why each part matters</h3>
+  <div class="table-wrap">
+    <table>
+      <caption class="sr-only">The six parts of a graphics prompt</caption>
+      <thead><tr><th scope="col">Part</th><th scope="col">What it prevents</th></tr></thead>
+      <tbody>
+        <tr><td>Audience</td><td>Graphics that are too technical or too childish for your students.</td></tr>
+        <tr><td>The one idea</td><td>Cluttered "everything about the topic" posters that teach nothing in particular.</td></tr>
+        <tr><td>Graphic type</td><td>A generic poster when you needed a flowchart, timeline, or comparison.</td></tr>
+        <tr><td>Exact words</td><td>Misspelled, invented, or outdated terminology.</td></tr>
+        <tr><td>Look and size</td><td>Styles that don't fit your course, and shapes that don't fit your slide.</td></tr>
+        <tr><td>Rules</td><td>Invented statistics, color-only meaning, logos, and stereotypes.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <p class="c-title">The prompt builder does this for you</p>
+    <p>The <a href="https://mqaissaunee-bcc.github.io/AI_Examples/graphics-prompt-builder.html" target="_blank" rel="noopener">graphics prompt builder <span class="newtab">(opens in new tab)</span></a> asks for each part, adds accuracy rules for your discipline, and writes a different prompt depending on whether you want an image or code. You'll use it in both labs.</p>
+  </div>
+
+  <figure class="shot" data-src="img/w2-01-prompt-builder.png" data-alt="The graphics prompt builder with the content fields filled in and the generated prompt in the right panel">
+    <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>Graphics prompt builder</span></div>
+      <div class="placeholder"><span class="ph-num">Screenshot 1</span><p class="ph-what">The prompt builder with a discipline, topic, and key terms filled in, and the generated prompt visible.</p><code>img/w2-01-prompt-builder.png</code></div>
+    </div>
+    <figcaption><b>The graphics prompt builder.</b> Fill in the steps on the left; the prompt on the right updates as you go.</figcaption>
+  </figure>
+
+  <div class="callout audio">
+    <p class="c-title">Grounded in your sources: Gemini Notebook infographics</p>
+    <p>If you attended Workshop 1, remember that Gemini Notebook's Studio can make an Infographic built only from the sources in a notebook. That's a good choice when the content must come from your readings. The same checks in this workshop still apply to it.</p>
+  </div>
+</section>
+
+<!-- ================= 5. LAB 1 ================= -->
+<section class="section" id="s-lab1" data-title="Lab 1: Image generator" data-time="0:27">
+  <div class="sec-head"><h2>Lab 1: an illustration from an image generator</h2><span class="sec-time">0:27 – 0:45</span></div>
+  <p class="lede">Image generators are at their best when they draw the picture and you supply the words.</p>
+  <p>In this lab you'll make a <strong>visual analogy</strong> or a <strong>labeled illustration</strong> with no text, refine it in conversation, then add labels yourself so every word is right.</p>
+
+  <h3>Generate the image</h3>
+  <div class="tabs" data-tabs>
+    <div class="tablist" role="tablist" aria-label="Image tools">
+      <button class="tab" role="tab" id="t-cg" aria-controls="p-cg" aria-selected="true" tabindex="0">ChatGPT</button>
+      <button class="tab" role="tab" id="t-gm" aria-controls="p-gm" aria-selected="false" tabindex="-1">Gemini</button>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-cg" aria-labelledby="t-cg">
+      <ol class="steps">
+        <li>In the prompt builder, choose your discipline, fill in step 1, pick <strong>Visual analogy</strong> or <strong>Labeled diagram</strong>, and choose <strong>Image, no text</strong>. Select <strong>ChatGPT</strong> as the tool.</li>
+        <li>Copy the prompt and paste it into a new ChatGPT chat. ChatGPT recognizes that you want an image and generates it.</li>
+        <li>Wait for the image to finish. It can take up to a minute.</li>
+        <li>Open the image to view it full size, then download it.</li>
+      </ol>
+      <figure class="shot" data-src="img/w2-02-chatgpt-image.png" data-alt="A ChatGPT conversation showing a pasted prompt and the generated image below it">
+        <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>chatgpt.com</span></div>
+          <div class="placeholder"><span class="ph-num">Screenshot 2</span><p class="ph-what">A ChatGPT chat with the pasted prompt and the generated image.</p><code>img/w2-02-chatgpt-image.png</code></div>
+        </div>
+        <figcaption><b>Generating in ChatGPT.</b> The prompt goes in as a normal message.</figcaption>
+      </figure>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-gm" aria-labelledby="t-gm" hidden>
+      <ol class="steps">
+        <li>In the prompt builder, choose your discipline, fill in step 1, pick <strong>Visual analogy</strong> or <strong>Labeled diagram</strong>, and choose <strong>Image, no text</strong>. Select <strong>Gemini</strong> as the tool.</li>
+        <li>In Gemini, select <strong>Create image</strong> from the tools in the prompt box, or just paste the prompt; it starts with "Generate an image."</li>
+        <li>Gemini generates the image with Nano Banana 2. If you have a paid plan, the More menu offers <strong>Redo with Pro</strong> for more detail.</li>
+        <li>Download the image from the menu under it.</li>
+      </ol>
+      <figure class="shot" data-src="img/w2-03-gemini-image.png" data-alt="A Gemini conversation showing the Create image tool, a pasted prompt, and the generated image">
+        <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>gemini.google.com</span></div>
+          <div class="placeholder"><span class="ph-num">Screenshot 3</span><p class="ph-what">A Gemini chat with the Create image tool selected, the prompt, and the generated image.</p><code>img/w2-03-gemini-image.png</code></div>
+        </div>
+        <figcaption><b>Generating in Gemini.</b> Redo with Pro appears in the More menu on paid plans.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <h3>Refine it in conversation</h3>
+  <p>Don't start over when something's off. Stay in the same chat and ask for one change at a time. The AI keeps the rest of the image and adjusts only what you name.</p>
+  <div class="prompt"><div class="prompt-top"><b>Fix one thing</b><button class="btn ghost copy" data-copy="Keep everything the same, but make the background plain white and remove the decorative border.">Copy</button></div><blockquote>Keep everything the same, but make the background plain white and remove the decorative border.</blockquote></div>
+  <div class="prompt"><div class="prompt-top"><b>Remove stray text</b><button class="btn ghost copy" data-copy="Remove every letter, word, and number from the image. Don't change anything else.">Copy</button></div><blockquote>Remove every letter, word, and number from the image. Don't change anything else.</blockquote></div>
+  <div class="prompt"><div class="prompt-top"><b>Match a set</b><button class="btn ghost copy" data-copy="Make a second image in exactly the same style, colors, and viewpoint as this one, showing [next stage or concept].">Copy</button></div><blockquote>Make a second image in exactly the same style, colors, and viewpoint as this one, showing [next stage or concept].</blockquote></div>
+  <p class="small">The Revision tab in the prompt builder writes these follow-ups for you, and repeats your original spelling and accuracy rules so they aren't lost.</p>
+
+  <h3>Add your own labels</h3>
+  <ol class="steps">
+    <li>Insert the downloaded image on a slide in PowerPoint or Google Slides.</li>
+    <li>Add text boxes for each label, typed or pasted from your term list.</li>
+    <li>Draw leader lines from each label to its part with the line tool.</li>
+    <li>Group the image, labels, and lines so they move together, then right-click the group to save it as a picture if you need a single file.</li>
+  </ol>
+
+  <div class="lab" data-lab="lab1">
+    <div class="lab-head"><h3>Hands-on lab: make and label an illustration</h3><span class="lab-count" aria-live="polite"></span></div>
+    <p>About 15 minutes.</p>
+    <ul class="checklist">
+      <li><label><input type="checkbox"><span>In the prompt builder, choose your discipline and fill in the topic, the one idea, and the exact terms.</span></label></li>
+      <li><label><input type="checkbox"><span>Choose <strong>Visual analogy</strong> or <strong>Labeled diagram</strong>, then <strong>Image, no text</strong>.</span></label></li>
+      <li><label><input type="checkbox"><span>Select your tool, copy the prompt, and generate the image.</span></label></li>
+      <li><label><input type="checkbox"><span>Zoom in and look for stray letters, extra parts, or anything inaccurate.</span></label></li>
+      <li><label><input type="checkbox"><span>Ask for one change in the same chat.</span></label></li>
+      <li><label><input type="checkbox"><span>Download the final image and place it on a slide.</span></label></li>
+      <li><label><input type="checkbox"><span>Add your labels and leader lines, then group everything.</span></label></li>
+      <li><label><input type="checkbox"><span>Compare with a partner who used the other tool. Note one difference.</span></label></li>
+    </ul>
+  </div>
+  <div class="facil"><strong>Facilitator:</strong> Ask two or three people to show their before-and-after edits. The most useful discussion point is usually how specific the follow-up request had to be. If someone gets text in a "no text" image, use it as a teaching moment: the fix is a one-line follow-up.</div>
+</section>
+
+<!-- ================= 6. LAB 2 ================= -->
+<section class="section" id="s-lab2" data-title="Lab 2: Drawn with code" data-time="0:45">
+  <div class="sec-head"><h2>Lab 2: a diagram drawn with code</h2><span class="sec-time">0:45 – 1:02</span></div>
+  <p class="lede">For anything with many labels, numbers, or arrows, let the chatbot write code instead of a picture.</p>
+  <p>You'll ask for an <strong>SVG</strong> file. You don't need to read or write code: you copy what the AI gives you into a file, and the browser or your slide software does the drawing.</p>
+
+  <h3>Generate and preview</h3>
+  <ol class="steps">
+    <li>In the prompt builder, keep your content from Lab 1 or start a new concept. Choose a <strong>Process</strong>, <strong>Cycle</strong>, <strong>Comparison</strong>, or <strong>Decision flowchart</strong> type, and choose <strong>Code-drawn graphic (SVG)</strong>.</li>
+    <li>Copy the prompt into ChatGPT or Gemini.</li>
+    <li>If the result opens in <strong>Canvas</strong>, you'll see a preview next to the code. If not, ask: <em>"Show this SVG inside an HTML page in Canvas so I can preview it."</em></li>
+    <li>Read the list of labels the AI sends back, and check each one against your term list.</li>
+  </ol>
+
+  <h3>Save it as a file</h3>
+  <ol class="steps">
+    <li>Copy all of the code. Use the copy button on the code block so nothing is missed.</li>
+    <li>Open a plain text editor: Notepad on Windows, or TextEdit on a Mac with <strong>Format &gt; Make Plain Text</strong> selected first.</li>
+    <li>Paste the code and save it with a name ending in <code>.svg</code>, such as <code>water-cycle.svg</code>. If your editor adds <code>.txt</code>, rename the file.</li>
+    <li>Double-click the file. It should open in your web browser and display the diagram.</li>
+  </ol>
+  <div class="callout caution">
+    <p class="c-title">If the file shows code instead of a picture</p>
+    <p>The file was probably saved as rich text or with a <code>.txt</code> ending. Save it again as plain text with only the <code>.svg</code> ending, or ask the AI for a version that starts with <code>&lt;svg</code> and contains nothing before it.</p>
+  </div>
+
+  <h3>Get it into your slides</h3>
+  <div class="tabs" data-tabs>
+    <div class="tablist" role="tablist" aria-label="Slide software">
+      <button class="tab" role="tab" id="t-pp" aria-controls="p-pp" aria-selected="true" tabindex="0">PowerPoint</button>
+      <button class="tab" role="tab" id="t-gsl" aria-controls="p-gsl" aria-selected="false" tabindex="-1">Google Slides</button>
+      <button class="tab" role="tab" id="t-lms" aria-controls="p-lms" aria-selected="false" tabindex="-1">LMS page</button>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-pp" aria-labelledby="t-pp">
+      <p>Choose <strong>Insert &gt; Pictures</strong> and select the <code>.svg</code> file. It stays sharp at any size. To edit labels or colors directly in PowerPoint, right-click it and choose <strong>Convert to Shape</strong>.</p>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-gsl" aria-labelledby="t-gsl" hidden>
+      <p>Google Slides doesn't accept SVG files, so convert the graphic to PNG first. Two easy ways: ask the AI, <em>"Give me this as a PNG,"</em> or open the SVG in your browser and take a full-size screenshot. Keep the SVG so you can make changes later.</p>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-lms" aria-labelledby="t-lms" hidden>
+      <p>Most LMS page editors accept an uploaded image. Upload a PNG for the widest support, or an SVG if your LMS allows it. Always add alt text when you insert it. Interactive HTML graphics are different: LMS editors usually strip their code, so host the file and link to it or embed it.</p>
+    </div>
+  </div>
+
+  <div class="lab" data-lab="lab2">
+    <div class="lab-head"><h3>Hands-on lab: draw a diagram with code</h3><span class="lab-count" aria-live="polite"></span></div>
+    <p>About 15 minutes.</p>
+    <ul class="checklist">
+      <li><label><input type="checkbox"><span>In the prompt builder, choose a diagram type and <strong>Code-drawn graphic (SVG)</strong>.</span></label></li>
+      <li><label><input type="checkbox"><span>Check the accuracy rules in step 3, and add one of your own.</span></label></li>
+      <li><label><input type="checkbox"><span>Generate the SVG and preview it in Canvas.</span></label></li>
+      <li><label><input type="checkbox"><span>Check every label in the list the AI sends back.</span></label></li>
+      <li><label><input type="checkbox"><span>Ask for one change, such as larger text or a different layout.</span></label></li>
+      <li><label><input type="checkbox"><span>Save the code as an <code>.svg</code> file and open it in your browser.</span></label></li>
+      <li><label><input type="checkbox"><span>Insert it into PowerPoint, or convert it to PNG for Google Slides.</span></label></li>
+      <li><label><input type="checkbox"><span>Compare it with your Lab 1 image. Which would you use for this concept, and why?</span></label></li>
+    </ul>
+  </div>
+  <div class="facil"><strong>Facilitator:</strong> Saving the file is where most people get stuck, especially on a Mac where TextEdit defaults to rich text. Demonstrate it once on the projector before people start. Have a finished <code>.svg</code> ready to share if someone's code won't render.</div>
+</section>
+
+<!-- ================= 7. REVIEW ================= -->
+<section class="section" id="s-review" data-title="Check accuracy and accessibility" data-time="1:02">
+  <div class="sec-head"><h2>Check it: accuracy and accessibility</h2><span class="sec-time">1:02 – 1:12</span></div>
+  <p class="lede">An AI graphic looks finished long before it is. Checking is the part that makes it yours.</p>
+
+  <h3>Spot the errors</h3>
+  <p>This infographic is the kind of thing an AI tool might return. Read it closely, then mark every statement below that describes a real problem.</p>
+  <figure class="spot">
+    <svg viewBox="0 0 640 380" role="img" aria-labelledby="spotT spotD">
+      <title id="spotT">A sample water cycle infographic with planted errors</title>
+      <desc id="spotD">Title: The Water Cycle. A sun at top left. Ocean at the bottom labeled Evaporaton, with an arrow rising to a cloud labeled Condensation. A second arrow labeled Precipitation points upward from the land to the cloud. A fact box says 97% of Earth's water is fresh water. A note says water boils at 100. The rising arrow is red and the falling arrow is green; a legend shows a red square labeled Rising and a green square labeled Falling.</desc>
+      <rect class="sp-bg" x="0" y="0" width="640" height="380" rx="12"/>
+      <text class="sp-title" x="320" y="38" text-anchor="middle">The Water Cycle</text>
+      <circle class="sp-sun" cx="70" cy="80" r="28"/>
+      <ellipse class="sp-cloud" cx="330" cy="105" rx="80" ry="30"/>
+      <text class="sp-label" x="330" y="110" text-anchor="middle">Condensation</text>
+      <rect class="sp-sea" x="20" y="300" width="300" height="60" rx="6"/>
+      <rect class="sp-land" x="320" y="270" width="300" height="90" rx="6"/>
+      <text class="sp-label" x="170" y="336" text-anchor="middle">Evaporaton</text>
+      <line class="sp-up" x1="200" y1="295" x2="270" y2="145"/>
+      <polygon class="sp-upf" points="270,140 260,160 278,156"/>
+      <line class="sp-down" x1="450" y1="265" x2="390" y2="140"/>
+      <polygon class="sp-downf" points="390,135 386,157 402,150"/>
+      <text class="sp-label" x="470" y="205">Precipitation</text>
+      <rect class="sp-box" x="440" y="60" width="180" height="62" rx="8"/>
+      <text class="sp-small" x="452" y="86">97% of Earth's water</text>
+      <text class="sp-small" x="452" y="106">is fresh water</text>
+      <text class="sp-small" x="40" y="160">Water boils at 100</text>
+      <rect class="sp-k1" x="40" y="200" width="16" height="16"/><rect class="sp-k2" x="40" y="224" width="16" height="16"/>
+      <text class="sp-small" x="64" y="213">Rising</text><text class="sp-small" x="64" y="237">Falling</text>
+    </svg>
+    <figcaption>A sample graphic made for this exercise.</figcaption>
+  </figure>
+  <div id="spotList"></div>
+  <div class="btn-row"><button class="btn" id="spotCheck">Check my answers</button><button class="btn ghost" id="spotReset">Try again</button></div>
+  <p class="result" id="spotResult" aria-live="polite" hidden></p>
+
+  <h3>Write alt text that teaches</h3>
+  <p>Alt text for a teaching graphic shouldn't just describe the picture. It should give a student who can't see it the same takeaway. Keep it short, and put the full detail in a long description below the image or linked from it.</p>
+  <div class="card">
+    <div class="form-grid">
+      <div class="field"><label for="altType">Type of graphic</label>
+        <select id="altType"><option>Diagram</option><option>Flowchart</option><option>Cycle diagram</option><option>Timeline</option><option>Comparison chart</option><option>Bar chart</option><option>Illustration</option><option>Infographic</option></select></div>
+      <div class="field"><label for="altSubject">What it shows</label>
+        <input id="altSubject" type="text" placeholder="e.g., the stages of the water cycle"></div>
+    </div>
+    <div class="field" style="margin-top:var(--s3)"><label for="altPoint">The one thing students should take from it</label>
+      <input id="altPoint" type="text" placeholder="e.g., water moves continuously between the ocean, air, and land"></div>
+    <div class="field" style="margin-top:var(--s3)"><label for="altParts">Parts, in reading order <span class="small">(optional, one per line)</span></label>
+      <textarea id="altParts" rows="3" placeholder="Evaporation&#10;Condensation&#10;Precipitation&#10;Collection"></textarea></div>
+    <h4>Alt text</h4>
+    <div class="output" id="altOut" aria-live="polite"></div>
+    <p class="small" id="altCount"></p>
+    <h4>Long description</h4>
+    <div class="output" id="longOut"></div>
+    <div class="btn-row"><button class="btn" id="altCopy">Copy alt text</button><button class="btn ghost" id="longCopy">Copy long description</button></div>
+  </div>
+
+  <h3>The quick accessibility pass</h3>
+  <ul>
+    <li><strong>Grayscale test:</strong> view it in black and white. If you can't tell parts apart, meaning depends on color alone.</li>
+    <li><strong>Back-row test:</strong> project it or shrink it to phone size. If you can't read the labels, make them bigger or use fewer.</li>
+    <li><strong>Contrast:</strong> dark text on a light background, or the reverse. Avoid text over busy parts of an image.</li>
+    <li><strong>Text in images:</strong> any words baked into an image must also appear in the alt text or long description, because screen readers can't read them.</li>
+  </ul>
+  <div class="facil"><strong>Facilitator:</strong> Run the spot-the-errors activity as a room: give two minutes, then have tables call out what they found. Most groups miss the invented statistic, which is the point to emphasize: errors that look plausible are the dangerous ones.</div>
+</section>
+
+<!-- ================= 8. RIGHTS ================= -->
+<section class="section" id="s-rights" data-title="Copyright, provenance, people" data-time="1:12">
+  <div class="sec-head"><h2>Copyright, provenance, and representation</h2><span class="sec-time">1:12 – 1:20</span></div>
+
+  <h3>Who owns an AI image?</h3>
+  <p>In the United States, the Copyright Office's January 2025 report on AI and copyrightability concluded that prompts alone aren't enough human authorship, so a purely AI-generated image generally can't be copyrighted. Your own contributions can be protected: the labels and text you add, and the way you select and arrange material into a larger work.</p>
+  <ul>
+    <li>Others may be free to reuse a purely AI-generated image, so don't count on owning it.</li>
+    <li>A graphic you label, arrange, and combine with your own content has more of you in it, which matters for course materials you plan to share or publish as OER.</li>
+    <li>Your institution may have its own rules about AI content in course materials.</li>
+  </ul>
+  <p class="small">This is general information, not legal advice. See the <a href="https://www.copyright.gov/ai/">Copyright Office's AI page</a> for the full reports.</p>
+
+  <h3>What not to ask for</h3>
+  <div class="grid">
+    <div class="card"><h4>Living artists' styles</h4><p>Describe the look you want (line weight, palette, texture) instead of naming an artist.</p></div>
+    <div class="card"><h4>Characters and logos</h4><p>No cartoon characters, mascots, brand logos, or product designs, even "in a similar style."</p></div>
+    <div class="card"><h4>Real people</h4><p>No likenesses of real people, including colleagues, public figures, and especially students.</p></div>
+    <div class="card"><h4>Fake history</h4><p>Never present a generated image as a historical photo, document, or artifact.</p></div>
+  </div>
+
+  <h3>Provenance: how AI images are labeled</h3>
+  <p>Many AI images carry hidden signals that identify them as AI-made.</p>
+  <ul>
+    <li><strong>ChatGPT</strong> images include Content Credentials (C2PA metadata) and a SynthID watermark. You can check an image at <a href="https://openai.com/verify">openai.com/verify</a>.</li>
+    <li><strong>Gemini</strong> images include Google's SynthID watermark. You can upload an image to Gemini and ask whether it was made with Google AI.</li>
+    <li>Metadata is easy to lose: screenshots, editing, and some uploads strip it. Watermarks survive better but aren't perfect.</li>
+  </ul>
+  <div class="callout">
+    <p class="c-title">Disclose it yourself</p>
+    <p>Hidden labels aren't a substitute for telling students. A short caption such as "Illustration generated with AI and reviewed by the instructor" is clear and honest, and it models the transparency you want from students.</p>
+  </div>
+
+  <h3>How people are shown</h3>
+  <p>Image generators reproduce patterns from their training data, which can mean stereotyped professions, a narrow range of skin tones and body types, and assumptions about who is a nurse, an engineer, or a CEO. When a graphic includes people:</p>
+  <ul>
+    <li>Ask for people of varied ages, genders, skin tones, body types, and abilities in realistic roles. The prompt builder adds this when you include people.</li>
+    <li>Look at a set of your graphics together. Patterns are easier to see across several images than in one.</li>
+    <li>In health and science courses, show conditions on a range of skin tones.</li>
+  </ul>
+</section>
+
+<!-- ================= 9. SHARE ================= -->
+<section class="section" id="s-share" data-title="Revise and share" data-time="1:20">
+  <div class="sec-head"><h2>Revise and share</h2><span class="sec-time">1:20 – 1:25</span></div>
+
+  <h3>The revision loop</h3>
+  <ol class="steps">
+    <li><strong>Check</strong> the graphic with the prompt builder's Checklist tab.</li>
+    <li><strong>Name the problems</strong> in the Revision tab, or type your own.</li>
+    <li><strong>Paste the revision prompt</strong> into the same chat. Fix one or two things at a time.</li>
+    <li><strong>Stop after two or three rounds</strong> if text keeps coming out wrong. Switch to a no-text image or to code instead of fighting it.</li>
+  </ol>
+  <figure class="shot" data-src="img/w2-04-revision-tab.png" data-alt="The prompt builder's Revision tab with two problems checked and the generated revision prompt">
+    <div class="shot-frame"><div class="chrome"><i></i><i></i><i></i><span>Graphics prompt builder</span></div>
+      <div class="placeholder"><span class="ph-num">Screenshot 4</span><p class="ph-what">The Revision tab with two problems checked and the revision prompt below.</p><code>img/w2-04-revision-tab.png</code></div>
+    </div>
+    <figcaption><b>The Revision tab.</b> It repeats your original rules so the fix doesn't introduce new errors.</figcaption>
+  </figure>
+
+  <h3>Which file to use</h3>
+  <div class="table-wrap">
+    <table>
+      <caption class="sr-only">File formats for graphics</caption>
+      <thead><tr><th scope="col">Format</th><th scope="col">Use it for</th><th scope="col">Good to know</th></tr></thead>
+      <tbody>
+        <tr><td>PNG</td><td>Slides, LMS pages, Google Slides</td><td>Works everywhere. Supports transparent backgrounds.</td></tr>
+        <tr><td>JPG</td><td>Photo-like images</td><td>Smaller files, but text and sharp edges can blur.</td></tr>
+        <tr><td>SVG</td><td>Diagrams you'll edit or print large</td><td>Sharp at any size and editable. Not accepted by Google Slides.</td></tr>
+        <tr><td>PDF</td><td>Printed handouts and posters</td><td>Print from the browser or slide software to make one.</td></tr>
+        <tr><td>HTML</td><td>Interactive graphics</td><td>Host it and link or embed; LMS editors usually strip the code.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Share the setup, not just the file</h3>
+  <p>The prompt builder's <strong>Copy link</strong> button carries every choice you made. Send it to a colleague who teaches the same course and they can make a matching graphic in their own tool, or export the setup as a file to reuse next semester.</p>
+</section>
+
+<!-- ================= 10. QUIZ ================= -->
+<section class="section" id="s-quiz" data-title="Knowledge check" data-time="1:25">
+  <div class="sec-head"><h2>Knowledge check</h2><span class="sec-time">1:25 – 1:30</span></div>
+  <p>Nine questions. You get feedback as soon as you choose an answer.</p>
+  <div id="quiz"></div>
+  <p class="score" id="quizScore" aria-live="polite"></p>
+  <div class="btn-row"><button class="btn ghost" id="quizReset">Shuffle and restart</button></div>
+</section>
+
+<!-- ================= 11. PROMPT LIBRARY ================= -->
+<section class="section" id="s-prompts" data-title="Prompt library" data-time="">
+  <div class="sec-head"><h2>Prompt library</h2><span class="sec-time">Take-away</span></div>
+  <p>Short prompts for common jobs. Replace the words in brackets. For a complete prompt with accuracy and accessibility rules, use the <a href="https://mqaissaunee-bcc.github.io/AI_Examples/graphics-prompt-builder.html" target="_blank" rel="noopener">graphics prompt builder <span class="newtab">(opens in new tab)</span></a>.</p>
+  <div id="promptLib"></div>
+</section>
+
+<!-- ================= 12. QUICK REFERENCE ================= -->
+<section class="section" id="s-ref" data-title="Quick reference" data-time="">
+  <div class="sec-head"><h2>Quick reference</h2><span class="sec-time">Take-away</span></div>
+
+  <details class="ref"><summary>Glossary</summary><div>
+    <p><strong>Image generator:</strong> an AI model that creates pictures pixel by pixel from a text description.</p>
+    <p><strong>Raster image:</strong> a picture made of pixels, such as PNG or JPG. It blurs when enlarged.</p>
+    <p><strong>SVG:</strong> a vector graphic described by code. It stays sharp at any size and its text is editable.</p>
+    <p><strong>Canvas:</strong> a side panel in ChatGPT and Gemini that shows code and a live preview.</p>
+    <p><strong>Leader line:</strong> the thin line connecting a label to the part it names.</p>
+    <p><strong>Alt text:</strong> a short text alternative read by screen readers in place of an image.</p>
+    <p><strong>Long description:</strong> a fuller text version of a complex graphic, placed near it or linked.</p>
+    <p><strong>C2PA / Content Credentials:</strong> metadata that records where an image came from.</p>
+    <p><strong>SynthID:</strong> an invisible watermark that marks content as AI-generated.</p>
+    <p><strong>Nano Banana:</strong> Google's name for the image models in Gemini.</p>
+  </div></details>
+
+  <details class="ref"><summary>Troubleshooting</summary><div>
+    <p><strong>Labels keep coming out misspelled.</strong> After two tries, switch to Image, no text and label it yourself, or use a code-drawn graphic.</p>
+    <p><strong>It won't make the image.</strong> Requests can be blocked for policy reasons, often because of real people, brands, or medical or violent content. Describe the concept more neutrally.</p>
+    <p><strong>A set of images doesn't match.</strong> Generate them in the same chat and ask for "exactly the same style, colors, and viewpoint as the last image."</p>
+    <p><strong>My SVG file shows code, not a picture.</strong> Save it as plain text with only the <code>.svg</code> ending.</p>
+    <p><strong>Google Slides won't take my SVG.</strong> Convert it to PNG first.</p>
+    <p><strong>The chart's numbers are wrong.</strong> Give the data in the prompt and ask for a code-drawn chart; never let it invent numbers.</p>
+    <p><strong>I hit a daily limit.</strong> Limits reset daily. Try the other tool in the meantime.</p>
+    <p><strong>It's blurry when printed.</strong> Use SVG or PDF for print, or ask for the largest available size.</p>
+  </div></details>
+
+  <details class="ref"><summary>Official help articles</summary><div>
+    <ul>
+      <li><a href="https://support.google.com/gemini/answer/14286560">Generate and edit images with Gemini Apps</a></li>
+      <li><a href="https://help.openai.com/en/articles/8912793">C2PA and SynthID in OpenAI-generated images</a> and the <a href="https://openai.com/verify">OpenAI verification tool</a></li>
+      <li><a href="https://support.google.com/gemininotebook/answer/16758265">Infographics in Gemini Notebook</a></li>
+      <li><a href="https://www.copyright.gov/ai/">U.S. Copyright Office: Copyright and Artificial Intelligence</a></li>
+      <li><a href="https://www.w3.org/WAI/tutorials/images/decision-tree/">W3C alt text decision tree</a></li>
+    </ul>
+  </div></details>
+
+  <div class="facil" id="shotPanel">
+    <strong>Facilitator: screenshot checklist.</strong> Save each image in the <code>img</code> folder next to this HTML file, using the exact filename below. Images appear automatically when the page loads; missing ones stay as labeled placeholders. Found images are marked with a check.
+    <ol class="shotlist" id="shotList"></ol>
+  </div>
+</section>
+
+<!-- ================= 13. WRAP ================= -->
+<section class="section" id="s-wrap" data-title="Wrap-up" data-time="1:30">
+  <div class="sec-head"><h2>Wrap-up</h2><span class="sec-time">1:30</span></div>
+  <p>You've seen why AI graphics go wrong, made one with an image generator and one with code, checked them for accuracy and accessibility, and learned what to watch for with copyright and representation. Before you leave, pick one graphic to make for a real course this week.</p>
+  <div class="field" style="max-width:var(--measure)"><label for="nextStep">My next step (saved in this browser)</label>
+    <textarea id="nextStep" rows="3" placeholder="e.g., Redraw my Week 4 process diagram as an SVG and add alt text before I post it."></textarea></div>
+  <p>Need ideas? See <a href="#s-after">After the workshop</a> for activities you can try this week or over the next month.</p>
+  <div class="btn-row"><button class="btn ghost" id="resetAll">Reset my progress on this page</button></div>
+</section>
+
+<!-- ================= AFTER THE WORKSHOP ================= -->
+<section class="section" id="s-after" data-title="After the workshop" data-time="">
+  <div class="sec-head"><h2>After the workshop: try it in your course</h2><span class="sec-time">Take-away</span></div>
+  <p class="lede">Activities for any discipline, from 20-minute quick wins to semester projects.</p>
+  <p>Choose how you want to browse them. Each activity includes steps and a prompt to copy. Activities that involve students also include assignment language you can paste into your LMS. Check off activities as you finish them; your progress saves in this browser.</p>
+
+  <div class="after-controls">
+    <div>
+      <p class="ctrl-label" id="viewLbl">Browse by</p>
+      <div class="chooser" role="group" aria-labelledby="viewLbl">
+        <button class="chip" data-view="time" aria-pressed="true">Time needed</button>
+        <button class="chip" data-view="goal" aria-pressed="false">Goal</button>
+        <button class="chip" data-view="week" aria-pressed="false">30-day challenge</button>
+      </div>
+    </div>
+    <div>
+      <p class="ctrl-label" id="whoLbl">Show</p>
+      <div class="chooser" role="group" aria-labelledby="whoLbl">
+        <button class="chip" data-who="all" aria-pressed="true">All</button>
+        <button class="chip" data-who="f" aria-pressed="false">For your prep</button>
+        <button class="chip" data-who="s" aria-pressed="false">With students</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="key small">
+    <span class="pill who-f">For your prep</span> You make graphics for your course. Students only see the files you post.
+    <br><span class="pill who-s">With students</span> Students take part. Each one says whether students need an AI account.
+  </div>
+
+  <p class="small" id="afterCount" aria-live="polite"></p>
+  <div id="afterList"></div>
+
+  <div class="callout">
+    <p class="c-title">Before you involve students</p>
+    <p>Check your institution's AI policy and tell students how AI is being used in your course. Don't require students to create personal accounts with AI companies; the "no student accounts needed" activities work for everyone. Never upload student photos or work to a personal account.</p>
+  </div>
+  <div class="facil"><strong>Facilitator:</strong> Point people here during the wrap-up. The 30-day challenge works well as a follow-up email series or a check-in a month later, and it leads into Workshop 3 on presentation materials.</div>
+</section>
+
+</main>
+
+</div>
+
+<dialog class="lightbox" id="lightbox" aria-label="Enlarged screenshot">
+  <div class="lb-bar">
+    <p class="lb-cap" id="lbCap"></p>
+    <button type="button" class="btn lb-close" id="lbClose">Close <span aria-hidden="true">✕</span></button>
+  </div>
+  <div class="lb-stage"><img id="lbImg" alt=""></div>
+</dialog>
+
+<footer>
+  <p>Images and infographics workshop tutorial, AI Teaching Workshop Series, Fall 2026. Features, limits, and policies reflect OpenAI and Google documentation as of October 2026 and may change. This page is general guidance, not legal advice.</p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var KEY = "ai-graphics-workshop-v1";
+  var state = {done:{}, labs:{}, next:"", facil:false};
+  try { var saved = JSON.parse(localStorage.getItem(KEY)); if (saved) state = Object.assign(state, saved); } catch(e){}
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+
+  /* ---------- Navigation + progress ---------- */
+  var sections = Array.prototype.slice.call(document.querySelectorAll(".section"));
+  var navList = document.getElementById("navList");
+  var total = sections.length;
+  document.getElementById("progressBar").setAttribute("aria-valuemax", total);
+  sections.forEach(function(sec){
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    a.href = "#" + sec.id;
+    a.dataset.id = sec.id;
+    var tick = document.createElement("span");
+    tick.className = "tick"; tick.setAttribute("role","checkbox"); tick.setAttribute("tabindex","0");
+    tick.setAttribute("aria-label","Mark " + sec.dataset.title + " done");
+    tick.textContent = "✓";
+    var label = document.createElement("span"); label.textContent = sec.dataset.title;
+    a.appendChild(tick); a.appendChild(label);
+    if (sec.dataset.time){ var t=document.createElement("span"); t.className="time"; t.textContent=sec.dataset.time; a.appendChild(t); }
+    li.appendChild(a); navList.appendChild(li);
+    function toggle(ev){ ev.preventDefault(); ev.stopPropagation(); state.done[sec.id] = !state.done[sec.id]; save(); renderProgress(); }
+    tick.addEventListener("click", toggle);
+    tick.addEventListener("keydown", function(ev){ if (ev.key===" "||ev.key==="Enter") toggle(ev); });
+    a.addEventListener("click", function(){ closeMenu(); });
+  });
+  function renderProgress(){
+    var n = 0;
+    navList.querySelectorAll("a").forEach(function(a){
+      var d = !!state.done[a.dataset.id];
+      a.classList.toggle("done", d);
+      a.querySelector(".tick").setAttribute("aria-checked", d ? "true" : "false");
+      if (d) n++;
+    });
+    document.getElementById("progressFill").style.width = (n/total*100) + "%";
+    document.getElementById("progressBar").setAttribute("aria-valuenow", n);
+    document.getElementById("progressText").textContent = n + " of " + total + " done";
+  }
+  renderProgress();
+
+  if ("IntersectionObserver" in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.isIntersecting){
+          navList.querySelectorAll("a").forEach(function(a){ a.setAttribute("aria-current", a.dataset.id===en.target.id ? "true" : "false"); });
+        }
+      });
+    }, {rootMargin:"-40% 0px -55% 0px"});
+    sections.forEach(function(s){ io.observe(s); });
+  }
+
+  var menuBtn = document.getElementById("menuBtn");
+  var sidenav = document.getElementById("sidenav");
+  function closeMenu(){ sidenav.classList.remove("open"); menuBtn.setAttribute("aria-expanded","false"); }
+  menuBtn.addEventListener("click", function(){
+    var open = sidenav.classList.toggle("open");
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  document.addEventListener("keydown", function(e){ if (e.key==="Escape" && sidenav.classList.contains("open")){ closeMenu(); menuBtn.focus(); } });
+
+  /* ---------- Facilitator toggle ---------- */
+  var facil = document.getElementById("facilToggle");
+  facil.checked = !!state.facil;
+  document.body.classList.toggle("show-facil", facil.checked);
+  facil.addEventListener("change", function(){ state.facil = facil.checked; document.body.classList.toggle("show-facil", facil.checked); save(); });
+
+  /* ---------- Screenshots: auto-load from img/ ---------- */
+  var lb = document.getElementById("lightbox");
+  var lbImg = document.getElementById("lbImg");
+  var lbCap = document.getElementById("lbCap");
+  var lbReturn = null;
+  function openLightbox(img, fig, opener){
+    lbImg.src = img.src;
+    lbImg.alt = img.alt;
+    lbImg.style.width = img.naturalWidth + "px";
+    var cap = fig.querySelector("figcaption");
+    lbCap.textContent = cap ? cap.textContent : "";
+    lbReturn = opener;
+    if (typeof lb.showModal === "function") lb.showModal(); else lb.setAttribute("open","");
+    document.body.classList.add("lb-open");
+    document.getElementById("lbClose").focus();
+  }
+  function closeLightbox(){
+    if (typeof lb.close === "function") lb.close();
+    else { lb.removeAttribute("open"); afterClose(); }
+  }
+  function afterClose(){
+    document.body.classList.remove("lb-open");
+    if (lbReturn) lbReturn.focus();
+  }
+  lb.addEventListener("close", afterClose);
+  document.getElementById("lbClose").addEventListener("click", closeLightbox);
+  lb.addEventListener("click", function(e){ if (e.target === lb || e.target.classList.contains("lb-stage")) closeLightbox(); });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape" && typeof lb.showModal !== "function" && lb.hasAttribute("open")) closeLightbox(); });
+
+  var shotList = document.getElementById("shotList");
+  var shots = Array.prototype.slice.call(document.querySelectorAll("figure.shot[data-src]"));
+  shots.sort(function(a,b){ return a.dataset.src.localeCompare(b.dataset.src); });
+  shots.forEach(function(fig){
+    var li = document.createElement("li");
+    var what = fig.querySelector(".ph-what");
+    li.innerHTML = "<code></code> ";
+    li.firstChild.textContent = fig.dataset.src;
+    li.appendChild(document.createTextNode(what ? what.textContent : ""));
+    shotList.appendChild(li);
+    var img = new Image();
+    img.addEventListener("load", function(){
+      img.alt = fig.dataset.alt || "";
+      img.loading = "lazy";
+      /* Screenshots are assumed to be Retina (2x) captures; add data-scale="1" to a figure for 1x images. */
+      var scale = parseFloat(fig.dataset.scale) || 2;
+      img.style.maxWidth = Math.round(img.naturalWidth / scale) + "px";
+      var frame = fig.querySelector(".shot-frame");
+      var zoom = document.createElement("button");
+      zoom.type = "button";
+      zoom.className = "zoom-btn";
+      zoom.setAttribute("aria-label", "Enlarge screenshot: " + (fig.dataset.alt || "screenshot"));
+      zoom.appendChild(img);
+      var hint = document.createElement("span");
+      hint.className = "zoom-hint"; hint.setAttribute("aria-hidden","true");
+      hint.textContent = "⤢ Click to enlarge";
+      zoom.appendChild(hint);
+      zoom.addEventListener("click", function(){ openLightbox(img, fig, zoom); });
+      frame.appendChild(zoom);
+      fig.classList.add("has-image");
+      li.classList.add("found");
+    });
+    img.src = fig.dataset.src;
+  });
+
+  /* ---------- Tabs ---------- */
+  document.querySelectorAll("[data-tabs]").forEach(function(group){
+    var tabs = Array.prototype.slice.call(group.querySelectorAll('[role="tab"]'));
+    function activate(tab, focus){
+      tabs.forEach(function(t){
+        var sel = t===tab;
+        t.setAttribute("aria-selected", sel ? "true" : "false");
+        t.tabIndex = sel ? 0 : -1;
+        document.getElementById(t.getAttribute("aria-controls")).hidden = !sel;
+      });
+      if (focus) tab.focus();
+    }
+    tabs.forEach(function(t,i){
+      t.addEventListener("click", function(){ activate(t,false); });
+      t.addEventListener("keydown", function(e){
+        var idx = null;
+        if (e.key==="ArrowRight") idx=(i+1)%tabs.length;
+        else if (e.key==="ArrowLeft") idx=(i-1+tabs.length)%tabs.length;
+        else if (e.key==="Home") idx=0;
+        else if (e.key==="End") idx=tabs.length-1;
+        if (idx!==null){ e.preventDefault(); activate(tabs[idx],true); }
+      });
+    });
+  });
+
+
+  /* ---------- Image or code sorter ---------- */
+  var SORT_OPTS = {img:"Image with text", notext:"Image, no text", code:"Code-drawn"};
+  var sortItems = [
+    {t:"A realistic scene of a patient arriving at a clinic, for a case study discussion.", ok:["img","notext"], e:"Scenes are what image generators do best. If the scene needs no signs or labels, either image option works."},
+    {t:"A 10-step decision flowchart for troubleshooting a problem in your field.", ok:["code"], e:"Flowcharts are mostly text and arrows that must point exactly right. Code draws both reliably."},
+    {t:"A labeled cross-section of a leaf with eight named parts.", ok:["notext","code"], e:"Eight labels is a lot for an image generator. Make a clean picture and label it yourself, or draw a simpler version with code."},
+    {t:"A bar chart of your own section's average exam scores over five semesters.", ok:["code"], e:"Charts must match real numbers. Give the data and have the chatbot draw it with code, so nothing is invented."},
+    {t:"A banner image for the top of an LMS module titled 'Unit 3: The Industrial Revolution.'", ok:["img","notext"], e:"A banner is mostly mood and imagery. Leave the title out of the image and type it in your LMS, or keep it to those few words."},
+    {t:"A one-page reference sheet with 20 formulas and definitions.", ok:["code"], e:"Dense text and notation are exactly where image generators fail. Code keeps every character exact."},
+    {t:"A visual analogy comparing a cell membrane to a security checkpoint.", ok:["notext","img"], e:"Analogies are illustrations. Generate the picture without text and add the two or three labels yourself."},
+    {t:"A timeline of 12 events, each with a date.", ok:["code"], e:"Twelve dates and labels in an exact order is a job for code."}
+  ];
+  var sorterEl = document.getElementById("sorter");
+  var sorterScore = document.getElementById("sorterScore");
+  var sortDone = 0, sortRight = 0;
+  sortItems.forEach(function(item, i){
+    var box = document.createElement("div"); box.className = "sort-item";
+    var p = document.createElement("p"); p.className = "sort-q"; p.textContent = (i+1) + ". " + item.t; box.appendChild(p);
+    var row = document.createElement("div"); row.className = "chooser"; row.setAttribute("role","group"); row.setAttribute("aria-label","How would you make graphic " + (i+1) + "?");
+    var fb = document.createElement("p"); fb.className = "fb"; fb.hidden = true;
+    Object.keys(SORT_OPTS).forEach(function(k){
+      var b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = SORT_OPTS[k]; b.setAttribute("aria-pressed","false");
+      b.addEventListener("click", function(){
+        if (box.dataset.done) return;
+        box.dataset.done = "1";
+        row.querySelectorAll("button").forEach(function(x){ x.disabled = true; x.setAttribute("aria-pressed", String(x === b)); });
+        var right = item.ok.indexOf(k) >= 0;
+        fb.hidden = false; fb.className = "fb " + (right ? "right" : "wrong");
+        fb.textContent = (right ? "Good choice. " : "Not the best fit. Try " + item.ok.map(function(o){ return SORT_OPTS[o].toLowerCase(); }).join(" or ") + ". ") + item.e;
+        sortDone++; if (right) sortRight++;
+        if (sortDone === sortItems.length) sorterScore.textContent = "You matched " + sortRight + " of " + sortItems.length + ".";
+      });
+      row.appendChild(b);
+    });
+    box.appendChild(row); box.appendChild(fb); sorterEl.appendChild(box);
+  });
+
+  /* ---------- Prompt anatomy ---------- */
+  var PARTS = [
+    {id:"aud", label:"Audience"},
+    {id:"idea", label:"The one idea"},
+    {id:"type", label:"Graphic type"},
+    {id:"words", label:"Exact words"},
+    {id:"look", label:"Look and size"},
+    {id:"rules", label:"Rules"}
+  ];
+  var EXAMPLES = {
+    nursing:{base:"Make an infographic about hand hygiene.",
+      aud:"It's for first-semester nursing students.",
+      idea:"It must make one idea clear: health care workers clean their hands at five specific moments during patient care.",
+      type:"Make it a cycle diagram with the five moments arranged evenly around a patient, connected by arrows.",
+      words:"Use only these labels, spelled exactly: \u201CBefore touching a patient\u201D, \u201CBefore a clean or aseptic procedure\u201D, \u201CAfter body fluid exposure risk\u201D, \u201CAfter touching a patient\u201D, \u201CAfter touching patient surroundings\u201D.",
+      look:"Use a clean, flat style in calm blues and greens, sized for a 16:9 slide, with large text that's readable from the back of a room.",
+      rules:"Don't include logos or brand names, show caregivers and patients of varied backgrounds, don't rely on color alone, and don't add any facts I haven't given you."},
+    business:{base:"Make an infographic about the accounting equation.",
+      aud:"It's for students in an introductory accounting course.",
+      idea:"It must make one idea clear: assets always equal liabilities plus owner's equity, so every transaction keeps the two sides balanced.",
+      type:"Make it a balance scale, with assets on one side and liabilities plus owner's equity on the other.",
+      words:"Use only these labels, spelled exactly: \u201CAssets\u201D, \u201CLiabilities\u201D, \u201COwner's equity\u201D, \u201CA = L + OE\u201D.",
+      look:"Use a professional textbook style in navy and gold, sized for a 16:9 slide, with plenty of white space.",
+      rules:"Use a fictional company name if you need one, label any sample numbers as hypothetical, and don't rely on color alone to tell the sides apart."},
+    history:{base:"Make an infographic about the causes of World War I.",
+      aud:"It's for first-year college students in a survey history course.",
+      idea:"It must make one idea clear: long-term tensions set the stage, and a single event triggered the war.",
+      type:"Make it a cause-and-effect diagram: four long-term causes on the left feeding into one trigger event in the center, leading to the outbreak of war on the right.",
+      words:"Use only these labels, spelled exactly: \u201CMilitarism\u201D, \u201CAlliances\u201D, \u201CImperialism\u201D, \u201CNationalism\u201D, \u201CAssassination of Franz Ferdinand, June 1914\u201D, \u201COutbreak of war\u201D.",
+      look:"Use an editorial style with muted, period-appropriate colors, sized for a printed letter-size handout in landscape.",
+      rules:"Don't depict real people's faces, keep objects and settings accurate to the period, and don't present anything as a real historical photo."}
+  };
+  var anaState = {ex:"nursing", on:{}};
+  var partList = document.getElementById("partList");
+  PARTS.forEach(function(p){
+    var li = document.createElement("li");
+    var lab = document.createElement("label");
+    var cb = document.createElement("input"); cb.type = "checkbox"; cb.dataset.part = p.id;
+    var sp = document.createElement("span"); sp.textContent = "Add the " + p.label.toLowerCase();
+    lab.appendChild(cb); lab.appendChild(sp); li.appendChild(lab); partList.appendChild(li);
+    cb.addEventListener("change", function(){ anaState.on[p.id] = cb.checked; renderAnatomy(); });
+  });
+  function renderAnatomy(){
+    var ex = EXAMPLES[anaState.ex];
+    var bits = [ex.base];
+    var n = 0;
+    PARTS.forEach(function(p){ if (anaState.on[p.id]){ bits.push(ex[p.id]); n++; } });
+    document.getElementById("anaOut").textContent = bits.join(" ");
+    document.getElementById("anaBase").textContent = n === 0 ? "This is the vague version. Check the boxes to add each part." : n + " of 6 parts added" + (n === 6 ? ". Compare it with where you started." : ".");
+  }
+  document.querySelectorAll("#exChooser .chip").forEach(function(c){
+    c.addEventListener("click", function(){
+      anaState.ex = c.dataset.ex;
+      document.querySelectorAll("#exChooser .chip").forEach(function(x){ x.setAttribute("aria-pressed", String(x === c)); });
+      renderAnatomy();
+    });
+  });
+  document.getElementById("anaCopy").addEventListener("click", function(){ copyText(document.getElementById("anaOut").textContent, this); });
+  renderAnatomy();
+
+  /* ---------- Spot the errors ---------- */
+  var spotItems = [
+    {t:"The word \u201CEvaporaton\u201D is misspelled.", real:true, e:"A classic image-generator slip. It would be easy to miss when glancing at a slide."},
+    {t:"The Precipitation arrow points up toward the cloud instead of down to the land.", real:true, e:"Arrow direction errors change the meaning of a process diagram entirely."},
+    {t:"The fact box says 97% of Earth's water is fresh water.", real:true, e:"It's the reverse: about 97% of Earth's water is salt water. Plausible-looking invented or flipped statistics are the most dangerous errors."},
+    {t:"\u201CWater boils at 100\u201D has no unit.", real:true, e:"100 what? It should say 100 \u00B0C (at sea level). Missing units are common in generated graphics."},
+    {t:"The arrows are told apart only by red versus green.", real:true, e:"Red and green are the hardest pair for people with the most common color vision deficiency. Add arrow labels or different line styles."},
+    {t:"The title is at the top of the graphic.", real:false, e:"That's good practice, not a problem."},
+    {t:"The sun is drawn in a simple, flat style.", real:false, e:"A simple style is fine and often clearer for teaching."},
+    {t:"Condensation is labeled at the cloud.", real:false, e:"That's correct: condensation forms clouds."}
+  ];
+  var spotList = document.getElementById("spotList");
+  var spotOrder = shuffle(spotItems);
+  function renderSpot(){
+    spotList.innerHTML = "";
+    var ul = document.createElement("ul"); ul.className = "checklist spot-list";
+    spotOrder.forEach(function(it, i){
+      var li = document.createElement("li");
+      var lab = document.createElement("label");
+      var cb = document.createElement("input"); cb.type = "checkbox"; cb.dataset.i = i;
+      var sp = document.createElement("span"); sp.textContent = it.t;
+      lab.appendChild(cb); lab.appendChild(sp); li.appendChild(lab);
+      var fb = document.createElement("p"); fb.className = "fb"; fb.hidden = true; li.appendChild(fb);
+      ul.appendChild(li);
+    });
+    spotList.appendChild(ul);
+    document.getElementById("spotResult").hidden = true;
+  }
+  document.getElementById("spotCheck").addEventListener("click", function(){
+    var right = 0;
+    spotList.querySelectorAll("li").forEach(function(li, i){
+      var it = spotOrder[i], cb = li.querySelector("input"), fb = li.querySelector(".fb");
+      var ok = cb.checked === it.real;
+      if (ok) right++;
+      cb.disabled = true;
+      fb.hidden = false; fb.className = "fb " + (ok ? "right" : "wrong");
+      fb.textContent = (it.real ? "Real problem. " : "Not a problem. ") + it.e;
+    });
+    var res = document.getElementById("spotResult");
+    res.hidden = false;
+    res.textContent = "You judged " + right + " of " + spotOrder.length + " statements correctly. There are five real errors in this graphic.";
+  });
+  document.getElementById("spotReset").addEventListener("click", function(){ spotOrder = shuffle(spotItems); renderSpot(); });
+  renderSpot();
+
+  /* ---------- Alt text builder ---------- */
+  function altVal(id){ return document.getElementById(id).value.trim(); }
+  function buildAlt(){
+    var type = altVal("altType"), subj = altVal("altSubject") || "[what it shows]", point = altVal("altPoint");
+    var alt = type + " of " + subj.replace(/[.]$/,"") + (point ? ", showing that " + point.replace(/[.]$/,"") : "") + ".";
+    document.getElementById("altOut").textContent = alt;
+    var n = alt.length;
+    document.getElementById("altCount").textContent = n + " characters. " + (n > 250 ? "That's long for alt text; move detail into the long description." : "A sentence or two is right for alt text.");
+    var parts = altVal("altParts").split(/\n+/).map(function(x){ return x.trim(); }).filter(Boolean);
+    var lines = [type + " of " + subj.replace(/[.]$/,"") + "."];
+    if (point) lines.push("Main point: " + point.charAt(0).toUpperCase() + point.slice(1).replace(/[.]$/,"") + ".");
+    if (parts.length){
+      lines.push("The graphic shows " + parts.length + " parts, in this order:");
+      parts.forEach(function(p, i){ lines.push((i+1) + ". " + p + ": [what this part shows or how it connects to the next]"); });
+    } else {
+      lines.push("[List each part in reading order, with what it shows and how it connects to the next.]");
+    }
+    lines.push("[Include any words, numbers, or data that appear in the graphic.]");
+    document.getElementById("longOut").textContent = lines.join("\n");
+  }
+  ["altType","altSubject","altPoint","altParts"].forEach(function(id){ var e = document.getElementById(id); e.addEventListener("input", buildAlt); e.addEventListener("change", buildAlt); });
+  document.getElementById("altCopy").addEventListener("click", function(){ copyText(document.getElementById("altOut").textContent, this); });
+  document.getElementById("longCopy").addEventListener("click", function(){ copyText(document.getElementById("longOut").textContent, this); });
+  buildAlt();
+
+  /* ---------- Copy helper ---------- */
+  function copyText(text, btn){
+    var original = btn.textContent;
+    function done(ok){ btn.textContent = ok ? "Copied" : "Select and copy manually"; setTimeout(function(){ btn.textContent = original; }, 1800); }
+    if (navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(text).then(function(){ done(true); }, function(){ fallback(); });
+    } else fallback();
+    function fallback(){
+      try {
+        var ta = document.createElement("textarea");
+        ta.value = text; ta.setAttribute("readonly",""); ta.style.position="absolute"; ta.style.left="-9999px";
+        document.body.appendChild(ta); ta.select();
+        var ok = document.execCommand("copy");
+        document.body.removeChild(ta); done(ok);
+      } catch(e){ done(false); }
+    }
+  }
+
+  /* ---------- Prompt library ---------- */
+  var library = [
+    ["v","Image","Text-free illustration","Create an image: a clean, flat illustration of [concept] for [audience]. Do not include any text, letters, numbers, or labels. Leave open space around each part so I can add labels later. Use a 16:9 landscape shape and a color-blind-safe palette."],
+    ["v","Image","Visual analogy","Create an image that explains [concept] by showing [familiar everyday thing] working the same way. Make the parallel obvious, keep the background simple, and include no text."],
+    ["v","Image","Case-study scene","Create a realistic image of [setting] at the moment just before [problem or decision]. Show people of varied ages, genders, and skin tones in realistic roles. No text, logos, or brand names."],
+    ["v","Image","LMS module banner","Create a wide 4:1 banner image that suggests [topic] using simple shapes and [colors]. Keep it uncluttered with open space on the left for a title I'll add myself. No text."],
+    ["c","Code","Process diagram","Create a single, self-contained SVG file showing the steps of [process] from left to right, each in its own box, joined by arrows. Use only these labels, spelled exactly: [labels]. Add a <title> and <desc>, use real text elements, and set the viewBox to 0 0 1920 1080."],
+    ["c","Code","Comparison table graphic","Create a single, self-contained SVG comparing [A] and [B] in two columns, with the same features in the same rows: [features]. Mark differences with icons as well as color. Use real text elements and a color-blind-safe palette."],
+    ["c","Code","Data chart","Create a single, self-contained SVG bar chart of exactly this data: [data]. Label both axes with units, start the y-axis at zero, and use a title that states the main takeaway. Don't add any data I haven't given."],
+    ["c","Code","Click-to-explore diagram","Create a single HTML file with inline CSS and JavaScript showing a labeled diagram of [object]. When a student clicks, taps, or tabs to a part, show a short explanation of it. Make every part keyboard-accessible and use no external libraries."],
+    ["o","Revise","Fix one thing","Keep everything the same, but [one specific change]. Don't change anything else."],
+    ["o","Revise","Match a set","Make another image in exactly the same style, colors, and viewpoint as the last one, showing [next concept]."],
+    ["o","Alt text","Draft alt text","Write alt text (under 150 characters) for this graphic that tells a student what it teaches, not just what it shows. Then write a long description listing every part in reading order, including all text and numbers."],
+    ["o","Check","Accuracy review","Review this graphic as a [discipline] instructor would. List every label, number, and arrow, and flag anything that is inaccurate, misspelled, unclear, or missing."]
+  ];
+  var lib = document.getElementById("promptLib");
+  library.forEach(function(p){
+    var d = document.createElement("div"); d.className="prompt";
+    var top = document.createElement("div"); top.className="prompt-top";
+    var b = document.createElement("b"); b.textContent = p[2] + " ";
+    var pill = document.createElement("span"); pill.className = "pill " + p[0]; pill.textContent = p[1];
+    b.appendChild(pill);
+    var btn = document.createElement("button"); btn.className="btn ghost copy"; btn.textContent="Copy"; btn.dataset.copy = p[3];
+    btn.setAttribute("aria-label","Copy prompt: " + p[2]);
+    top.appendChild(b); top.appendChild(btn);
+    var q = document.createElement("blockquote"); q.textContent = p[3];
+    d.appendChild(top); d.appendChild(q); lib.appendChild(d);
+  });
+  document.querySelectorAll(".copy").forEach(function(btn){
+    btn.addEventListener("click", function(){ copyText(btn.dataset.copy, btn); });
+  });
+
+  /* ---------- Labs ---------- */
+  document.querySelectorAll("[data-lab]").forEach(function(lab){
+    var id = lab.dataset.lab;
+    var boxes = Array.prototype.slice.call(lab.querySelectorAll('input[type="checkbox"]'));
+    var count = lab.querySelector(".lab-count");
+    var saved = state.labs[id] || [];
+    boxes.forEach(function(b,i){ b.checked = !!saved[i]; });
+    function update(){
+      var vals = boxes.map(function(b){ return b.checked; });
+      state.labs[id] = vals; save();
+      var n = vals.filter(Boolean).length;
+      count.textContent = n + " of " + boxes.length + " steps done";
+    }
+    boxes.forEach(function(b){ b.addEventListener("change", update); });
+    var n0 = boxes.filter(function(b){ return b.checked; }).length;
+    count.textContent = n0 + " of " + boxes.length + " steps done";
+  });
+
+  /* ---------- Quiz ---------- */
+  var questions = [
+    {q:"Why do image generators often misspell the labels on a diagram?", a:"They draw shapes that look like letters instead of writing actual text.", w:["They're trained only on languages other than English.","Labels are deliberately scrambled to protect copyright.","They can't create any text at all."], e:"An image model draws pixels. Code writes real text, which is why it's better for label-heavy graphics."},
+    {q:"You need a flowchart with 10 steps and decision points for a handout. What's the best way to make it?", a:"Ask a chatbot for a code-drawn SVG.", w:["Ask an image generator for an image with all the labels.","Generate a photorealistic image and crop it.","Ask for an image, then hope the arrows come out right."], e:"Flowcharts are mostly text and arrows that must be exact. Code handles both."},
+    {q:"Which detail does the most to keep a generated infographic from becoming cluttered?", a:"Naming the one idea the graphic must make clear.", w:["Asking for more colors.","Requesting the highest resolution.","Adding the word \u201Cinfographic\u201D twice."], e:"A single, specific idea gives the AI a reason to leave things out."},
+    {q:"Your generated image is nearly perfect, but one arrow points the wrong way. What should you do?", a:"In the same chat, ask it to fix only that arrow and keep everything else.", w:["Start a new chat with the original prompt.","Delete the image and switch tools.","Accept it, since students won't notice."], e:"Conversational editing keeps what works. Name one change at a time."},
+    {q:"You ask for a bar chart of enrollment trends but don't supply numbers. What's the main risk?", a:"The AI may invent realistic-looking numbers.", w:["The chart will be in black and white.","The AI will refuse to make a chart.","The bars will be the wrong width."], e:"Always give the data yourself and ask it not to add any."},
+    {q:"According to the U.S. Copyright Office's 2025 report, can you usually copyright an image generated purely from your prompt?", a:"No. Prompts alone aren't enough human authorship.", w:["Yes, the person who writes the prompt owns the image.","Yes, if the prompt is longer than 100 words.","Only if you pay for the AI tool."], e:"Your own additions, such as labels and arrangement, can be protected; the purely generated image generally can't."},
+    {q:"What should alt text for a teaching diagram focus on?", a:"What students should learn from it, in a sentence or two.", w:["A detailed description of every color and shape.","The name of the AI tool that made it.","The file name and size."], e:"Give the takeaway in the alt text and put the full detail in a long description."},
+    {q:"Your school uses Microsoft 365 and students don't have Google or ChatGPT accounts. What's the best way to give them a graphic you made?", a:"Download the file and post it in your LMS, OneDrive, or Teams.", w:["Ask every student to create a ChatGPT account.","Share a link to your chat so they can see the image.","Upload your class roster so the tool can invite students."], e:"Posting the file means students never need an AI account, and no student data leaves your systems."},
+    {q:"A student asks whether an image on your slide was AI-generated. What's the most reliable answer?", a:"Tell them yourself, ideally with a caption on the image.", w:["Rely on the hidden watermark to tell them.","Say you can't know because metadata is always removed.","Tell them to run it through a detector."], e:"Hidden signals can be stripped or missed. Clear disclosure is your job."}
+  ];
+  function shuffle(arr){ var a=arr.slice(); for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+  var quizEl = document.getElementById("quiz");
+  var scoreEl = document.getElementById("quizScore");
+  var answered, correct;
+  function renderQuiz(){
+    quizEl.innerHTML = ""; answered = 0; correct = 0; scoreEl.textContent = "";
+    shuffle(questions).forEach(function(item, qi){
+      var box = document.createElement("div"); box.className="q";
+      var fs = document.createElement("fieldset");
+      var lg = document.createElement("legend"); lg.textContent = (qi+1) + ". " + item.q;
+      fs.appendChild(lg);
+      var opts = shuffle([item.a].concat(item.w));
+      var fb = document.createElement("p"); fb.className="fb"; fb.hidden = true; fb.setAttribute("aria-live","polite");
+      opts.forEach(function(o, oi){
+        var lab = document.createElement("label");
+        var inp = document.createElement("input"); inp.type="radio"; inp.name="q"+qi; inp.value=o;
+        var sp = document.createElement("span"); sp.textContent = o;
+        lab.appendChild(inp); lab.appendChild(sp); fs.appendChild(lab);
+        inp.addEventListener("change", function(){
+          var right = o===item.a;
+          fs.querySelectorAll("input").forEach(function(x){ x.disabled = true; });
+          fb.hidden = false;
+          fb.className = "fb " + (right ? "right" : "wrong");
+          fb.textContent = (right ? "Correct. " : "Not quite. The answer is: " + item.a + " ") + item.e;
+          answered++; if (right) correct++;
+          if (answered===questions.length) scoreEl.textContent = "You scored " + correct + " out of " + questions.length + ".";
+        });
+      });
+      fs.appendChild(fb); box.appendChild(fs); quizEl.appendChild(box);
+    });
+  }
+  renderQuiz();
+  document.getElementById("quizReset").addEventListener("click", renderQuiz);
+
+
+  /* ---------- After the workshop activities ---------- */
+  var TIME = {quick:"Under 30 minutes", build:"1–2 hours", project:"Half a day or ongoing"};
+  var GOAL = {prep:"Course preparation", access:"Accessibility and student support", assess:"Assessment and practice", active:"Active learning", pro:"Professional practice"};
+  var WEEK = {1:"Week 1: Quick wins", 2:"Week 2: Fix what you have", 3:"Week 3: Go deeper", 4:"Week 4: Bring students in"};
+  var NOACCT = "No student accounts needed. Students only use files or pages you post.";
+  var ACCT = "Students need an AI tool account. Don't require personal accounts; make this optional, or offer a no-account activity instead.";
+  var acts = [
+    {id:"f-replace", who:"f", time:"quick", goal:"prep", week:1, t:"Replace one decorative image with a teaching graphic",
+     d:"Find a slide where an image is just decoration and replace it with a graphic that explains the idea on that slide.",
+     steps:["Open a slide deck you'll use in the next two weeks and find a slide with a decorative stock image.","Write down the one idea that slide is meant to teach.","Build a prompt in the graphics prompt builder and generate the graphic.","Replace the old image and add alt text."],
+     p:"Create a simple diagram for [audience] that makes one idea clear: [the slide's main idea]. Use only these labels, spelled exactly: [terms]. Keep it uncluttered, with large text readable from the back of a room.",
+     tell:"Some graphics in this course were made with AI and reviewed by me for accuracy. If you spot an error, let me know and you'll help the next class too."},
+    {id:"f-banner", who:"f", time:"quick", goal:"prep", week:1, t:"Make matching module banners for your LMS",
+     d:"Give each module a consistent banner so students can see at a glance where they are in the course.",
+     steps:["In the prompt builder, use the LMS module banner quick start.","Generate the first banner, then ask for the others \u201Cin exactly the same style\u201D in the same chat.","Add module titles yourself in the LMS so they're real text.","Add short alt text, or mark them as decorative if your LMS allows it."],
+     p:"Create a wide 4:1 banner suggesting [module topic] with simple shapes in [colors]. No text. Leave open space on the left for a title."},
+    {id:"f-diagram", who:"f", time:"build", goal:"prep", week:2, t:"Redraw your messiest whiteboard diagram",
+     d:"Turn the diagram you sketch every semester into a clean, editable SVG you can reuse.",
+     steps:["Photograph or describe your usual whiteboard sketch. Leave out anything with student names.","Use the prompt builder with a code-drawn graphic, listing every label exactly.","Generate, check every label and arrow, and revise.","Save the SVG and insert it into your slides and LMS page."],
+     p:"Redraw this diagram as a single, self-contained SVG for [audience]. Keep the same structure, use only these labels spelled exactly: [labels], and make all text real text elements so I can edit it later."},
+    {id:"f-alt", who:"f", time:"quick", goal:"access", week:2, t:"Write alt text for one module's images",
+     d:"Go through one module and give every meaningful image alt text that tells students what it teaches.",
+     steps:["List the images in one module.","Decide which are decorative and which carry meaning.","For each meaningful image, use the alt text builder on this page or the prompt below.","Rewrite the draft in your own words and add it in your LMS."],
+     p:"Write alt text (under 150 characters) for this graphic that tells a student what it teaches, not just what it shows. Then write a long description listing every part in reading order, including all text and numbers.",
+     note:"Upload only images you made or have the right to use. Review every AI draft, since only you know what the image is meant to teach."},
+    {id:"f-cheat", who:"f", time:"build", goal:"assess", week:3, t:"Build a one-page reference sheet",
+     d:"Make a printable sheet of key terms, steps, or formulas that students can use while studying.",
+     steps:["List what belongs on the sheet, with exact wording.","Use the prompt builder's Printable reference sheet quick start.","Generate it as code so every character is exact, then check every entry.","Save as PDF from your browser and post it."],
+     p:"Create a single, self-contained SVG reference sheet for [audience] on [topic], letter size, portrait. Organize these items into clearly headed blocks, exactly as written: [items]. Use grayscale so it prints cheaply.",
+     tell:"This reference sheet covers the key [terms / steps / formulas] for [unit]. Use it while you study, but make sure you can explain each item without it."},
+    {id:"f-miscon", who:"f", time:"build", goal:"active", week:3, t:"Make a misconception graphic",
+     d:"Show the common wrong idea next to the correct one, so students can see exactly where their thinking goes off track.",
+     steps:["Choose a misconception you see every semester.","Use a Side-by-side comparison or Before and after type in the prompt builder.","Fill in the misconception field so the prompt asks the AI to correct it.","Use it to open a class discussion: \u201CWhich of these matches what you thought?\u201D"],
+     p:"Create a side-by-side graphic for [audience]. On the left, show the common misconception that [misconception]. On the right, show what actually happens: [correct idea]. Label the sides \u201CCommon idea\u201D and \u201CWhat really happens.\u201D"},
+    {id:"f-scenario", who:"f", time:"quick", goal:"active", week:0, t:"Create a case-study scene",
+     d:"Give a case study or discussion prompt a realistic opening image that students can examine for clues.",
+     steps:["Write the case in two or three sentences.","Use the Scenario or case scene type with an image deliverable.","Check the image for stereotypes and details that contradict the case.","Post it with the case and a question about what students notice."],
+     p:"Create a realistic image of [setting] at the moment just before [problem]. Include these details students should notice: [details]. Show people of varied backgrounds in realistic roles. No text, logos, or brand names."},
+    {id:"f-chart", who:"f", time:"quick", goal:"prep", week:0, t:"Chart real data correctly",
+     d:"Turn a table of data from a reading or public source into a clear chart, with no invented numbers.",
+     steps:["Copy the data and its source.","Use the Data chart type with a code-drawn deliverable, pasting the data into the data field.","Check every bar or point against your table.","Add the source in a caption."],
+     p:"Create a single, self-contained SVG bar chart of exactly this data: [data]. Label axes with units, start at zero, title it with the main takeaway, and add a caption citing [source]."},
+    {id:"f-icons", who:"f", time:"project", goal:"prep", week:0, t:"Design a consistent icon set for your course",
+     d:"Create a small set of icons for recurring things in your course, such as readings, labs, quizzes, and discussions.",
+     steps:["List five to eight recurring course elements.","Generate the first icon as an SVG with simple shapes.","Ask for each remaining icon \u201Cin exactly the same style.\u201D","Use them consistently across your LMS and slides."],
+     p:"Create a set of simple, flat SVG icons in one consistent style for these course elements: [list]. Use the same line weight, corner style, and two colors throughout, with no text."},
+    {id:"f-explore", who:"f", time:"project", goal:"active", week:0, t:"Turn a diagram into a click-to-explore activity",
+     d:"Make an interactive diagram where students select each part to read about it, for review or flipped preparation.",
+     steps:["Use the Click-to-explore diagram quick start in the prompt builder.","Write a one- or two-sentence explanation for each part and include them in the prompt.","Test it with the keyboard and on a phone.","Host the file and link it from your LMS."],
+     p:"Create a single HTML file with inline CSS and JavaScript showing a labeled diagram of [object]. When a student selects a part, show this explanation: [part: explanation, ...]. Make every part keyboard-accessible and use no external libraries.",
+     note:"Most LMS page editors strip JavaScript, so host the file (for example, on GitHub Pages) and link to it or embed it."},
+    {id:"f-audit", who:"f", time:"build", goal:"access", week:0, t:"Audit your course images for representation",
+     d:"Look across the images in your course for patterns in who is shown, and in what roles.",
+     steps:["Gather the images that include people from one course.","Note age, gender, skin tone, body type, and ability across the set, and who is shown in expert roles.","Replace or regenerate images to fill gaps, using the prompt below.","In health and science courses, check that conditions appear on a range of skin tones."],
+     p:"Create an image of [role] doing [task] in [setting]. Show a person who is [specific description] in a realistic, respectful way. No text or logos."},
+    {id:"f-share", who:"f", time:"quick", goal:"pro", week:4, t:"Share a builder setup with a colleague",
+     d:"Agree on a common look for graphics in a shared course, then hand a colleague the exact setup.",
+     steps:["Set up the prompt builder with your course's style, colors, and rules.","Select Copy link and send it, or export the .json file.","Ask your colleague to make one graphic for their section with it.","Compare results and adjust the shared setup."],
+     p:"Review this set of course graphics and list any differences in style, color, labeling, or level of detail that would make them look inconsistent."},
+    {id:"s-critique", who:"s", time:"quick", goal:"assess", week:0, acct:false, t:"Students critique an AI infographic",
+     d:"Students examine an AI-generated infographic on a topic they've studied and identify what it got wrong or left out.",
+     steps:["Generate an infographic on a topic students have already studied. Don't fix it.","Post it with the assignment below.","Discuss what students found and why errors were easy to miss."],
+     p:"Create an infographic for students on [topic], with key facts and short explanations.",
+     assign:"Look closely at the attached AI-generated infographic on [topic]. In 200\u2013300 words: (1) Identify at least three errors, oversimplifications, or missing ideas, using our course materials to support each point. (2) Explain which error would be most likely to mislead a classmate, and why. (3) Describe one change that would make the graphic more accurate."},
+    {id:"s-spot", who:"s", time:"quick", goal:"assess", week:4, acct:false, t:"Run a spot-the-error challenge",
+     d:"Plant errors in a graphic and turn finding them into a review game.",
+     steps:["Make an accurate graphic, then ask the AI to create a copy with a set number of errors.","Post the flawed version without saying where the errors are.","Students find and correct them individually or in teams.","Reveal the accurate version afterward."],
+     p:"Make a copy of this graphic with exactly five errors a [course] student should catch: one misspelled term, one wrong arrow direction, one incorrect fact, one missing unit, and one label on the wrong part. Then list the errors separately so I have an answer key.",
+     assign:"This graphic on [topic] contains five errors. Find as many as you can. For each one, describe the error, explain why it's wrong, and give the correction, citing our course materials."},
+    {id:"s-spec", who:"s", time:"build", goal:"active", week:0, acct:false, t:"Students design the graphic, you generate it",
+     d:"Students use the prompt builder to specify a graphic for a concept, then you generate it and they evaluate the result. Students practice explaining a concept precisely without needing an AI account.",
+     steps:["Share the prompt builder link with students; it needs no account or login.","Each student or group builds a specification for one concept and exports the .json or copies the link.","Generate the graphics yourself and post them.","Students evaluate the result against their specification."],
+     p:"Use the student's specification exactly as provided.",
+     assign:"Use the graphics prompt builder to design a graphic that explains [concept] to a classmate who missed class. Choose the type, the one idea, and the exact labels. Submit your link. When I post the result, write 150 words: did the graphic match your specification, what would you change, and what did writing the specification teach you about the concept?"},
+    {id:"s-alt", who:"s", time:"quick", goal:"access", week:0, acct:false, t:"Students write alt text",
+     d:"Writing alt text for a diagram is a compact way for students to show they understand what it teaches.",
+     steps:["Pick a diagram from your course materials.","Post it with the assignment below.","Share a few strong examples and discuss what made them effective."],
+     p:"Write alt text for this graphic that tells a student what it teaches.",
+     assign:"Write alt text (one or two sentences) for the attached diagram that would give a classmate who can't see it the same main idea. Then write a longer description that walks through each part in order. Your description will be graded on accuracy and completeness."},
+    {id:"s-visual", who:"s", time:"project", goal:"active", week:0, acct:true, t:"Students create and evaluate a visual summary",
+     d:"Students make a graphic that summarizes a unit, then evaluate the AI's work as critically as they would a source.",
+     steps:["Students choose a concept from the unit and write the one idea and exact terms.","They generate a graphic with any approved tool.","They check it against course materials and revise at least once.","They submit the graphic, the prompts they used, and a reflection."],
+     p:"Create a graphic for classmates that explains [concept] using only these labels: [terms].",
+     assign:"Create a graphic that explains [concept] from this unit. Submit: (1) your final graphic with alt text, (2) every prompt you used, and (3) a 300-word reflection on what the AI got wrong, how you fixed it, and what you understood better by checking its work. Don't upload any personal information about yourself or others."},
+    {id:"s-compare", who:"s", time:"build", goal:"assess", week:0, acct:true, t:"Compare image and code versions",
+     d:"Students make the same graphic both ways and analyze the strengths of each, building AI literacy.",
+     steps:["Students build one specification in the prompt builder.","They generate it once as an image and once as code.","They compare accuracy, clarity, and editability.","Discuss which method fits which kinds of graphics."],
+     p:"Use the same specification for both versions.",
+     assign:"Generate the same graphic of [concept] twice: once as an image and once as a code-drawn SVG. Submit both, then compare them in 200 words: which was more accurate, which was clearer, and which would you use in a study guide, and why?"}
+  ];
+
+  var afterList = document.getElementById("afterList");
+  var afterCount = document.getElementById("afterCount");
+  var view = "time", who = "all";
+  state.acts = state.acts || {};
+
+  function el(tag, cls, text){ var e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
+  function copyBlock(label, text){
+    var d = el("div","prompt");
+    var top = el("div","prompt-top");
+    top.appendChild(el("b",null,label));
+    var btn = el("button","btn ghost act-copy","Copy");
+    btn.dataset.copy = text; btn.setAttribute("aria-label","Copy " + label.toLowerCase());
+    top.appendChild(btn); d.appendChild(top);
+    d.appendChild(el("blockquote",null,text));
+    return d;
+  }
+  function card(a){
+    var c = el("article","act" + (state.acts[a.id] ? " is-done" : ""));
+    var head = el("div","act-head");
+    var h = el("h4",null,a.t);
+    head.appendChild(h);
+    var lab = el("label","act-done");
+    var cb = document.createElement("input"); cb.type="checkbox"; cb.checked=!!state.acts[a.id];
+    cb.setAttribute("aria-label","Mark done: " + a.t);
+    cb.addEventListener("change", function(){ state.acts[a.id]=cb.checked; c.classList.toggle("is-done", cb.checked); save(); updateCount(); });
+    lab.appendChild(cb); lab.appendChild(document.createTextNode(" Done"));
+    head.appendChild(lab);
+    c.appendChild(head);
+    var tags = el("div","act-tags");
+    tags.appendChild(el("span","pill who-" + a.who, a.who==="f" ? "For your prep" : "With students"));
+    tags.appendChild(el("span","pill",TIME[a.time]));
+    tags.appendChild(el("span","pill",GOAL[a.goal]));
+    c.appendChild(tags);
+    c.appendChild(el("p",null,a.d));
+    if (a.who==="s") c.appendChild(el("p","acct " + (a.acct ? "need" : "none"), a.acct ? ACCT : NOACCT));
+    var det = document.createElement("details");
+    det.appendChild(el("summary",null,"Steps, prompt" + (a.assign ? ", and assignment" : a.tell ? ", and note to students" : "")));
+    var ol = el("ol","act-steps");
+    a.steps.forEach(function(s){ ol.appendChild(el("li",null,s)); });
+    det.appendChild(ol);
+    det.appendChild(copyBlock("Prompt", a.p));
+    if (a.assign) det.appendChild(copyBlock("Assignment language", a.assign));
+    if (a.tell) det.appendChild(copyBlock("Note to students (for your LMS)", a.tell));
+    if (a.note) det.appendChild(el("p","small act-note",a.note));
+    c.appendChild(det);
+    return c;
+  }
+  function updateCount(){
+    var shown = acts.filter(function(a){ return who==="all" || a.who===who; });
+    if (view==="week") shown = shown.filter(function(a){ return a.week; });
+    var done = shown.filter(function(a){ return state.acts[a.id]; }).length;
+    afterCount.textContent = "Showing " + shown.length + " activities. " + done + " done.";
+  }
+  function renderActs(){
+    afterList.innerHTML = "";
+    var keys = view==="time" ? Object.keys(TIME) : view==="goal" ? Object.keys(GOAL) : ["1","2","3","4"];
+    var labels = view==="time" ? TIME : view==="goal" ? GOAL : WEEK;
+    keys.forEach(function(k){
+      var items = acts.filter(function(a){
+        var match = view==="time" ? a.time===k : view==="goal" ? a.goal===k : String(a.week)===k;
+        return match && (who==="all" || a.who===who);
+      });
+      if (!items.length) return;
+      var grp = el("div","act-group");
+      grp.appendChild(el("h3",null,labels[k]));
+      var grid = el("div","act-grid");
+      items.forEach(function(a){ grid.appendChild(card(a)); });
+      grp.appendChild(grid);
+      afterList.appendChild(grp);
+    });
+    if (view==="week") afterList.appendChild(el("p","small","The challenge uses eight of the activities, two per week. Switch to Time needed or Goal to see them all."));
+    if (!afterList.children.length) afterList.appendChild(el("p",null,"No activities match this filter."));
+    updateCount();
+  }
+  afterList.addEventListener("click", function(e){
+    var btn = e.target.closest(".act-copy");
+    if (btn) copyText(btn.dataset.copy, btn);
+  });
+  document.querySelectorAll("[data-view]").forEach(function(b){
+    b.addEventListener("click", function(){
+      view = b.dataset.view;
+      document.querySelectorAll("[data-view]").forEach(function(x){ x.setAttribute("aria-pressed", String(x===b)); });
+      renderActs();
+    });
+  });
+  document.querySelectorAll("[data-who]").forEach(function(b){
+    b.addEventListener("click", function(){
+      who = b.dataset.who;
+      document.querySelectorAll("[data-who]").forEach(function(x){ x.setAttribute("aria-pressed", String(x===b)); });
+      renderActs();
+    });
+  });
+  renderActs();
+
+  /* ---------- Next step + reset ---------- */
+  var nextStep = document.getElementById("nextStep");
+  nextStep.value = state.next || "";
+  nextStep.addEventListener("input", function(){ state.next = nextStep.value; save(); });
+  document.getElementById("resetAll").addEventListener("click", function(){
+    state = {done:{}, labs:{}, next:"", acts:{}, facil:state.facil}; save();
+    document.querySelectorAll('[data-lab] input[type="checkbox"]').forEach(function(b){ b.checked=false; });
+    document.querySelectorAll(".lab-count").forEach(function(c){ var n=c.closest("[data-lab]").querySelectorAll('input[type="checkbox"]').length; c.textContent = "0 of " + n + " steps done"; });
+    nextStep.value = ""; renderProgress(); renderQuiz(); renderActs();
+  });
+})();
+</script>
+</body>
+</html>
