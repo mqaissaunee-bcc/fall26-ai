@@ -196,9 +196,9 @@ h3{font-family:var(--display);font-weight:500;font-size:1.15rem;margin:18px 0 8p
         <li>Remove names, course numbers, and anything about real students.</li>
         <li>For each faculty piece, use the AI prompt below to write a matching AI piece of the same type.</li>
         <li>Paste everything into Edit passages, set each one’s author, and add a reveal note.</li>
-        <li>Shuffle, then download the game file and upload it to your site.</li>
+        <li>Download the game file and upload it to your site in place of the old one.</li>
       </ol>
-      <p>Aim for 8 to 12 rounds, about 10 minutes. An uneven split, like 7 AI and 5 faculty, keeps people from counting.</p>
+      <p>Add as many passages as you like. Each game code draws its rounds from the whole bank in a different order, with roughly 4 faculty passages for every 6 AI ones, so a bigger bank means more variety from one session to the next. About 10 rounds takes 10 minutes.</p>
       <h3>Message to colleagues</h3>
       <pre id="msgColleague">Hi! For the AI teaching workshop I’m running an icebreaker called “AI or Faculty?” where people guess whether a short piece of teaching writing came from a person or from AI. Would you send me one short thing you wrote yourself, about 60 to 150 words? A syllabus policy, feedback you gave on student work, a course announcement, or a reply to a student email all work. I’ll remove names and course details, and I won’t say who wrote it unless you want credit. Thank you!</pre>
       <button class="btn small" type="button" data-copy="msgColleague">Copy message</button>
@@ -221,16 +221,198 @@ h3{font-family:var(--display);font-weight:500;font-size:1.15rem;margin:18px 0 8p
 
 <script type="application/json" id="deck">
 [
-  {"type":"Syllabus policy: late work","source":"ai","text":"Late work is accepted up to one week after the due date with a 10% deduction. After that, it’s worth zero — but please talk to me before you get to that point. I’d much rather hear from you on day two than find out in week twelve that you’ve been struggling. Things happen, and I can usually work something out if you reach out early.","note":"Written by AI (Claude) for this game. Notice the casual dash and the “I’d much rather hear from you” warmth: AI can do approachable too."},
-  {"type":"Feedback on student work","source":"faculty","text":"","note":"Written by a faculty member. (Add who, or the discipline, if they’re OK with it.)"},
-  {"type":"Announcement before an exam","source":"ai","text":"Quick reminder that Exam 2 is this Thursday. It covers Chapters 5 through 7, including the lab on subnetting. You can bring one handwritten index card, both sides. Calculators are fine, phones are not. If you missed Tuesday’s review session, the slides are posted in Week 9. See you Thursday, and get some sleep the night before.","note":"Written by AI (Claude). Specific details like chapter numbers and the index-card rule make AI writing feel real."},
-  {"type":"Reply to a student email","source":"faculty","text":"","note":"Written by a faculty member."},
-  {"type":"Course welcome message","source":"ai","text":"Welcome to the course! I’m excited to work with you this semester. This class moves quickly, but it’s designed so that every week builds on the last, and you’ll be surprised how much you can do by the end. My best advice: start the weekly labs early, ask questions in the discussion board (someone else probably has the same one), and come to office hours even if you think your question is small. There are no small questions here.","note":"Written by AI (Claude). This one has classic AI tells: “I’m excited,” the tidy three-part advice, and an upbeat closing line."},
-  {"type":"Syllabus policy: attendance","source":"faculty","text":"","note":"Written by a faculty member."},
-  {"type":"Feedback on student work","source":"ai","text":"Your argument is strongest in the second section, where you connect the data to your own experience at work. The introduction needs to get to your point faster; right now it takes three sentences before I know what you’re arguing. Also double-check your citations on page 3, two of them are missing dates. Solid draft overall. Fix the intro and this moves from a B to an A.","note":"Written by AI (Claude). The comma splice in “page 3, two of them” is the kind of small slip people assume only humans make."},
-  {"type":"Discussion board reply","source":"faculty","text":"","note":"Written by a faculty member."},
-  {"type":"Syllabus policy: AI use","source":"ai","text":"You may use AI tools to brainstorm, check your grammar, or explain a concept you’re stuck on. You may not submit AI-written text or code as your own work. If you use AI on an assignment, add one sentence at the end saying what you used it for. That’s it — no penalty for being honest. The penalty is for hiding it.","note":"Written by AI (Claude). An AI writing a policy about AI."},
-  {"type":"Announcement: class cancelled","source":"faculty","text":"","note":"Written by a faculty member."}
+ {
+  "type": "Syllabus policy: late work",
+  "source": "ai",
+  "text": "Late work is accepted up to one week after the due date with a 10% deduction. After that, it’s worth zero — but please talk to me before you get to that point. I’d much rather hear from you on day two than find out in week twelve that you’ve been struggling. Things happen, and I can usually work something out if you reach out early.",
+  "note": "Written by AI (Claude) for this game. Notice the casual dash and the warm “I’d much rather hear from you”: AI can do approachable too."
+ },
+ {
+  "type": "Announcement before an exam",
+  "source": "ai",
+  "text": "Quick reminder that Exam 2 is this Thursday. It covers Chapters 5 through 7, including the lab on subnetting. You can bring one handwritten index card, both sides. Calculators are fine, phones are not. If you missed Tuesday’s review session, the slides are posted in Week 9. See you Thursday, and get some sleep the night before.",
+  "note": "Written by AI (Claude) for this game. Specific details like chapter numbers and the index-card rule make AI writing feel real."
+ },
+ {
+  "type": "Course welcome message",
+  "source": "ai",
+  "text": "Welcome to the course! I’m excited to work with you this semester. This class moves quickly, but it’s designed so that every week builds on the last, and you’ll be surprised how much you can do by the end. My best advice: start the weekly labs early, ask questions in the discussion board (someone else probably has the same one), and come to office hours even if you think your question is small. There are no small questions here.",
+  "note": "Written by AI (Claude) for this game. Classic tells: “I’m excited,” tidy three-part advice, and an upbeat closing line."
+ },
+ {
+  "type": "Feedback on student work",
+  "source": "ai",
+  "text": "Your argument is strongest in the second section, where you connect the data to your own experience at work. The introduction needs to get to your point faster; right now it takes three sentences before I know what you’re arguing. Also double-check your citations on page 3, two of them are missing dates. Solid draft overall. Fix the intro and this moves from a B to an A.",
+  "note": "Written by AI (Claude) for this game. The comma splice in “page 3, two of them” is the kind of slip people assume only humans make."
+ },
+ {
+  "type": "Syllabus policy: AI use",
+  "source": "ai",
+  "text": "You may use AI tools to brainstorm, check your grammar, or explain a concept you’re stuck on. You may not submit AI-written text or code as your own work. If you use AI on an assignment, add one sentence at the end saying what you used it for. That’s it — no penalty for being honest. The penalty is for hiding it.",
+  "note": "Written by AI (Claude) for this game. An AI writing a policy about AI."
+ },
+ {
+  "type": "Feedback on a lab report",
+  "source": "ai",
+  "text": "Data table is good. Your % error calc uses the wrong accepted value — density of water at 22°C is 0.9978, not 1.000. Redo #3 and resubmit by Friday for full credit. Conclusion is too short, tell me WHY the result was off, not just that it was.",
+  "note": "Written by AI (Claude) for this game. Short, blunt, and technical. AI doesn’t have to sound polished."
+ },
+ {
+  "type": "Reply to a student email",
+  "source": "ai",
+  "text": "Hi Jordan, no worries, thanks for letting me know. We covered sections 4.2 and 4.3. The slides are on Canvas under Week 6, and the homework is the odd problems 1–25. If anything doesn’t click, come by office hours Wednesday at 2.",
+  "note": "Written by AI (Claude) for this game."
+ },
+ {
+  "type": "Clinical reminder",
+  "source": "ai",
+  "text": "Reminder for clinical tomorrow: arrive at 6:45 on 4 West, full uniform, badge visible. Bring your drug cards for your assigned patient and be ready to talk through the meds at pre-conference. If you are sick, call me AND the unit before 6:00. Do not just text.",
+  "note": "Written by AI (Claude) for this game. The capitalized AND reads like a frustrated instructor."
+ },
+ {
+  "type": "Discussion board reply",
+  "source": "ai",
+  "text": "Good point about the railroads, Maria. I’d push you a little further, though: who actually benefited from the land grants? Look back at the Chapter 8 reading on the Central Pacific workers and see if that changes your answer.",
+  "note": "Written by AI (Claude) for this game."
+ },
+ {
+  "type": "Announcement: class cancelled",
+  "source": "ai",
+  "text": "class is cancelled today, sorry for the late notice — my kid’s daycare closed. please do the reading for chapter 9 and post your response by sunday. we’ll catch up thursday",
+  "note": "Written by AI (Claude) for this game. All lowercase and a personal excuse. Did that make it feel human?"
+ },
+ {
+  "type": "Letter of recommendation excerpt",
+  "source": "ai",
+  "text": "I have had the pleasure of teaching Alex in two courses, and she stands out as one of the most curious and persistent students I have worked with. When her first circuit design failed, she stayed after class for three weeks straight until she understood why.",
+  "note": "Written by AI (Claude) for this game. “I have had the pleasure” is a stock phrase people and AI both lean on."
+ },
+ {
+  "type": "Feedback on an exam",
+  "source": "ai",
+  "text": "You set up the integral correctly but lost a negative sign in line 3. Everything after that follows logically, so I gave partial credit. Watch your signs on the next exam!",
+  "note": "Written by AI (Claude) for this game."
+ },
+ {
+  "type": "Syllabus policy: phones in lab",
+  "source": "ai",
+  "text": "Phones stay in your bag during labs. This isn’t me being old-fashioned — we’re working with 120 volts and I need your full attention. Outside of labs, I don’t care if you check your phone, just don’t let it become a distraction for the people around you.",
+  "note": "Written by AI (Claude) for this game."
+ },
+ {
+  "type": "Office hours",
+  "source": "ai",
+  "text": "Office hours are Tuesdays and Thursdays, 1 to 2:30, in room 112, or by appointment if those times don’t work. You don’t need a “good” reason to come. Some of my favorite conversations with students started with “I’m not sure what I’m confused about.”",
+  "note": "Written by AI (Claude) for this game. The little anecdote is a common AI move to sound personal."
+ },
+ {
+  "type": "Feedback on a presentation",
+  "source": "ai",
+  "text": "Strong delivery. You made eye contact and didn’t just read the slides. Two things for next time: slide 4 had way too much text, and you went 3 minutes over. Practice with a timer. Your Q&A answers were the best part.",
+  "note": "Written by AI (Claude) for this game."
+ },
+ {
+  "type": "Announcement: midterm grades",
+  "source": "ai",
+  "text": "Midterm grades are posted. If you’re below a C, please don’t panic, but do email me this week so we can make a plan. There is still plenty of time to turn this around, and I’ve seen students do it many times. The worst thing you can do right now is disappear.",
+  "note": "Written by AI (Claude) for this game."
+ },
+ {
+  "type": "Syllabus policy: group projects",
+  "source": "ai",
+  "text": "For the group project, each person will submit a short peer evaluation at the end. If someone isn’t pulling their weight, tell me early, not the night before it’s due. I can’t fix a group problem I don’t know about.",
+  "note": "Written by AI (Claude) for this game."
+ },
+ {
+  "type": "Syllabus policy: extra credit",
+  "source": "ai",
+  "text": "I don’t offer individual extra credit. I know that’s frustrating to hear at the end of the semester, but it wouldn’t be fair to everyone else. What I can do is help you make the most of the final, which is worth 25% and replaces your lowest exam score if it’s higher.",
+  "note": "Written by AI (Claude) for this game."
+ },
+ {
+  "type": "Announcement: weather closing",
+  "source": "ai",
+  "text": "If the college closes for weather, check Canvas by 8 a.m. I’ll post either a short online activity or a note saying to just stay safe. Please don’t try to drive in if the roads are bad. No assignment is worth an accident.",
+  "note": "Written by AI (Claude) for this game."
+ },
+ {
+  "type": "Feedback on student work",
+  "source": "ai",
+  "text": "nice job overall. your thesis is clear but paragraph 3 kind of wanders, try cutting the part about your cousin. citations look good. B+",
+  "note": "Written by AI (Claude) for this game. Lowercase, abrupt, a grade tacked on the end. Plenty of people guess human here."
+ },
+ {
+  "type": "Feedback on student work",
+  "source": "faculty",
+  "text": "",
+  "note": "Written by a faculty member."
+ },
+ {
+  "type": "Reply to a student email",
+  "source": "faculty",
+  "text": "",
+  "note": "Written by a faculty member."
+ },
+ {
+  "type": "Syllabus policy: attendance",
+  "source": "faculty",
+  "text": "",
+  "note": "Written by a faculty member."
+ },
+ {
+  "type": "Discussion board reply",
+  "source": "faculty",
+  "text": "",
+  "note": "Written by a faculty member."
+ },
+ {
+  "type": "Announcement: class cancelled",
+  "source": "faculty",
+  "text": "",
+  "note": "Written by a faculty member."
+ },
+ {
+  "type": "Syllabus policy: late work",
+  "source": "faculty",
+  "text": "",
+  "note": "Written by a faculty member."
+ },
+ {
+  "type": "Announcement before an exam",
+  "source": "faculty",
+  "text": "",
+  "note": "Written by a faculty member."
+ },
+ {
+  "type": "Course welcome message",
+  "source": "faculty",
+  "text": "",
+  "note": "Written by a faculty member."
+ },
+ {
+  "type": "Feedback on a lab or project",
+  "source": "faculty",
+  "text": "",
+  "note": "Written by a faculty member."
+ },
+ {
+  "type": "Letter of recommendation excerpt",
+  "source": "faculty",
+  "text": "",
+  "note": "Written by a faculty member."
+ },
+ {
+  "type": "Syllabus policy: AI use",
+  "source": "faculty",
+  "text": "",
+  "note": "Written by a faculty member."
+ },
+ {
+  "type": "Announcement: midterm grades",
+  "source": "faculty",
+  "text": "",
+  "note": "Written by a faculty member."
+ }
 ]
 </script>
 
@@ -242,6 +424,22 @@ let deck=store.get("aof-deck",null)||JSON.parse(JSON.stringify(FILE_DECK));
 const usingLocal=()=>!!store.get("aof-deck",null);
 const playable=()=>deck.filter(d=>d.text&&d.text.trim());
 const label=s=>s==="ai"?"AI":"Faculty";
+function rng(seed){let a=(seed*2654435761)>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function shuf(arr,r){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+/* A game code picks the same rounds, in the same order, on every device. */
+function gameOrder(code){
+  const r=rng(code), pool=playable();
+  const ai=shuf(pool.filter(d=>d.source==="ai"),r), fac=shuf(pool.filter(d=>d.source==="faculty"),r);
+  const out=[];
+  while(ai.length||fac.length){
+    const pickFac=fac.length&&(!ai.length||r()<0.42);
+    out.push(pickFac?fac.shift():ai.shift());
+  }
+  return out;
+}
+function gameRounds(code,n){return gameOrder(code).slice(0,n)}
+function codeFor(n){return Math.max(1,n|0)%100000}
+const newCode=()=>1000+Math.floor(Math.random()*9000);
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 
 /* sound */
@@ -274,26 +472,36 @@ function route(){
 addEventListener("hashchange",route);
 
 /* ================= PLAY (phone) ================= */
-function playKey(){return "aof-play-"+playable().map(d=>d.text.length).join(".")}
 let P=null;
 function renderPlay(){
-  const rounds=playable(); const root=document.getElementById("playRoot");
-  if(!rounds.length){root.innerHTML='<div class="panel"><h2>No rounds yet</h2><p class="muted">The facilitator hasn’t added passages to this game.</p></div>';return}
-  P=store.get(playKey(),{i:0,guess:[],shown:[]});
-  const save=()=>store.set(playKey(),P);
-  if(P.i>=rounds.length){
+  const root=document.getElementById("playRoot");
+  if(!playable().length){root.innerHTML='<div class="panel"><h2>No rounds yet</h2><p class="muted">The facilitator hasn’t added passages to this game.</p></div>';return}
+  P=store.get("aof-p",null);
+  const save=()=>store.set("aof-p",P);
+  if(!P||!P.code){
+    root.innerHTML=`<div class="panel"><h2>Join the game</h2><p class="muted" style="margin-top:0">Enter the game code on the screen at the front of the room.</p>
+      <div class="row"><input type="number" id="joinCode" inputmode="numeric" aria-label="Game code" placeholder="Game code" style="font:800 1.6rem var(--display);width:7em;padding:8px 12px;border-radius:10px;border:2px solid var(--line);background:var(--paper);color:var(--ink)">
+      <button class="btn primary" id="joinBtn" type="button">Join</button></div><p class="result wrong" id="joinErr" style="font-size:1rem"></p></div>`;
+    const go=()=>{const c=parseInt(document.getElementById("joinCode").value,10);if(!c){document.getElementById("joinErr").textContent="Type the code shown on the screen.";return}
+      P={code:codeFor(c),i:0,guess:[],shown:[],done:false};save();ac();renderPlay()};
+    document.getElementById("joinBtn").onclick=go;document.getElementById("joinCode").addEventListener("keydown",e=>{if(e.key==="Enter")go()});
+    return;
+  }
+  const all=gameOrder(P.code);
+  const rounds=P.done?all.slice(0,P.i):all;
+  if(P.done||P.i>=all.length){
     const score=rounds.reduce((n,d,k)=>n+(P.guess[k]===d.source?1:0),0);
     const pct=score/rounds.length;
     const msg=pct>=.85?"Sharp eye. You’re harder to fool than most.":pct>=.6?"Better than a coin flip. Most rooms land right around here.":"The AI got you. You’re in very good company.";
     root.innerHTML=`<div class="panel" style="text-align:center"><h2>Your score</h2><p class="score">${score} / ${rounds.length}</p><p>${msg}</p>
-      <div class="row" style="justify-content:center;margin-top:14px"><button class="btn" id="pAgain" type="button">Play again</button>${soundBtn()}</div></div>
+      <div class="row" style="justify-content:center;margin-top:14px"><button class="btn" id="pAgain" type="button">Join a new game</button>${soundBtn()}</div></div>
       <h3>How you did</h3><div class="tablewrap"><table class="summary"><thead><tr><th>Round</th><th>Type</th><th>Answer</th><th>You said</th></tr></thead><tbody>
       ${rounds.map((d,k)=>`<tr><td>${k+1}</td><td>${esc(d.type)}</td><td class="tag ${d.source}">${label(d.source)}</td><td>${P.guess[k]?(P.guess[k]===d.source?"✓ ":"✗ ")+label(P.guess[k]):"—"}</td></tr>`).join("")}</tbody></table></div>`;
-    document.getElementById("pAgain").onclick=()=>{P={i:0,guess:[],shown:[]};save();renderPlay()};
+    document.getElementById("pAgain").onclick=()=>{P=null;store.del("aof-p");renderPlay()};
     return;
   }
   const d=rounds[P.i], g=P.guess[P.i], shown=P.shown[P.i];
-  root.innerHTML=`<div class="meta"><span class="round">Round ${P.i+1} of ${rounds.length}</span><span class="type">${esc(d.type)}</span></div>
+  root.innerHTML=`<div class="meta"><span class="round">Round ${P.i+1}</span><span class="type">${esc(d.type)}</span></div>
     <div class="passage play-pass">${esc(d.text)}<span class="stamp ${d.source} ${shown?"on":""}">${label(d.source)}</span></div>
     <div class="choices">
       <button class="choice ai" type="button" data-g="ai" aria-pressed="${g==="ai"}" ${shown?"disabled":""}>AI</button>
@@ -301,13 +509,16 @@ function renderPlay(){
     </div>
     <div id="pAfter" aria-live="polite"></div>
     <div class="row" style="justify-content:space-between;margin-top:18px">
-      <button class="btn small" id="pPrev" type="button" ${P.i===0?"disabled":""}>Previous round</button>${soundBtn()}</div>`;
+      <button class="btn small" id="pPrev" type="button" ${P.i===0?"disabled":""}>Previous round</button>${soundBtn()}</div>
+    <p class="muted" style="font-size:.9rem;margin-top:14px">Game ${P.code}. <a href="#play" id="pLeave">Join a different game</a></p>`;
+  document.getElementById("pLeave").onclick=e=>{e.preventDefault();if(confirm("Leave this game? Your answers so far will be cleared.")){P=null;store.del("aof-p");renderPlay()}};
   const after=document.getElementById("pAfter");
   if(shown){
     const right=g===d.source;
     after.innerHTML=`<p class="result ${right?"right":"wrong"}">${g?(right?"You got it.":"Fooled you."):"No vote this round."} It was ${label(d.source)}.</p>${d.note?`<p class="muted" style="margin:0">${esc(d.note)}</p>`:""}
-      <button class="btn primary" id="pNext" type="button" style="margin-top:14px">${P.i===rounds.length-1?"See my score":"Next round"}</button>`;
-    document.getElementById("pNext").onclick=()=>{P.i++;save();if(P.i>=rounds.length)sfx.done();renderPlay();scrollTo(0,0)};
+      <div class="row" style="margin-top:14px"><button class="btn primary" id="pNext" type="button">Next round</button><button class="btn" id="pEnd" type="button">That was the last one. See my score</button></div>`;
+    document.getElementById("pNext").onclick=()=>{P.i++;save();renderPlay();scrollTo(0,0)};
+    document.getElementById("pEnd").onclick=()=>{P.i++;P.done=true;save();sfx.done();renderPlay();scrollTo(0,0)};
   } else if(g){
     after.innerHTML=`<p class="muted" style="margin:14px 0 8px">Locked in: <strong>${label(g)}</strong>. Wait for the answer on the screen, then tap below.</p><button class="btn primary" id="pShow" type="button">Show me the answer</button>`;
     document.getElementById("pShow").onclick=()=>{P.shown[P.i]=true;save();(g===d.source?sfx.right:sfx.wrong)();renderPlay()};
@@ -317,14 +528,17 @@ function renderPlay(){
 }
 
 /* ================= HOST (projector) ================= */
-let H=store.get("aof-host",{i:0,revealed:[],t:[]}); let timerId=null,timeLeft=0;
-const saveH=()=>store.set("aof-host",H);
+const ROUNDS_DEFAULT=10;
+const freshH=n=>({code:newCode(),n:n||ROUNDS_DEFAULT,i:0,revealed:[],t:[]});
+let H=store.get("aof-host2",null)||freshH(); let timerId=null,timeLeft=0;
+const saveH=()=>store.set("aof-host2",H);
+const hostRounds=()=>gameRounds(H.code,H.n);
 function stopTimer(){clearInterval(timerId);timerId=null}
 function renderHost(){
   document.getElementById("localNotice").hidden=!usingLocal();
-  const rounds=playable(), root=document.getElementById("hostRoot");
+  const rounds=hostRounds(), root=document.getElementById("hostRoot");
   if(!rounds.length){root.innerHTML='<div class="panel"><h2>No rounds yet</h2><p>Add passages on the <a href="#edit">Edit passages</a> tab first.</p></div>';return}
-  const skipped=deck.length-rounds.length;
+  const pool=playable(), facN=pool.filter(d=>d.source==="faculty").length;
   if(H.i>rounds.length) H.i=rounds.length;
   if(H.i===rounds.length) return renderSummary(rounds,root);
   const d=rounds[H.i], rev=!!H.revealed[H.i], t=H.t[H.i]||{ai:0,fac:0};
@@ -334,6 +548,7 @@ function renderHost(){
       <div class="meta"><span class="round">Round ${H.i+1} of ${rounds.length}</span><span class="type">${esc(d.type)}</span></div>
       <div class="passage host-pass">${esc(d.text)}<span class="stamp ${d.source} ${rev?"on":""}" id="stamp">${label(d.source)}</span></div>
       <div class="reveal-note ${rev&&d.note?"on":""}">${esc(d.note||"")}</div>
+      ${rev&&H.i===rounds.length-1?`<p class="notice" style="margin-top:14px">That’s the last round. Players: tap “That was the last one” to see your score.</p>`:""}
       <div class="row host-actions">
         <button class="btn small" id="hPrev" type="button" ${H.i===0?"disabled":""}>Previous</button>
         <button class="btn primary" id="hMain" type="button">${rev?(H.i===rounds.length-1?"See the results":"Next round"):"Reveal the answer"}</button>
@@ -341,9 +556,20 @@ function renderHost(){
         <button class="btn small" id="hRestart" type="button">Start over</button>
       </div>
       <p class="kbd">Keyboard: Space reveals, then moves to the next round. A and F add a vote. Left arrow goes back.</p>
-      ${skipped?`<p class="muted">${skipped} round${skipped>1?"s have":" has"} no text yet and ${skipped>1?"are":"is"} skipped.</p>`:""}
+      ${facN===0?`<p class="notice" style="margin-top:14px">Every passage in this game is AI-written. Add real faculty writing on the Edit passages tab before you play with a group.</p>`:""}
     </div>
     <div class="side">
+      <div class="panel" style="text-align:center">
+        <h3 style="margin-top:0">Game code</h3>
+        <div class="timer" style="color:var(--ai)">${H.code}</div>
+        <p class="muted" style="margin:0 0 10px;font-size:.92rem">Players open “Play on my phone” and enter this code.</p>
+        <div class="row" style="justify-content:center">
+          <label for="hN" class="muted" style="font-size:.92rem">Rounds</label>
+          <select id="hN" style="font:700 1rem var(--body);padding:6px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink)">${[6,8,10,12,15,20].filter(x=>x<=pool.length||x===6).map(x=>`<option ${x===H.n?"selected":""}>${x}</option>`).join("")}</select>
+          <button class="btn small" id="hNew" type="button">New game</button>
+        </div>
+        <p class="muted" style="margin:8px 0 0;font-size:.85rem">${pool.length} passages in the bank. Each code picks a different mix.</p>
+      </div>
       <div class="panel">
         <h3 style="margin-top:0">Timer</h3>
         <div class="timer" id="timer">${timerId?timeLeft:"0:30"}</div>
@@ -366,12 +592,15 @@ function renderHost(){
   document.getElementById("vFAC").onchange=e=>setV("fac",+e.target.value);
   document.getElementById("hMain").onclick=hostMain;
   document.getElementById("hPrev").onclick=()=>{H.i=Math.max(0,H.i-1);stopTimer();saveH();renderHost()};
-  document.getElementById("hRestart").onclick=()=>{if(!confirm("Start over? This clears every reveal and vote count."))return;H={i:0,revealed:[],t:[]};stopTimer();saveH();renderHost()};
+  document.getElementById("hRestart").onclick=()=>{if(!confirm("Start this game over? Same code, same rounds. Reveals and vote counts are cleared."))return;H={...H,i:0,revealed:[],t:[]};stopTimer();saveH();renderHost()};
+  const startNew=n=>{H=freshH(n);stopTimer();saveH();renderHost()};
+  document.getElementById("hNew").onclick=()=>{if(H.revealed.some(Boolean)&&!confirm("Start a new game with a new code? Players will need to join again."))return;startNew(H.n)};
+  document.getElementById("hN").onchange=e=>{const n=+e.target.value;if(H.revealed.some(Boolean)&&!confirm("Changing the number of rounds starts a new game with a new code."))return renderHost();startNew(n)};
   document.getElementById("tStart").onclick=toggleTimer;
   paintTimer();
 }
 function hostMain(){
-  const rounds=playable(); if(H.i>=rounds.length) return;
+  const rounds=hostRounds(); if(H.i>=rounds.length) return;
   if(!H.revealed[H.i]){H.revealed[H.i]=true;stopTimer();sfx.stamp();}
   else {H.i++;stopTimer();if(H.i===rounds.length)sfx.done();}
   saveH();renderHost();
@@ -392,16 +621,16 @@ function renderSummary(rounds,root){
     ${totSum?`<p class="score" style="color:var(--ai)">${Math.round(rightSum/totSum*100)}%</p><p style="margin-top:0">of all votes were right. ${rightSum/totSum<.6?"That’s barely better than flipping a coin.":"Better than a coin flip, but not by as much as most people expect."}</p>`:`<p>No votes were counted, so there’s no room score.</p>`}
     ${worst?`<p><strong>Most convincing round:</strong> Round ${worst.k+1} (${esc(worst.d.type)}). Only ${Math.round(worst.p*100)}% got it right. It was <span class="tag ${worst.d.source}">${label(worst.d.source)}</span>.</p>`:""}
     <div class="tablewrap"><table class="summary"><thead><tr><th>Round</th><th>Type</th><th>Answer</th><th>Room got it right</th></tr></thead><tbody>${rows}</tbody></table></div>
-    <div class="row" style="margin-top:16px"><button class="btn" id="hBack" type="button">Back to the last round</button><button class="btn" id="hRestart2" type="button">Start over</button><a class="btn" href="#prep">Debrief questions</a></div></div>`;
+    <div class="row" style="margin-top:16px"><button class="btn" id="hBack" type="button">Back to the last round</button><button class="btn" id="hRestart2" type="button">New game</button><a class="btn" href="#prep">Debrief questions</a></div></div>`;
   document.getElementById("hBack").onclick=()=>{H.i=rounds.length-1;saveH();renderHost()};
-  document.getElementById("hRestart2").onclick=()=>{if(!confirm("Start over? This clears every reveal and vote count."))return;H={i:0,revealed:[],t:[]};saveH();renderHost()};
+  document.getElementById("hRestart2").onclick=()=>{H=freshH(H.n);saveH();renderHost()};
 }
 addEventListener("keydown",e=>{
   if(view!=="host"||e.target.closest("input,textarea,select,button"))return;
   if(e.key===" "||e.key==="Enter"){e.preventDefault();hostMain()}
   else if(e.key==="ArrowLeft"){H.i=Math.max(0,H.i-1);stopTimer();saveH();renderHost()}
   else if(e.key==="ArrowRight"){hostMain()}
-  else if(e.key==="a"||e.key==="f"){const k=e.key==="a"?"ai":"fac";if(H.i<playable().length){H.t[H.i]=H.t[H.i]||{ai:0,fac:0};H.t[H.i][k]++;saveH();renderHost()}}
+  else if(e.key==="a"||e.key==="f"){const k=e.key==="a"?"ai":"fac";if(H.i<hostRounds().length){H.t[H.i]=H.t[H.i]||{ai:0,fac:0};H.t[H.i][k]++;saveH();renderHost()}}
 });
 
 /* ================= EDIT ================= */

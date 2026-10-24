@@ -113,6 +113,16 @@ h2{font-family:var(--font-head);font-size:clamp(1.4rem,1.2rem + .8vw,1.8rem);mar
   .date .dd{font-size:1.4rem}
 }
 
+/* Collapsible section */
+.acc{margin:var(--s7) 0 0}
+.acc>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:var(--s3);margin:0 0 var(--s4);border-radius:var(--r-sm)}
+.acc>summary::-webkit-details-marker{display:none}
+.acc>summary h2{margin:0}
+.acc>summary::before{content:"";width:.6em;height:.6em;border-right:3px solid var(--ink-soft);border-bottom:3px solid var(--ink-soft);transform:rotate(-45deg);transition:transform .15s;flex:none;margin-left:2px}
+.acc[open]>summary::before{transform:rotate(45deg)}
+.acc-hint{font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft);background:var(--sunk);border-radius:99px;padding:2px 10px}
+.acc:not([open]){margin-bottom:0}
+
 /* Icebreakers */
 .ice{display:grid;grid-template-columns:auto 1fr;gap:var(--s5);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s5);margin-bottom:var(--s4)}
 .ice-mark{width:92px;aspect-ratio:1;border-radius:var(--r-sm);background:var(--tba-soft);display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:10px;align-self:start}
@@ -161,7 +171,8 @@ html{scroll-behavior:smooth}
 </header>
 
 <main id="main" class="wrap">
-  <h2 id="icebreakers">Icebreakers</h2>
+  <details class="acc" id="icebreakers" open>
+  <summary><h2>Icebreakers</h2><span class="acc-hint">2 games</span></summary>
 
   <article class="ice" id="excuse-bingo">
     <div class="ice-mark" aria-hidden="true"><span class="x"></span><span></span><span></span><span></span><span class="x"></span><span></span><span></span><span></span><span class="x"></span></div>
@@ -191,6 +202,7 @@ html{scroll-behavior:smooth}
       </div>
     </div>
   </article>
+  </details>
 
   <h2>The workshops</h2>
 
@@ -272,6 +284,11 @@ html{scroll-behavior:smooth}
 </footer>
 
 <script>
+(function(){
+  var acc=document.getElementById("icebreakers");
+  try{ if(localStorage.getItem("ice-open")==="0") acc.removeAttribute("open"); }catch(e){}
+  acc.addEventListener("toggle",function(){ try{ localStorage.setItem("ice-open",acc.open?"1":"0"); }catch(e){} });
+})();
 (function(){
   "use strict";
   var today = new Date(); today.setHours(0,0,0,0);
