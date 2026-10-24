@@ -472,20 +472,63 @@ function route(){
 addEventListener("hashchange",route);
 
 /* ================= PLAY (phone) ================= */
+/* =====================================================================
+   LIVE VOTING (Firebase). Paste your firebaseConfig object here in place
+   of null. See firebase-setup.html, step 7. While this is null, the game
+   uses the free public relay below for syncing and votes are counted by hand.
+   ===================================================================== */
+const FIREBASE_CONFIG = null;
+
+const FB={mode:FIREBASE_CONFIG?"loading":"off",db:null,uid:null,err:""};
+function loadScript(src){return new Promise((res,rej)=>{const el=document.createElement("script");el.src=src;el.onload=res;el.onerror=()=>rej(new Error("Couldn’t load "+src));document.head.appendChild(el)})}
+async function fbInit(){
+  if(!FIREBASE_CONFIG) return;
+  try{
+    const base="https://www.gstatic.com/firebasejs/10.12.2/";
+    await loadScript(base+"firebase-app-compat.js");
+    await loadScript(base+"firebase-auth-compat.js");
+    await loadScript(base+"firebase-database-compat.js");
+    firebase.initializeApp(FIREBASE_CONFIG);
+    const cred=await firebase.auth().signInAnonymously();
+    FB.uid=cred.user.uid; FB.db=firebase.database(); FB.mode="on";
+  }catch(e){ FB.mode="failed"; FB.err=(e&&(e.code||e.message))||"unknown error"; console.error("Firebase:",e); }
+  stopSync(); pub.key=null; route();
+}
+const gameRef=code=>FB.db.ref("games/"+code);
+
 /* ---------- live sync ----------
    The projector posts the current round and whether it has been revealed to a free
    public relay (ntfy.sh). Phones listen and follow along. Only round numbers are sent,
    never passages or names. If the relay can't be reached, players use the buttons. */
 const RELAY="https://ntfy.sh/";
 const topic=code=>"bcc-ai-or-faculty-x7q2-"+code;
-let sync={state:"off",code:null,es:null,lastT:0,lastId:null};
-function syncLineText(){return sync.state==="live"?"● Following the screen. Rounds and answers change on their own.":sync.state==="connecting"?"Connecting to the screen…":"Not connected to the screen. Use the buttons to move along."}
+let sync={state:"off",code:null,es:null,lastT:0,lastId:null,kind:null,ref:null};
+function syncLineText(){
+  if(sync.state==="missing") return "No game with this code is running. Check the code on the screen, or tap “Join a different game.”";
+  if(sync.state==="live") return sync.kind==="fb"?"● Following the screen. Your vote is sent automatically.":"● Following the screen. Rounds and answers change on their own.";
+  return sync.state==="connecting"?"Connecting to the screen…":"Not connected to the screen. Use the buttons to move along.";
+}
 function paintSyncLine(){const el=document.getElementById("syncLine");if(el){el.textContent=syncLineText();el.style.color=sync.state==="live"?"var(--fac)":"var(--ink-soft)"}}
-function stopSync(){if(sync.es){sync.es.close()}sync={state:"off",code:null,es:null,lastT:0,lastId:null}}
+function stopSync(){if(sync.es){sync.es.close()}if(sync.ref){sync.ref.off()}sync={state:"off",code:null,es:null,lastT:0,lastId:null,kind:null,ref:null}}
 function ensureSync(code){
-  if(sync.code===code&&sync.es) return;
-  stopSync(); if(!window.EventSource) return;
-  sync.code=code; sync.state="connecting";
+  const kind=FB.mode==="on"?"fb":FB.mode==="loading"?"wait":"relay";
+  if(sync.code===code&&sync.kind===kind) return;
+  stopSync(); sync.code=code; sync.kind=kind;
+  if(kind==="wait"){ sync.state="connecting"; return; }
+  if(kind==="fb"){
+    sync.state="connecting";
+    const ref=gameRef(code).child("state"); sync.ref=ref;
+    ref.on("value",snap=>{
+      if(!snap.exists()){ sync.state="missing"; if(view==="play") renderPlay(); return; }
+      const v=snap.val(); const was=sync.state; sync.state="live";
+      applyState({t:"s",c:code,i:v.i,n:v.n,r:!!v.r});
+      if(was!=="live"){ const p=store.get("aof-p",null); if(p&&p.code===code&&p.guess[p.i]&&!p.shown[p.i]) sendVote(code,p.i,p.guess[p.i]); }
+      if(was!=="live"&&view==="play") renderPlay();
+    },()=>{ sync.state="off"; if(view==="play") renderPlay(); });
+    return;
+  }
+  if(!window.EventSource){ sync.state="off"; return; }
+  sync.state="connecting";
   try{
     const es=new EventSource(RELAY+topic(code)+"/sse?since=20m"); sync.es=es;
     es.onopen=()=>{sync.state="live";paintSyncLine();if(view==="play")renderPlay()};
@@ -505,6 +548,10 @@ function applyState(st){
   }
   store.set("aof-p",P);
   if(view==="play"){renderPlay(); if(before!==P.i) scrollTo(0,0)}
+}
+function sendVote(code,round,g){
+  if(FB.mode!=="on"||sync.kind!=="fb"||sync.state!=="live") return;
+  gameRef(code).child("votes/"+round+"/"+FB.uid).set(g).catch(e=>console.warn("Vote not saved:",e&&e.code));
 }
 let P=null;
 function renderPlay(){
@@ -561,7 +608,7 @@ function renderPlay(){
     after.innerHTML=live?`<p class="muted" style="margin:14px 0 8px">Locked in: <strong>${label(g)}</strong>. Your answer shows here when it’s revealed on the screen. You can still change your vote.</p><button class="btn small" id="pShow" type="button">Show me the answer now</button>`:`<p class="muted" style="margin:14px 0 8px">Locked in: <strong>${label(g)}</strong>. Wait for the answer on the screen, then tap below.</p><button class="btn primary" id="pShow" type="button">Show me the answer</button>`;
     document.getElementById("pShow").onclick=()=>{P.shown[P.i]=true;save();(g===d.source?sfx.right:sfx.wrong)();renderPlay()};
   } else after.innerHTML='<p class="muted" style="margin:14px 0 0">Tap AI or Faculty to vote. You can change your mind until the answer is shown.</p>';
-  root.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{P.guess[P.i]=b.dataset.g;save();sfx.pick();renderPlay()});
+  root.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{P.guess[P.i]=b.dataset.g;save();sfx.pick();sendVote(P.code,P.i,b.dataset.g);renderPlay()});
   document.getElementById("pPrev").onclick=()=>{P.i=Math.max(0,P.i-1);save();renderPlay()};
 }
 
@@ -572,15 +619,63 @@ let H=store.get("aof-host2",null)||freshH(); let timerId=null,timeLeft=0;
 const saveH=()=>store.set("aof-host2",H);
 const hostRounds=()=>gameRounds(H.code,H.n);
 let pub={key:null,state:"idle",hb:null};
+/* phone votes for the current game, by round: {ai, fac} */
+let PV=[];
+let fbHost={code:null,ready:null,votesRef:null};
+function fbHostEnsure(){
+  if(FB.mode!=="on") return null;
+  if(fbHost.code===H.code&&fbHost.ready) return fbHost.ready;
+  if(fbHost.votesRef) fbHost.votesRef.off();
+  const code=H.code; fbHost={code,ready:null,votesRef:null}; PV=[];
+  const ref=gameRef(code);
+  fbHost.ready=ref.once("value").then(snap=>{
+    if(snap.exists()&&snap.child("owner").val()!==FB.uid){ throw {code:"taken"} }
+    if(!snap.exists()) return ref.set({owner:FB.uid,created:firebase.database.ServerValue.TIMESTAMP,state:{i:H.i,n:Math.max(1,Math.min(H.n,playable().length)),r:!!H.revealed[H.i]}});
+  }).then(()=>{
+    const vr=ref.child("votes"); fbHost.votesRef=vr;
+    vr.on("value",snap=>{
+      const next=[]; snap.forEach(rs=>{const k=+rs.key;const c={ai:0,fac:0};rs.forEach(v=>{if(v.val()==="ai")c.ai++;else if(v.val()==="faculty")c.fac++});next[k]=c});
+      PV=next; refreshHostTallies();
+    });
+    return true;
+  }).catch(e=>{
+    if(e&&e.code==="taken"){ H=freshH(H.n); saveH(); fbHost={code:null,ready:null,votesRef:null}; renderHost(); return false; }
+    pub.state="fail"; FB.err=(e&&e.code)||"database error"; paintPub(); return false;
+  });
+  return fbHost.ready;
+}
+function refreshHostTallies(){
+  if(view!=="host") return;
+  const a=document.activeElement; if(a&&a.matches&&a.matches("input,select,textarea")) return;
+  renderHost();
+}
+function fbDeleteGame(code){ if(FB.mode==="on"&&code) gameRef(code).remove().catch(()=>{}); }
+function fbClearVotes(code){ if(FB.mode==="on"&&code) gameRef(code).child("votes").remove().catch(()=>{}); PV=[]; }
 function publishState(force){
-  const st={t:"s",c:H.code,i:H.i,n:Math.min(H.n,playable().length),r:!!H.revealed[H.i]};
-  const key=JSON.stringify(st); if(!force&&key===pub.key) return; pub.key=key;
-  fetch(RELAY+topic(H.code),{method:"POST",body:key}).then(r=>{pub.state=r.ok?"ok":"fail";paintPub()}).catch(()=>{pub.state="fail";paintPub()});
+  const st={t:"s",c:H.code,i:H.i,n:Math.max(1,Math.min(H.n,playable().length)),r:!!H.revealed[H.i]};
+  if(FB.mode==="loading"){ pub.state="idle"; paintPub(); return; }
+  const key=FB.mode+JSON.stringify(st); if(!force&&key===pub.key) return; pub.key=key;
+  if(FB.mode==="on"){
+    const ready=fbHostEnsure(); if(!ready) return;
+    ready.then(ok=>{ if(!ok||fbHost.code!==st.c) return;
+      gameRef(st.c).child("state").set({i:st.i,n:st.n,r:st.r}).then(()=>{pub.state="ok";paintPub()}).catch(e=>{pub.state="fail";FB.err=(e&&e.code)||"write failed";paintPub()});
+    });
+    return;
+  }
+  fetch(RELAY+topic(H.code),{method:"POST",body:JSON.stringify(st)}).then(r=>{pub.state=r.ok?"ok":"fail";paintPub()}).catch(()=>{pub.state="fail";paintPub()});
 }
 function paintPub(){const el=document.getElementById("pubLine");if(!el)return;
-  el.textContent=pub.state==="ok"?"● Phones follow this screen automatically.":pub.state==="fail"?"Phones can’t sync right now. Players can still move along with their buttons.":"Connecting phones…";
-  el.style.color=pub.state==="ok"?"var(--fac)":pub.state==="fail"?"var(--red)":"var(--ink-soft)"}
-function startHeartbeat(){ if(pub.hb) return; pub.hb=setInterval(()=>{ if(view==="host") publishState(true) },60000) }
+  let txt,col;
+  if(FB.mode==="loading"){txt="Starting live voting…";col="var(--ink-soft)"}
+  else if(FB.mode==="on"){txt=pub.state==="fail"?`Live voting has a problem (${FB.err}). Count votes by hand for now.`:pub.state==="ok"?"● Live voting is on. Phone votes are counted automatically.":"Connecting phones…";col=pub.state==="fail"?"var(--red)":pub.state==="ok"?"var(--fac)":"var(--ink-soft)"}
+  else if(FB.mode==="failed"){txt=`Live voting couldn’t start (${FB.err}). Using the backup relay: phones sync, but count votes by hand.`;col="var(--red)"}
+  else {txt=pub.state==="ok"?"● Phones follow this screen automatically. Live voting is off, so count votes by hand.":pub.state==="fail"?"Phones can’t sync right now. Players can still move along with their buttons.":"Connecting phones…";col=pub.state==="ok"?"var(--fac)":pub.state==="fail"?"var(--red)":"var(--ink-soft)"}
+  el.textContent=txt; el.style.color=col;
+}
+function startHeartbeat(){ if(pub.hb) return; pub.hb=setInterval(()=>{ if(view==="host"&&FB.mode!=="on") publishState(true) },60000) }
+const handsOf=k=>H.t[k]||{ai:0,fac:0};
+const phonesOf=k=>PV[k]||{ai:0,fac:0};
+function votesOf(k){const h=handsOf(k),p=phonesOf(k);return{ai:h.ai+p.ai,fac:h.fac+p.fac}}
 function stopTimer(){clearInterval(timerId);timerId=null}
 function renderHost(){
   document.getElementById("localNotice").hidden=!usingLocal();
@@ -589,8 +684,8 @@ function renderHost(){
   const pool=playable(), facN=pool.filter(d=>d.source==="faculty").length;
   if(H.i>rounds.length) H.i=rounds.length;
   if(H.i===rounds.length){ publishState(); startHeartbeat(); return renderSummary(rounds,root); }
-  const d=rounds[H.i], rev=!!H.revealed[H.i], t=H.t[H.i]||{ai:0,fac:0};
-  const tot=t.ai+t.fac, pa=tot?Math.round(t.ai/tot*100):0;
+  const d=rounds[H.i], rev=!!H.revealed[H.i], t=handsOf(H.i), ph=phonesOf(H.i), V=votesOf(H.i), live=FB.mode==="on";
+  const tot=V.ai+V.fac, pa=tot?Math.round(V.ai/tot*100):0;
   root.innerHTML=`<div class="host-grid">
     <div>
       <div class="meta"><span class="round">Round ${H.i+1} of ${rounds.length}</span><span class="type">${esc(d.type)}</span></div>
@@ -626,13 +721,14 @@ function renderHost(){
       </div>
       <div class="panel">
         <h3 style="margin-top:0">Room vote</h3>
-        <p class="muted" style="margin:0 0 10px;font-size:.92rem">“Hands up if you think AI wrote this.” Count, then do Faculty.</p>
+        ${live?`<p style="margin:0 0 4px;font-weight:700">Phones: <span class="tag ai">${ph.ai} AI</span>, <span class="tag faculty">${ph.fac} Faculty</span></p>
+        <p class="muted" style="margin:0 0 10px;font-size:.9rem">Add hands here for anyone playing without a phone.</p>`:`<p class="muted" style="margin:0 0 10px;font-size:.92rem">“Hands up if you think AI wrote this.” Count, then do Faculty.</p>`}
         <div class="tally">
-          <div class="tbox ai"><div class="lab">AI</div><input type="number" min="0" id="vAI" value="${t.ai}" aria-label="Votes for AI"><div class="pm"><button type="button" data-v="ai" data-d="-1" aria-label="One fewer AI vote">−</button><button type="button" data-v="ai" data-d="1" aria-label="One more AI vote">+</button></div></div>
-          <div class="tbox fac"><div class="lab">Faculty</div><input type="number" min="0" id="vFAC" value="${t.fac}" aria-label="Votes for Faculty"><div class="pm"><button type="button" data-v="fac" data-d="-1" aria-label="One fewer Faculty vote">−</button><button type="button" data-v="fac" data-d="1" aria-label="One more Faculty vote">+</button></div></div>
+          <div class="tbox ai"><div class="lab">${live?"AI hands":"AI"}</div><input type="number" min="0" id="vAI" value="${t.ai}" aria-label="Votes for AI"><div class="pm"><button type="button" data-v="ai" data-d="-1" aria-label="One fewer AI vote">−</button><button type="button" data-v="ai" data-d="1" aria-label="One more AI vote">+</button></div></div>
+          <div class="tbox fac"><div class="lab">${live?"Faculty hands":"Faculty"}</div><input type="number" min="0" id="vFAC" value="${t.fac}" aria-label="Votes for Faculty"><div class="pm"><button type="button" data-v="fac" data-d="-1" aria-label="One fewer Faculty vote">−</button><button type="button" data-v="fac" data-d="1" aria-label="One more Faculty vote">+</button></div></div>
         </div>
         <div class="bar" aria-hidden="true"><i class="ai" style="width:${tot?pa:0}%"></i><i class="fac" style="width:${tot?100-pa:0}%"></i></div>
-        <p style="margin:8px 0 0;font-weight:700">${tot?`${pa}% said AI, ${100-pa}% said Faculty`:"No votes counted yet"}${rev&&tot?`<br><span class="tag ${d.source}">${Math.round((d.source==="ai"?t.ai:t.fac)/tot*100)}% of the room got it right</span>`:""}</p>
+        <p style="margin:8px 0 0;font-weight:700">${tot?`${pa}% said AI, ${100-pa}% said Faculty`:"No votes counted yet"}${tot?`<br><span class="muted" style="font-weight:400">${tot} vote${tot===1?"":"s"} in all</span>`:""}${rev&&tot?`<br><span class="tag ${d.source}">${Math.round((d.source==="ai"?V.ai:V.fac)/tot*100)}% of the room got it right</span>`:""}</p>
       </div>
     </div></div>`;
   const setV=(k,v)=>{H.t[H.i]=H.t[H.i]||{ai:0,fac:0};H.t[H.i][k]=Math.max(0,v|0);saveH();renderHost()};
@@ -641,8 +737,8 @@ function renderHost(){
   document.getElementById("vFAC").onchange=e=>setV("fac",+e.target.value);
   document.getElementById("hMain").onclick=hostMain;
   document.getElementById("hPrev").onclick=()=>{H.i=Math.max(0,H.i-1);stopTimer();saveH();renderHost()};
-  document.getElementById("hRestart").onclick=()=>{if(!confirm("Start this game over? Same code, same rounds. Reveals and vote counts are cleared."))return;H={...H,i:0,revealed:[],t:[]};stopTimer();saveH();renderHost()};
-  const startNew=n=>{H=freshH(n);stopTimer();saveH();renderHost()};
+  document.getElementById("hRestart").onclick=()=>{if(!confirm("Start this game over? Same code, same rounds. Reveals and vote counts are cleared."))return;H={...H,i:0,revealed:[],t:[]};fbClearVotes(H.code);stopTimer();saveH();renderHost()};
+  const startNew=n=>{const old=H.code;H=freshH(n);fbDeleteGame(old);stopTimer();saveH();renderHost()};
   document.getElementById("hNew").onclick=()=>{if(H.revealed.some(Boolean)&&!confirm("Start a new game with a new code? Players will need to join again."))return;startNew(H.n)};
   document.getElementById("hN").onchange=e=>{const n=+e.target.value;if(H.revealed.some(Boolean)&&!confirm("Changing the number of rounds starts a new game with a new code."))return renderHost();startNew(n)};
   document.getElementById("tStart").onclick=toggleTimer;
@@ -664,16 +760,23 @@ function toggleTimer(){
 }
 function renderSummary(rounds,root){
   let rightSum=0,totSum=0,worst=null;
-  const rows=rounds.map((d,k)=>{const t=H.t[k]||{ai:0,fac:0},tot=t.ai+t.fac,right=d.source==="ai"?t.ai:t.fac;
+  const rows=rounds.map((d,k)=>{const t=votesOf(k),tot=t.ai+t.fac,right=d.source==="ai"?t.ai:t.fac;
     if(tot){rightSum+=right;totSum+=tot;const p=right/tot;if(!worst||p<worst.p)worst={p,k,d}}
     return `<tr><td>${k+1}</td><td>${esc(d.type)}</td><td class="tag ${d.source}">${label(d.source)}</td><td>${tot?Math.round(right/tot*100)+"%":"—"}</td></tr>`}).join("");
   root.innerHTML=`<div class="panel"><h2>How the room did</h2>
     ${totSum?`<p class="score" style="color:var(--ai)">${Math.round(rightSum/totSum*100)}%</p><p style="margin-top:0">of all votes were right. ${rightSum/totSum<.6?"That’s barely better than flipping a coin.":"Better than a coin flip, but not by as much as most people expect."}</p>`:`<p>No votes were counted, so there’s no room score.</p>`}
     ${worst?`<p><strong>Most convincing round:</strong> Round ${worst.k+1} (${esc(worst.d.type)}). Only ${Math.round(worst.p*100)}% got it right. It was <span class="tag ${worst.d.source}">${label(worst.d.source)}</span>.</p>`:""}
     <div class="tablewrap"><table class="summary"><thead><tr><th>Round</th><th>Type</th><th>Answer</th><th>Room got it right</th></tr></thead><tbody>${rows}</tbody></table></div>
-    <div class="row" style="margin-top:16px"><button class="btn" id="hBack" type="button">Back to the last round</button><button class="btn" id="hRestart2" type="button">New game</button><a class="btn" href="#prep">Debrief questions</a></div></div>`;
+    <div class="row" style="margin-top:16px"><button class="btn" id="hBack" type="button">Back to the last round</button><button class="btn" id="hCsv" type="button">Download votes (CSV)</button><button class="btn" id="hRestart2" type="button">New game</button><a class="btn" href="#prep">Debrief questions</a></div></div>`;
+  document.getElementById("hCsv").onclick=()=>{
+    const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+    const lines=[["Game code","Round","Type","Answer","Phone votes AI","Phone votes Faculty","Hands AI","Hands Faculty","Total votes","Percent correct","Passage"].map(q).join(",")];
+    rounds.forEach((d,k)=>{const p=phonesOf(k),h=handsOf(k),t=votesOf(k),tot=t.ai+t.fac,right=d.source==="ai"?t.ai:t.fac;
+      lines.push([H.code,k+1,d.type,label(d.source),p.ai,p.fac,h.ai,h.fac,tot,tot?Math.round(right/tot*100):"",d.text].map(q).join(","))});
+    saveFile(`ai-or-faculty-game-${H.code}.csv`,"\ufeff"+lines.join("\r\n"),"text/csv");
+  };
   document.getElementById("hBack").onclick=()=>{H.i=rounds.length-1;saveH();renderHost()};
-  document.getElementById("hRestart2").onclick=()=>{H=freshH(H.n);saveH();renderHost()};
+  document.getElementById("hRestart2").onclick=()=>{const old=H.code;H=freshH(H.n);fbDeleteGame(old);saveH();renderHost()};
 }
 addEventListener("keydown",e=>{
   if(view!=="host"||e.target.closest("input,textarea,select,button"))return;
@@ -734,6 +837,7 @@ document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{const t=
   try{await navigator.clipboard.writeText(t);s.textContent="Copied."}catch(e){s.textContent="Select the text and copy it with Ctrl+C."}});
 
 route();
+fbInit();
 </script>
 </body>
 </html>
