@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Student Excuse Bingo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F9FD; --surface:#FFFFFF; --rule:#C9D9F0; --ink:#1B2A4A; --ink-soft:#4D5D7E;
+  --blue:#1D3F8F; --red:#D7263D; --canary:#FFE27A; --pink:#F5C3CE; --sky:#BCD6F2; --mint:#CDEBD8;
+  --called:#DCE1EA; --called-ink:#8A94A8; --shadow:0 1px 0 rgba(27,42,74,.08),0 6px 18px rgba(27,42,74,.08);
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",ui-sans-serif,system-ui,sans-serif;
+  --hand:"Caveat","Comic Sans MS","Segoe Print",cursive;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#121827; --surface:#1B2336; --rule:#2A3654; --ink:#E7ECF7; --ink-soft:#A9B4CC;
+    --blue:#9DB8FF; --red:#FF5C70; --canary:#8C7420; --pink:#7E3A4C; --sky:#2F4F7E; --mint:#2C5A44;
+    --called:#262E42; --called-ink:#6E7892; --shadow:0 1px 0 rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.3);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#121827; --surface:#1B2336; --rule:#2A3654; --ink:#E7ECF7; --ink-soft:#A9B4CC;
+  --blue:#9DB8FF; --red:#FF5C70; --canary:#8C7420; --pink:#7E3A4C; --sky:#2F4F7E; --mint:#2C5A44;
+  --called:#262E42; --called-ink:#6E7892; --shadow:0 1px 0 rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.3);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;
+  background-image:repeating-linear-gradient(to bottom,transparent 0 31px,var(--rule) 31px 32px);background-attachment:local}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px 48px}
+header.top{position:relative;padding:28px 0 8px 0}
+header.top::before{content:"";position:absolute;left:-6px;top:0;bottom:0;border-left:2px solid var(--red);opacity:.55}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(2.1rem,5vw,3.6rem);line-height:1;margin:0 0 6px 14px;letter-spacing:-.02em}
+h1 .note{font-family:var(--hand);font-weight:700;color:var(--red);font-size:.55em;letter-spacing:0;display:inline-block;transform:rotate(-4deg);margin-left:.3em}
+.sub{margin:0 0 0 14px;color:var(--ink-soft);max-width:62ch}
+nav.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:22px 0 20px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding:8px 0}
+nav.tabs a{font-family:var(--display);font-weight:500;text-decoration:none;color:var(--ink);padding:8px 14px;border:1.5px solid var(--rule);border-radius:999px;background:var(--surface)}
+nav.tabs a[aria-current="page"]{background:var(--blue);border-color:var(--blue);color:var(--paper)}
+a:focus-visible,button:focus-visible,input:focus-visible,.sq:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+section.view{display:none}
+section.view.on{display:block}
+h2{font-family:var(--display);font-weight:800;font-size:1.6rem;margin:0 0 10px;letter-spacing:-.01em}
+h3{font-family:var(--display);font-weight:500;font-size:1.15rem;margin:0 0 8px}
+.btn{font:700 1rem var(--body);border:2px solid var(--blue);background:var(--surface);color:var(--blue);padding:10px 18px;border-radius:10px;cursor:pointer}
+.btn.primary{background:var(--blue);color:var(--paper)}
+.btn.red{border-color:var(--red);color:var(--red)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+input[type=number]{font:700 1rem var(--body);width:7.5em;padding:9px 10px;border-radius:8px;border:2px solid var(--rule);background:var(--surface);color:var(--ink)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.muted{color:var(--ink-soft)}
+.panel{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);padding:20px}
+
+/* spinner */
+.spin-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:860px){.spin-grid{grid-template-columns:1fr}}
+.wheel-box{position:relative;width:min(100%,560px);aspect-ratio:1;margin:0 auto}
+.wheel-box canvas{width:100%;height:100%;display:block;border-radius:50%;transition:transform 4.6s cubic-bezier(.12,.72,.14,1)}
+@media (prefers-reduced-motion:reduce){.wheel-box canvas{transition-duration:.6s}}
+.pointer{position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:34px solid var(--red);filter:drop-shadow(0 2px 2px rgba(0,0,0,.25));z-index:2}
+.hub{position:absolute;inset:0;margin:auto;width:23%;aspect-ratio:1;border-radius:50%;background:var(--surface);border:3px solid var(--blue);display:grid;place-items:center;font-family:var(--display);font-weight:800;color:var(--blue);font-size:clamp(.9rem,2.4vw,1.25rem);cursor:pointer;box-shadow:var(--shadow)}
+.hub:disabled{cursor:wait}
+.slip{position:relative;background:var(--canary);color:var(--ink);border-radius:4px;padding:26px 26px 22px;min-height:230px;box-shadow:var(--shadow);transform:rotate(-1deg)}
+.slip .lbl{font-family:var(--hand);font-size:1.5rem;color:var(--red);margin:0}
+.slip .excuse{font-family:var(--display);font-weight:800;font-size:clamp(1.7rem,3.6vw,2.8rem);line-height:1.08;margin:8px 0 12px;letter-spacing:-.01em}
+.slip .cat{font-weight:700;color:var(--ink-soft)}
+.slip .count{position:absolute;right:16px;top:12px;font-family:var(--hand);font-size:1.4rem;color:var(--blue)}
+.slip.pop{animation:pop .45s ease-out}
+@keyframes pop{0%{transform:rotate(-1deg) scale(.94)}60%{transform:rotate(-2deg) scale(1.03)}100%{transform:rotate(-1deg) scale(1)}}
+@media (prefers-reduced-motion:reduce){.slip.pop{animation:none}}
+.called-list{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0;padding:0;list-style:none}
+.called-list li{font-size:.88rem;background:var(--sky);border-radius:6px;padding:3px 9px}
+.called-list li:first-child{background:var(--pink);font-weight:700}
+
+/* cards */
+.card{--gap:5px;background:var(--surface);border-radius:14px;box-shadow:var(--shadow);padding:14px;max-width:640px;margin:0 auto}
+.card-head{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--gap);margin-bottom:var(--gap)}
+.card-head span{font-family:var(--display);font-weight:800;text-align:center;font-size:clamp(1.4rem,5vw,2.1rem);color:var(--paper);background:var(--blue);border-radius:8px;line-height:1.35}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--gap)}
+.sq{position:relative;aspect-ratio:1;border:1.5px solid var(--rule);border-radius:8px;background:var(--surface);color:var(--ink);font:400 clamp(.6rem,2.3vw,.86rem)/1.18 var(--body);padding:4px;display:grid;place-items:center;text-align:center;cursor:pointer;overflow:hidden;hyphens:auto}
+.sq.free{background:var(--canary);font-family:var(--hand);font-size:clamp(1.3rem,5vw,2rem);font-weight:700;cursor:default}
+.sq.hit{background:var(--mint)}
+@media (max-width:560px){.sq{aspect-ratio:auto;min-height:76px;padding:3px 2px;font-size:.66rem;hyphens:auto;overflow-wrap:anywhere}}
+.sq svg{position:absolute;inset:3%;width:94%;height:94%;pointer-events:none;overflow:visible}
+.sq svg path{fill:none;stroke:var(--red);stroke-width:5;stroke-linecap:round;stroke-dasharray:330;stroke-dashoffset:330;opacity:.85}
+.sq.marked svg path{animation:draw .35s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.sq.marked svg path{animation:none;stroke-dashoffset:0}}
+.card-meta{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;gap:10px;flex-wrap:wrap}
+.cardno{font-family:var(--hand);font-size:1.6rem;color:var(--red)}
+.bingo-banner{display:none;margin:14px auto 0;max-width:640px;text-align:center;background:var(--red);color:#fff;border-radius:12px;padding:14px;font-family:var(--display);font-weight:800;font-size:1.4rem}
+.bingo-banner.on{display:block}
+.verify-out{margin-top:14px}
+.verify-out .card{box-shadow:none;border:1.5px solid var(--rule);padding:8px}
+.verify-out .sq{cursor:default;font-size:clamp(.5rem,1.2vw,.72rem)}
+.verdict{font-family:var(--display);font-weight:800;font-size:1.2rem;margin:10px 0 0}
+.verdict.win{color:var(--red)}
+
+/* debrief */
+.cats{columns:2 300px;column-gap:28px}
+.cat-block{break-inside:avoid;margin:0 0 18px}
+.cat-block ul{margin:0;padding-left:1.1em}
+.prompts li{margin-bottom:8px;max-width:70ch}
+.tips{max-width:70ch}
+.tips li{margin-bottom:6px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media (max-width:760px){.two{grid-template-columns:1fr}}
+.status{min-height:1.5em;font-weight:700;color:var(--blue)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Student Excuse Bingo <span class="note">no doctor’s note required</span></h1>
+    <p class="sub">A faculty icebreaker. Everyone gets their own unique card, the facilitator spins the wheel, and the first person to circle five in a row wins.</p>
+  </header>
+
+  <nav class="tabs" aria-label="Sections">
+    <a href="#spin">Spin the wheel</a>
+    <a href="#card">My card</a>
+    <a href="#print">Print cards</a>
+    <a href="#debrief">Excuse list &amp; debrief</a>
+  </nav>
+
+  <!-- SPINNER -->
+  <section class="view" id="v-spin" aria-labelledby="h-spin">
+    <h2 id="h-spin" class="sr-only" style="position:absolute;left:-9999px">Spin the wheel</h2>
+    <div class="spin-grid">
+      <div>
+        <div class="wheel-box">
+          <div class="pointer" aria-hidden="true"></div>
+          <canvas id="wheel" width="1000" height="1000" aria-hidden="true"></canvas>
+          <button class="hub" id="hub" type="button" aria-label="Spin the wheel">Spin</button>
+        </div>
+      </div>
+      <div>
+        <div class="slip" id="slip" aria-live="polite">
+          <span class="count" id="count"></span>
+          <p class="lbl">Today’s excuse:</p>
+          <p class="excuse" id="excuse">Spin the wheel to call the first excuse.</p>
+          <p class="cat" id="cat"></p>
+        </div>
+        <div class="row" style="margin-top:18px">
+          <button class="btn primary" id="spinBtn" type="button">Spin</button>
+          <button class="btn red" id="resetBtn" type="button">Start a new game</button>
+          <button class="btn" id="soundBtn" type="button" aria-pressed="true">Sound on</button>
+        </div>
+        <h3 style="margin-top:22px">Called so far</h3>
+        <ul class="called-list" id="calledList"><li style="background:none;padding:0" class="muted">Nothing yet.</li></ul>
+
+        <div class="panel" style="margin-top:24px">
+          <h3>Check a winner</h3>
+          <p class="muted" style="margin:0 0 10px">Someone yelled bingo? Type the number on their card to check it against the excuses you’ve called.</p>
+          <div class="row">
+            <label for="verifyNo" class="muted">Card number</label>
+            <input type="number" id="verifyNo" min="1" max="99999" inputmode="numeric">
+            <button class="btn" id="verifyBtn" type="button">Check card</button>
+          </div>
+          <div class="verify-out" id="verifyOut"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MY CARD -->
+  <section class="view" id="v-card" aria-labelledby="h-card">
+    <h2 id="h-card">My card</h2>
+    <p class="muted" style="max-width:62ch;margin-top:0">When the facilitator calls an excuse that’s on your card, tap it to circle it. Five in a row, column or diagonal wins. The middle square is free.</p>
+    <div class="card" id="myCard"></div>
+    <div class="bingo-banner" id="banner" role="status"></div>
+    <div class="row" style="justify-content:center;margin-top:16px">
+      <button class="btn" id="clearMarks" type="button">Clear my circles</button>
+      <button class="btn" id="newCard" type="button">Get a different card</button>
+      <button class="btn" id="soundBtn2" type="button" aria-pressed="true">Sound on</button>
+    </div>
+  </section>
+
+  <!-- PRINT -->
+  <section class="view" id="v-print" aria-labelledby="h-print">
+    <h2 id="h-print">Print cards</h2>
+    <div class="two">
+      <div>
+        <p style="margin-top:0;max-width:60ch">Prefer paper? Download a sheet of numbered cards, two per page, and open it in any browser to print. Every card number makes a different card, and the same number always makes the same card, so you can check winners on the spinner screen.</p>
+        <div class="row" style="margin:14px 0">
+          <label for="pCount">How many cards</label>
+          <input type="number" id="pCount" value="40" min="1" max="300">
+          <label for="pStart">First card number</label>
+          <input type="number" id="pStart" value="101" min="1" max="99000">
+        </div>
+        <button class="btn primary" id="dlBtn" type="button" hidden>Download printable cards</button>
+        <p class="status" id="dlStatus" role="status"></p>
+      </div>
+      <div>
+        <h3>Preview of the first card</h3>
+        <div id="printPreview"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEBRIEF -->
+  <section class="view" id="v-debrief" aria-labelledby="h-deb">
+    <h2 id="h-deb">Excuse list &amp; debrief</h2>
+    <div class="two">
+      <div>
+        <h3>Running the game</h3>
+        <ol class="tips">
+          <li>Put the “Spin the wheel” screen on the projector.</li>
+          <li>Have people open this page’s “My card” on their phones, or hand out printed cards.</li>
+          <li>Spin, read the excuse aloud in your best student voice, and pause so people can circle it.</li>
+          <li>When someone calls bingo, check their card number under “Check a winner.”</li>
+          <li>Plan on 15 to 20 spins and about 8 to 10 minutes for the first bingo. Bigger rooms finish a little faster.</li>
+          <li>Play a second round for “blackout” or four corners if the room is having fun.</li>
+        </ol>
+      </div>
+      <div>
+        <h3>Questions for afterward</h3>
+        <ul class="prompts">
+          <li>Which of these have you heard this semester? Which ones turned out to be true?</li>
+          <li>Behind the funny ones are real pressures: work schedules, caregiving, transportation, money. Which of these do our students face most?</li>
+          <li>What does your attendance or late-work policy ask a student to prove, and what does that cost them?</li>
+          <li>Would a no-questions-asked option, like one late pass or a dropped quiz, change what you hear?</li>
+        </ul>
+      </div>
+    </div>
+    <h3 style="margin-top:18px">Every excuse on the wheel</h3>
+    <div class="cats" id="catList"></div>
+  </section>
+</div>
+
+<script>
+const EXCUSES = [
+  ["My grandmother passed away","Family & home"],
+  ["My grandmother passed away… again","Family & home"],
+  ["Family emergency (no further details)","Family & home"],
+  ["My cousin’s wedding was this weekend","Family & home"],
+  ["I had to babysit my little brother","Family & home"],
+  ["My dog ate my homework","Family & home"],
+  ["My cat walked on my keyboard","Family & home"],
+  ["I had to take my pet to the vet","Family & home"],
+  ["My kid was sick","Family & home"],
+  ["Daycare was closed","Family & home"],
+  ["We were moving apartments","Family & home"],
+  ["My car broke down","Getting to class"],
+  ["I got a flat tire","Getting to class"],
+  ["I missed the bus","Getting to class"],
+  ["Traffic on the Parkway was insane","Getting to class"],
+  ["I couldn’t find parking","Getting to class"],
+  ["My ride bailed on me","Getting to class"],
+  ["I couldn’t find the building","Getting to class"],
+  ["My laptop crashed","Technology"],
+  ["My Wi-Fi went out","Technology"],
+  ["Canvas wouldn’t let me submit","Technology"],
+  ["I submitted it — it must not have gone through","Technology"],
+  ["I emailed it to you. Didn’t you get it?","Technology"],
+  ["The file got corrupted","Technology"],
+  ["I uploaded the wrong file","Technology"],
+  ["My printer ran out of ink","Technology"],
+  ["My phone died so my alarm didn’t go off","Technology"],
+  ["My account got locked","Technology"],
+  ["I was sick","Health"],
+  ["Food poisoning","Health"],
+  ["I had a doctor’s appointment","Health"],
+  ["I got my wisdom teeth out","Health"],
+  ["I thought I had COVID","Health"],
+  ["I had a migraine","Health"],
+  ["My boss made me work a double","Work & life"],
+  ["I got called in to work","Work & life"],
+  ["I had jury duty","Work & life"],
+  ["I had a court date","Work & life"],
+  ["I was at the DMV all day","Work & life"],
+  ["My roommate locked me out","Work & life"],
+  ["The power went out","Work & life"],
+  ["My basement flooded","Work & life"],
+  ["I had a game / tournament","Work & life"],
+  ["I was studying for another class’s exam","Work & life"],
+  ["I didn’t know we had class today","Confusion"],
+  ["I thought class was cancelled","Confusion"],
+  ["I thought it was due next week","Confusion"],
+  ["I didn’t know there was an exam","Confusion"],
+  ["I was here — you just didn’t see me","Confusion"],
+  ["I went to the wrong section","Confusion"],
+  ["I thought it was optional","Confusion"],
+  ["I overslept","Classics"],
+  ["Did we do anything important?","Classics"],
+  ["It’s in my other bag","Classics"],
+  ["I finished it but left it at home","Classics"],
+  ["My group never sent me their parts","Classics"],
+  ["I just had a lot going on","Classics"]
+];
+const FREE = "FREE";
+const store = {
+  get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+function rng(seed){let a=(seed*2654435761)>>>0;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function cardFor(num){
+  const r=rng(Number(num)||1); const idx=EXCUSES.map((_,i)=>i);
+  for(let i=idx.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]]}
+  const cells=idx.slice(0,24); cells.splice(12,0,-1); return cells;
+}
+const LINES=(()=>{const L=[];for(let r=0;r<5;r++)L.push([0,1,2,3,4].map(c=>r*5+c));for(let c=0;c<5;c++)L.push([0,1,2,3,4].map(r=>r*5+c));L.push([0,6,12,18,24],[4,8,12,16,20]);return L})();
+function winningLines(isOn){return LINES.filter(l=>l.every(isOn))}
+const CIRCLE='<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M52 8 C 80 6, 96 28, 92 55 C 88 82, 60 96, 36 90 C 12 84, 2 58, 10 34 C 17 15, 38 5, 60 10"/></svg>';
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+/* ---------- sound ---------- */
+let soundOn=store.get("eb-sound",true); let actx=null;
+function ac(){ if(!soundOn) return null; try{ if(!actx) actx=new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==="suspended") actx.resume(); }catch(e){actx=null} return actx; }
+function tone(freq,start,dur,type="sine",vol=.2,glideTo){
+  const a=ac(); if(!a) return; const t=a.currentTime+start;
+  const o=a.createOscillator(), g=a.createGain(); o.type=type; o.frequency.setValueAtTime(freq,t);
+  if(glideTo) o.frequency.exponentialRampToValueAtTime(glideTo,t+dur);
+  g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(vol,t+.008); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t+dur+.02);
+}
+const sfx={
+  tick(){tone(2300,0,.03,"square",.05)},
+  reveal(){tone(660,0,.18,"triangle",.25);tone(990,.12,.45,"triangle",.25)},
+  mark(){tone(520,0,.07,"sine",.12,780)},
+  unmark(){tone(500,0,.07,"sine",.08,340)},
+  bingo(){[523,659,784,1047].forEach((f,i)=>tone(f,i*.12,.35,"triangle",.22));tone(1047,.5,.7,"triangle",.2);tone(1319,.5,.7,"sine",.12)},
+  reset(){tone(400,0,.25,"sawtooth",.06,200)}
+};
+function paintSound(){["soundBtn","soundBtn2"].forEach(id=>{const b=document.getElementById(id);b.textContent=soundOn?"Sound on":"Sound off";b.setAttribute("aria-pressed",soundOn)})}
+function toggleSound(){soundOn=!soundOn;store.set("eb-sound",soundOn);paintSound();if(soundOn)sfx.mark()}
+
+/* ---------- routing ---------- */
+const VIEWS=["spin","card","print","debrief"];
+function route(){
+  let h=(location.hash||"").replace("#",""); if(!VIEWS.includes(h)) h="spin";
+  VIEWS.forEach(v=>document.getElementById("v-"+v).classList.toggle("on",v===h));
+  document.querySelectorAll("nav.tabs a").forEach(a=>{if(a.getAttribute("href")==="#"+h)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  if(h==="spin") drawWheel();
+}
+addEventListener("hashchange",route);
+
+/* ---------- wheel ---------- */
+const canvas=document.getElementById("wheel"), ctx=canvas.getContext("2d");
+let called=store.get("eb-called",[]); let rotation=store.get("eb-rot",0); let spinning=false;
+canvas.style.transition="none"; canvas.style.transform=`rotate(${rotation}deg)`; requestAnimationFrame(()=>requestAnimationFrame(()=>canvas.style.transition=""));
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+function drawWheel(){
+  const N=EXCUSES.length, S=1000, c=S/2, R=c-8, step=2*Math.PI/N;
+  const cols=[css("--canary"),css("--pink"),css("--sky"),css("--mint")];
+  ctx.clearRect(0,0,S,S);
+  for(let i=0;i<N;i++){
+    const a0=-Math.PI/2+i*step, isCalled=called.includes(i);
+    ctx.beginPath();ctx.moveTo(c,c);ctx.arc(c,c,R,a0,a0+step);ctx.closePath();
+    ctx.fillStyle=isCalled?css("--called"):cols[i%4];ctx.fill();
+    ctx.strokeStyle=css("--surface");ctx.lineWidth=2;ctx.stroke();
+    ctx.save();ctx.translate(c,c);ctx.rotate(a0+step/2);
+    ctx.fillStyle=isCalled?css("--called-ink"):css("--ink");
+    ctx.font=`700 26px "Atkinson Hyperlegible", sans-serif`;ctx.textAlign="right";ctx.textBaseline="middle";
+    ctx.fillText(String(i+1),R-18,0);ctx.restore();
+  }
+  ctx.beginPath();ctx.arc(c,c,R,0,2*Math.PI);ctx.lineWidth=10;ctx.strokeStyle=css("--blue");ctx.stroke();
+}
+function renderCalled(){
+  const ul=document.getElementById("calledList");
+  if(!called.length){ul.innerHTML='<li style="background:none;padding:0" class="muted">Nothing yet.</li>';}
+  else ul.innerHTML=called.slice().reverse().map(i=>`<li>${esc(EXCUSES[i][0])}</li>`).join("");
+  document.getElementById("count").textContent=called.length?`${called.length} of ${EXCUSES.length} called`:"";
+  const out=called.length===EXCUSES.length;
+  document.getElementById("spinBtn").disabled=out; document.getElementById("hub").disabled=out;
+}
+function showSlip(i,animate){
+  document.getElementById("excuse").textContent=EXCUSES[i][0];
+  document.getElementById("cat").textContent=EXCUSES[i][1];
+  const s=document.getElementById("slip"); if(animate){s.classList.remove("pop");void s.offsetWidth;s.classList.add("pop")}
+}
+function spin(){
+  if(spinning) return;
+  const left=EXCUSES.map((_,i)=>i).filter(i=>!called.includes(i));
+  if(!left.length) return;
+  const pick=left[Math.floor(Math.random()*left.length)];
+  const N=EXCUSES.length, s=360/N;
+  const jitter=(Math.random()-.5)*s*.7;
+  const desired=((360-(pick+.5)*s+jitter)%360+360)%360;
+  const cur=((rotation%360)+360)%360;
+  rotation=rotation+360*6+((desired-cur)+360)%360;
+  spinning=true; document.getElementById("spinBtn").disabled=true; document.getElementById("hub").disabled=true;
+  document.getElementById("excuse").textContent="Spinning…"; document.getElementById("cat").textContent="";
+  canvas.style.transform=`rotate(${rotation}deg)`;
+  ac();
+  let lastSlice=null;
+  const track=()=>{ if(!spinning) return;
+    const m=getComputedStyle(canvas).transform;
+    if(m&&m!=="none"){const v=m.match(/matrix\(([^)]+)\)/); if(v){const [a,b]=v[1].split(",").map(Number); const deg=((Math.atan2(b,a)*180/Math.PI)%360+360)%360; const sl=Math.floor(deg/s); if(lastSlice!==null&&sl!==lastSlice) sfx.tick(); lastSlice=sl;}}
+    requestAnimationFrame(track); };
+  requestAnimationFrame(track);
+  const done=()=>{canvas.removeEventListener("transitionend",done);clearTimeout(t);if(!spinning)return;spinning=false;
+    sfx.reveal();
+    called.push(pick);store.set("eb-called",called);store.set("eb-rot",rotation);drawWheel();renderCalled();showSlip(pick,true)};
+  canvas.addEventListener("transitionend",done); const t=setTimeout(done,5200);
+}
+document.getElementById("spinBtn").onclick=spin; document.getElementById("hub").onclick=spin;
+document.getElementById("resetBtn").onclick=()=>{
+  if(called.length && !confirm("Start a new game? This clears every excuse called so far.")) return;
+  called=[];store.set("eb-called",called);drawWheel();renderCalled();sfx.reset();
+  document.getElementById("excuse").textContent="Spin the wheel to call the first excuse.";document.getElementById("cat").textContent="";
+  document.getElementById("verifyOut").innerHTML="";
+};
+
+/* ---------- card rendering ---------- */
+function cardHTML(num,opts={}){
+  const cells=cardFor(num);
+  const sq=cells.map((ei,k)=>{
+    if(ei<0) return `<div class="sq free ${opts.marked?'marked':''}">${esc(FREE)}</div>`;
+    const m=opts.marked&&opts.marked.includes(k), h=opts.hits&&opts.hits.includes(k);
+    const tag=opts.interactive?'button type="button"':'div';
+    const end=opts.interactive?'button':'div';
+    return `<${tag} class="sq ${m?'marked':''} ${h?'hit':''}" data-k="${k}" ${opts.interactive?`aria-pressed="${m}"`:''}>${esc(EXCUSES[ei][0])}${CIRCLE}</${end}>`;
+  }).join("");
+  return `<div class="card-head" aria-hidden="true"><span>B</span><span>I</span><span>N</span><span>G</span><span>O</span></div><div class="grid">${sq}</div>
+  <div class="card-meta"><span class="cardno">Card #${num}</span>${opts.footer||""}</div>`;
+}
+
+/* verify */
+document.getElementById("verifyBtn").onclick=()=>{
+  const num=parseInt(document.getElementById("verifyNo").value,10);
+  const out=document.getElementById("verifyOut");
+  if(!num||num<1){out.innerHTML='<p class="verdict">Type the number printed at the bottom of their card.</p>';return}
+  const cells=cardFor(num);
+  const isOn=k=>cells[k]<0||called.includes(cells[k]);
+  const hits=cells.map((_,k)=>k).filter(k=>cells[k]>=0&&called.includes(cells[k]));
+  const wins=winningLines(isOn);
+  const winSet=new Set(wins.flat());
+  if(wins.length) sfx.bingo();
+  out.innerHTML=`<div class="card">${cardHTML(num,{hits,marked:[...winSet]})}</div>
+    <p class="verdict ${wins.length?'win':''}">${wins.length?`Bingo confirmed: ${wins.length} winning line${wins.length>1?'s':''}.`:`No bingo yet. ${hits.length} of 24 squares have been called.`}</p>`;
+};
+document.getElementById("verifyNo").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("verifyBtn").click()});
+
+/* my card */
+let myNo=store.get("eb-myno",null);
+if(!myNo){myNo=1000+Math.floor(Math.random()*9000);store.set("eb-myno",myNo)}
+function renderMy(){
+  const marks=store.get("eb-marks-"+myNo,[]);
+  const el=document.getElementById("myCard");
+  el.innerHTML=cardHTML(myNo,{interactive:true,marked:marks,footer:'<span class="muted">Tap a square to circle it</span>'});
+  el.querySelectorAll("button.sq").forEach(b=>b.onclick=()=>{
+    const k=+b.dataset.k; let m=store.get("eb-marks-"+myNo,[]);
+    if(m.includes(k)){ m=m.filter(x=>x!==k); sfx.unmark(); } else { m.push(k); sfx.mark(); }
+    store.set("eb-marks-"+myNo,m);
+    b.classList.toggle("marked",m.includes(k)); b.setAttribute("aria-pressed",m.includes(k));
+    checkMy(m);
+  });
+  checkMy(marks);
+}
+let hadBingo=null;
+function checkMy(m){
+  const wins=winningLines(k=>k===12||m.includes(k));
+  const b=document.getElementById("banner");
+  if(hadBingo!==null && wins.length>hadBingo) sfx.bingo();
+  hadBingo=wins.length;
+  if(wins.length){b.textContent=`Bingo! Call it out and show card #${myNo} to the facilitator.`;b.classList.add("on")}
+  else b.classList.remove("on");
+}
+document.getElementById("clearMarks").onclick=()=>{store.set("eb-marks-"+myNo,[]);renderMy()};
+document.getElementById("newCard").onclick=()=>{
+  if(!confirm("Switch to a different card? Your circles on this one will be cleared.")) return;
+  store.set("eb-marks-"+myNo,[]); myNo=1000+Math.floor(Math.random()*9000); store.set("eb-myno",myNo); renderMy();
+};
+
+/* print */
+function updatePreview(){
+  const start=parseInt(document.getElementById("pStart").value,10)||101;
+  document.getElementById("printPreview").innerHTML=`<div class="card">${cardHTML(start)}</div>`;
+}
+document.getElementById("pStart").addEventListener("input",updatePreview);
+function printableDoc(start,count){
+  const cardsHTML=[];
+  for(let n=start;n<start+count;n++){
+    const cells=cardFor(n);
+    const rows=[0,1,2,3,4].map(r=>`<tr>${cells.slice(r*5,r*5+5).map((ei)=>ei<0?`<td class="free">${esc(FREE)}</td>`:`<td>${esc(EXCUSES[ei][0])}</td>`).join("")}</tr>`).join("");
+    cardsHTML.push(`<div class="pc"><div class="t">Student Excuse Bingo</div><table><thead><tr><th>B</th><th>I</th><th>N</th><th>G</th><th>O</th></tr></thead><tbody>${rows}</tbody></table><div class="no">Card #${n}</div></div>`);
+  }
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Student Excuse Bingo cards ${start}–${start+count-1}</title>
+<style>
+@page{size:letter portrait;margin:0.45in}
+body{font-family:Arial,Helvetica,sans-serif;margin:0;color:#1B2A4A}
+.bar{padding:14px;text-align:center;font-size:15px;background:#FFE27A}
+.bar button{font-size:16px;padding:8px 16px;margin-left:10px;cursor:pointer}
+@media print{.bar{display:none}}
+.pc{height:4.95in;display:flex;flex-direction:column;align-items:center;justify-content:center;break-inside:avoid;page-break-inside:avoid;border-bottom:1px dashed #999}
+.cards .pc:nth-child(2n){page-break-after:always;break-after:page;border-bottom:none}
+.t{font-weight:800;font-size:18px;margin-bottom:4px}
+table{border-collapse:collapse;table-layout:fixed;width:4.6in}
+th{background:#1D3F8F;color:#fff;font-size:22px;padding:2px 0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+td{border:1.5px solid #1D3F8F;height:0.8in;width:0.92in;text-align:center;vertical-align:middle;font-size:10.5px;line-height:1.15;padding:3px}
+td.free{background:#FFE27A;font-weight:700;font-size:20px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.no{margin-top:5px;font-size:13px;color:#D7263D;font-weight:700}
+</style></head><body><div class="bar">${count} cards, two per page.<button onclick="window.print()">Print</button></div><div class="cards">${cardsHTML.join("")}</div></body></html>`;
+}
+let downloads=null;
+(async()=>{
+  try{ if(window.claude&&claude.use){ downloads=await claude.use("downloads"); } }catch(e){downloads=null}
+  const btn=document.getElementById("dlBtn");
+  if(downloads){btn.hidden=false}
+  else document.getElementById("dlStatus").textContent="Downloads aren’t available in this view. Open this page in claude.ai to get the printable cards.";
+})();
+document.getElementById("dlBtn").onclick=async()=>{
+  const st=document.getElementById("dlStatus");
+  let count=Math.min(300,Math.max(1,parseInt(document.getElementById("pCount").value,10)||40));
+  let start=Math.max(1,parseInt(document.getElementById("pStart").value,10)||101);
+  try{
+    await downloads.save({filename:`excuse-bingo-cards-${start}-${start+count-1}.html`,data:printableDoc(start,count)});
+    st.textContent="Saved. Open the file in your browser and press Print.";
+  }catch(e){
+    const code=e&&e.code;
+    if(code==="declined") st.textContent="Download cancelled.";
+    else if(code==="rate_limited") st.textContent="A download prompt is already open. Finish that one first.";
+    else {st.textContent="Downloads aren’t available here.";document.getElementById("dlBtn").hidden=true}
+  }
+};
+
+/* debrief list */
+(function(){
+  const groups={};EXCUSES.forEach(([t,c],i)=>{(groups[c]=groups[c]||[]).push(`<li><span class="muted">${i+1}.</span> ${esc(t)}</li>`)});
+  document.getElementById("catList").innerHTML=Object.entries(groups).map(([c,l])=>`<div class="cat-block"><h3>${esc(c)}</h3><ul style="list-style:none;padding:0">${l.join("")}</ul></div>`).join("");
+})();
+
+/* init */
+document.getElementById("soundBtn").onclick=toggleSound; document.getElementById("soundBtn2").onclick=toggleSound; paintSound();
+renderCalled(); if(called.length) showSlip(called[called.length-1],false);
+renderMy(); updatePreview(); route();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",drawWheel);
+new MutationObserver(drawWheel).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+if(document.fonts) document.fonts.ready.then(drawWheel);
+</script>
+</body>
+</html>

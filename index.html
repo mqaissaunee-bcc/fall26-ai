@@ -11,7 +11,8 @@
   - When materials are ready: set data-ready="true", replace the "coming soon" <span> with a link
     (<a class="btn" href="your-file.html" target="_blank" rel="noopener">Open workshop materials <span class="newtab">(opens in new tab)</span> <span aria-hidden="true">↗</span></a>), and update the "In this session" list.
   - data-date (YYYY-MM-DD) drives the automatic "Next up" and "Completed" labels.
-  Keep this file in the same folder as the workshop HTML files.
+  Icebreakers are <article class="ice"> blocks in the "Icebreakers" section; copy one to add another.
+  Keep this file in the same folder as the workshop HTML files (including excuse-bingo.html).
 -->
 <style>
 :root{
@@ -112,6 +113,17 @@ h2{font-family:var(--font-head);font-size:clamp(1.4rem,1.2rem + .8vw,1.8rem);mar
   .date .dd{font-size:1.4rem}
 }
 
+/* Icebreakers */
+.ice{display:grid;grid-template-columns:auto 1fr;gap:var(--s5);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s5);margin-bottom:var(--s4)}
+.ice-mark{width:92px;aspect-ratio:1;border-radius:var(--r-sm);background:var(--tba-soft);display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:10px;align-self:start}
+.ice-mark span{background:var(--surface);border-radius:3px}
+.ice-mark span.x{background:var(--c2)}
+.ice h3{font-family:var(--font-head);font-size:clamp(1.25rem,1.1rem + .5vw,1.5rem);line-height:1.2;margin:0 0 var(--s2)}
+.ice p{margin:0 0 var(--s3);max-width:68ch}
+.ice ul{margin:0 0 var(--s4);padding-left:1.2rem;font-size:.95rem}
+.ice .meta{font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft);margin:0 0 var(--s4)}
+@media (max-width:600px){.ice{grid-template-columns:1fr;gap:var(--s3);padding:var(--s4)}.ice-mark{width:64px;padding:7px}}
+
 .about{display:grid;gap:var(--s4);grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr))}
 .about div{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4)}
 .about h3{font-family:var(--font-ui);font-size:1rem;margin:0 0 var(--s2)}
@@ -149,6 +161,23 @@ html{scroll-behavior:smooth}
 </header>
 
 <main id="main" class="wrap">
+  <h2 id="icebreakers">Icebreakers</h2>
+
+  <article class="ice" id="excuse-bingo">
+    <div class="ice-mark" aria-hidden="true"><span class="x"></span><span></span><span></span><span></span><span class="x"></span><span></span><span></span><span></span><span class="x"></span></div>
+    <div>
+      <div class="ws-top"><span class="num">Icebreaker</span><span class="pill ready">Ready to play</span></div>
+      <h3>Student Excuse Bingo</h3>
+      <p>Every attendee gets a unique bingo card filled with excuses we’ve all heard, from “my grandmother passed away” to “I emailed it to you, didn’t you get it?” The facilitator spins the wheel, people circle what’s called, and the first five in a row wins. A short debrief connects the laughs to the real pressures behind many excuses.</p>
+      <p class="meta">About 10 minutes for a round, plus 5 for the debrief. Works on phones or printed cards.</p>
+      <div class="btn-row">
+        <a class="btn" href="excuse-bingo.html#card" target="_blank" rel="noopener">Get my bingo card <span class="newtab">(opens in new tab)</span> <span aria-hidden="true">↗</span></a>
+        <a class="btn ghost" href="excuse-bingo.html#spin" target="_blank" rel="noopener">Facilitator spinner <span class="newtab">(opens in new tab)</span> <span aria-hidden="true">↗</span></a>
+        <a class="btn ghost" href="excuse-bingo.html#print" target="_blank" rel="noopener">Print cards <span class="newtab">(opens in new tab)</span> <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </article>
+
   <h2>The workshops</h2>
 
   <article class="ws w1" id="w1" data-date="2026-09-24" data-ready="true">
