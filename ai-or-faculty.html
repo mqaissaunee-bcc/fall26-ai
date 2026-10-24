@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI or Faculty?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Caveat:wght@700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F5F6FA; --surface:#FFFFFF; --sunk:#E9ECF3; --line:#D3D8E5; --ink:#1B2236; --ink-soft:#505A72;
+  --ai:#6D3FD1; --ai-soft:#ECE5FC; --fac:#0E7C66; --fac-soft:#DDF3EC; --red:#D7263D; --gold:#FFE27A;
+  --shadow:0 1px 0 rgba(27,34,54,.06),0 10px 28px rgba(27,34,54,.08);
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",ui-sans-serif,system-ui,sans-serif;
+  --read:"Source Serif 4",Charter,Georgia,serif;
+  --hand:"Caveat","Segoe Print",cursive;
+  color-scheme:light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#121624; --surface:#1B2133; --sunk:#242B40; --line:#323B55; --ink:#E8ECF6; --ink-soft:#A9B2C8;
+    --ai:#B89CFF; --ai-soft:#2D2450; --fac:#5FD3B6; --fac-soft:#173A31; --red:#FF5C70; --gold:#8C7420;
+    --shadow:0 1px 0 rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.35); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#121624; --surface:#1B2133; --sunk:#242B40; --line:#323B55; --ink:#E8ECF6; --ink-soft:#A9B2C8;
+  --ai:#B89CFF; --ai-soft:#2D2450; --fac:#5FD3B6; --fac-soft:#173A31; --red:#FF5C70; --gold:#8C7420;
+  --shadow:0 1px 0 rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.35); color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 56px}
+a{color:var(--ai)}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+header.top{padding:26px 0 4px;display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(2rem,5vw,3.4rem);line-height:1;margin:0;letter-spacing:-.02em}
+h1 .a{color:var(--ai)} h1 .f{color:var(--fac)} h1 .or{font-family:var(--hand);font-weight:700;color:var(--ink-soft);font-size:.7em;margin:0 .12em}
+.back{font-size:.95rem}
+nav.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 22px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding:8px 0}
+nav.tabs a{font-family:var(--display);font-weight:500;text-decoration:none;color:var(--ink);padding:8px 14px;border:1.5px solid var(--line);border-radius:999px;background:var(--surface)}
+nav.tabs a[aria-current="page"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+body.playing nav.tabs{display:none}
+section.view{display:none} section.view.on{display:block}
+h2{font-family:var(--display);font-weight:800;font-size:1.6rem;margin:0 0 10px}
+h3{font-family:var(--display);font-weight:500;font-size:1.15rem;margin:18px 0 8px}
+.muted{color:var(--ink-soft)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{font:700 1rem var(--body);border:2px solid var(--ink);background:var(--surface);color:var(--ink);padding:10px 18px;border-radius:10px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.small{padding:6px 12px;font-size:.9rem}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.panel{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);padding:20px}
+.notice{background:var(--gold);color:var(--ink);border-radius:10px;padding:10px 14px;margin:0 0 16px;font-weight:700}
+.notice[hidden]{display:none}
+
+/* home */
+.roles{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:900px}
+@media (max-width:640px){.roles{grid-template-columns:1fr}}
+.role{display:block;text-decoration:none;color:var(--ink);background:var(--surface);border-radius:16px;box-shadow:var(--shadow);padding:22px;border-top:6px solid var(--fac)}
+.role.host{border-top-color:var(--ai)}
+.role strong{font-family:var(--display);font-size:1.4rem;display:block;margin-bottom:4px}
+
+/* passage card */
+.meta{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.round{font-family:var(--display);font-weight:800;font-size:1.2rem}
+.type{font-weight:700;background:var(--sunk);border-radius:999px;padding:3px 12px;font-size:.9rem}
+.passage{position:relative;background:var(--surface);border-radius:16px;box-shadow:var(--shadow);padding:28px 32px 34px;margin-bottom:24px;font-family:var(--read);line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.host-pass{font-size:clamp(1.15rem,1.9vw,1.6rem);min-height:260px;max-width:78ch}
+.play-pass{font-size:1.05rem}
+.stamp{position:absolute;right:18px;bottom:-20px;font-family:var(--display);font-weight:800;font-size:clamp(1.4rem,3vw,2.2rem);padding:4px 18px;border:4px solid currentColor;border-radius:10px;background:var(--surface);transform:rotate(6deg);display:none}
+.stamp.ai{color:var(--ai)} .stamp.faculty{color:var(--fac)}
+.stamp.on{display:block;animation:thunk .35s ease-out}
+@keyframes thunk{0%{transform:rotate(14deg) scale(1.6);opacity:0}100%{transform:rotate(6deg) scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){.stamp.on{animation:none}}
+.reveal-note{margin:14px 0 0;padding:12px 16px;border-radius:10px;background:var(--sunk);display:none}
+.reveal-note.on{display:block}
+
+/* host layout */
+.host-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:26px;align-items:start}
+@media (max-width:900px){.host-grid{grid-template-columns:1fr}}
+.side .panel+.panel{margin-top:16px}
+.tally{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tbox{border-radius:12px;padding:10px;text-align:center}
+.tbox.ai{background:var(--ai-soft)} .tbox.fac{background:var(--fac-soft)}
+.tbox .lab{font-family:var(--display);font-weight:800}
+.tbox.ai .lab{color:var(--ai)} .tbox.fac .lab{color:var(--fac)}
+.tbox input{width:4.2em;font:800 1.6rem var(--display);text-align:center;border:0;background:transparent;color:var(--ink)}
+.tbox .pm{display:flex;justify-content:center;gap:6px}
+.tbox button{font:800 1.1rem var(--body);width:38px;height:34px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.bar{height:14px;border-radius:7px;overflow:hidden;display:flex;background:var(--sunk);margin-top:10px}
+.bar i{display:block;height:100%}
+.bar .ai{background:var(--ai)} .bar .fac{background:var(--fac)}
+.timer{font-family:var(--display);font-weight:800;font-size:3rem;line-height:1;text-align:center;margin:4px 0 10px}
+.timer.low{color:var(--red)}
+.host-actions{margin-top:18px}
+.kbd{font-size:.85rem;color:var(--ink-soft);margin-top:8px}
+.summary{width:100%;border-collapse:collapse;margin-top:10px}
+.summary th,.summary td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.tag{font-weight:800}
+.tag.ai{color:var(--ai)} .tag.faculty{color:var(--fac)}
+.tablewrap{overflow-x:auto}
+
+/* play */
+.play{max-width:640px;margin:0 auto}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.choice{font:800 1.35rem var(--display);padding:18px 10px;border-radius:14px;border:3px solid;cursor:pointer;background:var(--surface)}
+.choice.ai{border-color:var(--ai);color:var(--ai)} .choice.fac{border-color:var(--fac);color:var(--fac)}
+.choice.ai[aria-pressed="true"]{background:var(--ai);color:var(--surface)}
+.choice.fac[aria-pressed="true"]{background:var(--fac);color:var(--surface)}
+.choice:disabled{cursor:default}
+.result{font-family:var(--display);font-weight:800;font-size:1.4rem;margin:14px 0 6px}
+.result.right{color:var(--fac)} .result.wrong{color:var(--red)}
+.score{font-family:var(--display);font-weight:800;font-size:clamp(3rem,14vw,5rem);line-height:1;margin:10px 0}
+
+/* editor */
+.ed-item{background:var(--surface);border-radius:12px;box-shadow:var(--shadow);padding:14px;margin-bottom:14px;border-left:6px solid var(--fac)}
+.ed-item.ai{border-left-color:var(--ai)}
+.ed-item.empty{outline:2px dashed var(--red);outline-offset:-2px}
+.ed-top{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.ed-top input,.ed-top select,.ed-item textarea,.ed-item .note{font:1rem var(--body);padding:8px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink)}
+.ed-top input{flex:1 1 220px}
+.ed-item textarea{width:100%;min-height:120px;font-family:var(--read);resize:vertical}
+.ed-item .note{width:100%;margin-top:8px}
+.ed-num{font-family:var(--display);font-weight:800;min-width:2.2em}
+.status{font-weight:700;color:var(--fac);min-height:1.5em}
+.prep{max-width:72ch}
+.prep pre{white-space:pre-wrap;background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:14px;font-family:var(--read);font-size:.98rem}
+.prep li{margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1><span class="a">AI</span><span class="or">or</span><span class="f">Faculty?</span></h1>
+    <a class="back" href="index.html">Back to the workshop series</a>
+  </header>
+  <nav class="tabs" aria-label="Sections">
+    <a href="#home">Start</a>
+    <a href="#play">Play on my phone</a>
+    <a href="#host">Run the game</a>
+    <a href="#edit">Edit passages</a>
+    <a href="#prep">Prepare</a>
+  </nav>
+
+  <!-- HOME -->
+  <section class="view" id="v-home">
+    <p style="max-width:62ch;margin-top:0">Each round shows a short piece of teaching writing: a syllabus policy, feedback on student work, a course announcement. Some were written by faculty. Some were written by AI. Read it, make your call, and see how good the room really is at telling the difference.</p>
+    <div class="roles">
+      <a class="role" href="#play"><strong>I’m playing</strong><span class="muted">Follow along on your phone, vote each round, and get your score at the end.</span></a>
+      <a class="role host" href="#host"><strong>I’m running it</strong><span class="muted">Put the passages on the projector, count the room’s votes, and reveal the answers.</span></a>
+    </div>
+  </section>
+
+  <!-- PLAY -->
+  <section class="view" id="v-play">
+    <div class="play" id="playRoot"></div>
+  </section>
+
+  <!-- HOST -->
+  <section class="view" id="v-host">
+    <p class="notice" id="localNotice" hidden>You’re running passages saved on this computer only. Attendees’ phones still show the passages in the uploaded file. Download the updated file from Edit passages and upload it before the session.</p>
+    <div id="hostRoot"></div>
+  </section>
+
+  <!-- EDIT -->
+  <section class="view" id="v-edit">
+    <h2>Edit passages</h2>
+    <p class="muted" style="max-width:70ch;margin-top:0">Rounds play in this order on the projector and on phones. Rounds with no text are skipped. Changes save on this computer as you type. To give attendees the same passages, download the game file and upload it to your site in place of the old one.</p>
+    <div class="row" style="margin-bottom:16px">
+      <button class="btn small" id="addRound" type="button">Add a round</button>
+      <button class="btn small" id="shuffle" type="button">Shuffle the order</button>
+      <button class="btn small primary" id="dlGame" type="button">Download game file with these passages</button>
+      <button class="btn small" id="exportJson" type="button">Export passages (JSON)</button>
+      <label class="btn small" for="importJson" style="cursor:pointer">Import passages (JSON)</label>
+      <input type="file" id="importJson" accept=".json,application/json" hidden>
+      <button class="btn small" id="resetDeck" type="button">Discard my changes</button>
+    </div>
+    <p class="status" id="edStatus" role="status"></p>
+    <p id="edCounts" class="muted"></p>
+    <div id="edList"></div>
+  </section>
+
+  <!-- PREP -->
+  <section class="view" id="v-prep">
+    <div class="prep">
+      <h2>Prepare a round set</h2>
+      <p style="margin-top:0">The game only works if the faculty passages are really written by people. Collect those first, then make AI versions of the same kinds of writing so the pairs feel alike.</p>
+      <ol>
+        <li>Ask four to six colleagues for one short piece each, 60 to 150 words: a late-work policy, a comment on a student paper, a reminder before an exam, a reply to a student email.</li>
+        <li>Remove names, course numbers, and anything about real students.</li>
+        <li>For each faculty piece, use the AI prompt below to write a matching AI piece of the same type.</li>
+        <li>Paste everything into Edit passages, set each one’s author, and add a reveal note.</li>
+        <li>Shuffle, then download the game file and upload it to your site.</li>
+      </ol>
+      <p>Aim for 8 to 12 rounds, about 10 minutes. An uneven split, like 7 AI and 5 faculty, keeps people from counting.</p>
+      <h3>Message to colleagues</h3>
+      <pre id="msgColleague">Hi! For the AI teaching workshop I’m running an icebreaker called “AI or Faculty?” where people guess whether a short piece of teaching writing came from a person or from AI. Would you send me one short thing you wrote yourself, about 60 to 150 words? A syllabus policy, feedback you gave on student work, a course announcement, or a reply to a student email all work. I’ll remove names and course details, and I won’t say who wrote it unless you want credit. Thank you!</pre>
+      <button class="btn small" type="button" data-copy="msgColleague">Copy message</button>
+      <h3>Prompt for the AI passages</h3>
+      <pre id="msgPrompt">You are a community college instructor. Write a [TYPE, e.g. late-work policy for a syllabus] for a [SUBJECT] course, about [WORD COUNT] words. Write it the way a real, busy instructor would: plain language, one or two personal touches, no headings or bullet points. Here is an example of the length and tone I want, written by a colleague:
+
+[PASTE THE MATCHING FACULTY PASSAGE]</pre>
+      <button class="btn small" type="button" data-copy="msgPrompt">Copy prompt</button>
+      <p class="status" id="copyStatus" role="status"></p>
+      <h3>Questions for afterward</h3>
+      <ul>
+        <li>Which round fooled the most people, and what made it convincing?</li>
+        <li>What clues did you rely on? Did they actually work?</li>
+        <li>If we can’t reliably tell, what does that mean for take-home writing assignments?</li>
+        <li>What would an assignment look like where it doesn’t matter whether a student used AI to draft?</li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<script type="application/json" id="deck">
+[
+  {"type":"Syllabus policy: late work","source":"ai","text":"Late work is accepted up to one week after the due date with a 10% deduction. After that, it’s worth zero — but please talk to me before you get to that point. I’d much rather hear from you on day two than find out in week twelve that you’ve been struggling. Things happen, and I can usually work something out if you reach out early.","note":"Written by AI (Claude) for this game. Notice the casual dash and the “I’d much rather hear from you” warmth: AI can do approachable too."},
+  {"type":"Feedback on student work","source":"faculty","text":"","note":"Written by a faculty member. (Add who, or the discipline, if they’re OK with it.)"},
+  {"type":"Announcement before an exam","source":"ai","text":"Quick reminder that Exam 2 is this Thursday. It covers Chapters 5 through 7, including the lab on subnetting. You can bring one handwritten index card, both sides. Calculators are fine, phones are not. If you missed Tuesday’s review session, the slides are posted in Week 9. See you Thursday, and get some sleep the night before.","note":"Written by AI (Claude). Specific details like chapter numbers and the index-card rule make AI writing feel real."},
+  {"type":"Reply to a student email","source":"faculty","text":"","note":"Written by a faculty member."},
+  {"type":"Course welcome message","source":"ai","text":"Welcome to the course! I’m excited to work with you this semester. This class moves quickly, but it’s designed so that every week builds on the last, and you’ll be surprised how much you can do by the end. My best advice: start the weekly labs early, ask questions in the discussion board (someone else probably has the same one), and come to office hours even if you think your question is small. There are no small questions here.","note":"Written by AI (Claude). This one has classic AI tells: “I’m excited,” the tidy three-part advice, and an upbeat closing line."},
+  {"type":"Syllabus policy: attendance","source":"faculty","text":"","note":"Written by a faculty member."},
+  {"type":"Feedback on student work","source":"ai","text":"Your argument is strongest in the second section, where you connect the data to your own experience at work. The introduction needs to get to your point faster; right now it takes three sentences before I know what you’re arguing. Also double-check your citations on page 3, two of them are missing dates. Solid draft overall. Fix the intro and this moves from a B to an A.","note":"Written by AI (Claude). The comma splice in “page 3, two of them” is the kind of small slip people assume only humans make."},
+  {"type":"Discussion board reply","source":"faculty","text":"","note":"Written by a faculty member."},
+  {"type":"Syllabus policy: AI use","source":"ai","text":"You may use AI tools to brainstorm, check your grammar, or explain a concept you’re stuck on. You may not submit AI-written text or code as your own work. If you use AI on an assignment, add one sentence at the end saying what you used it for. That’s it — no penalty for being honest. The penalty is for hiding it.","note":"Written by AI (Claude). An AI writing a policy about AI."},
+  {"type":"Announcement: class cancelled","source":"faculty","text":"","note":"Written by a faculty member."}
+]
+</script>
+
+<script>
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const PRISTINE="<!doctype html>\n"+document.documentElement.outerHTML;
+const FILE_DECK=JSON.parse(document.getElementById("deck").textContent);
+let deck=store.get("aof-deck",null)||JSON.parse(JSON.stringify(FILE_DECK));
+const usingLocal=()=>!!store.get("aof-deck",null);
+const playable=()=>deck.filter(d=>d.text&&d.text.trim());
+const label=s=>s==="ai"?"AI":"Faculty";
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+/* sound */
+let soundOn=store.get("aof-sound",true),actx=null;
+function ac(){if(!soundOn)return null;try{if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume()}catch(e){actx=null}return actx}
+function tone(f,st,d,type="sine",v=.2,g2){const a=ac();if(!a)return;const t=a.currentTime+st;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(g2)o.frequency.exponentialRampToValueAtTime(g2,t+d);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d+.02)}
+const sfx={
+  tick(){tone(1800,0,.04,"square",.05)},
+  buzz(){tone(220,0,.5,"sawtooth",.12,140)},
+  stamp(){tone(140,0,.18,"square",.18,60);tone(660,.12,.18,"triangle",.2);tone(990,.24,.4,"triangle",.2)},
+  pick(){tone(520,0,.08,"sine",.14,780)},
+  right(){[659,880].forEach((f,i)=>tone(f,i*.1,.25,"triangle",.22))},
+  wrong(){tone(330,0,.18,"triangle",.18,300);tone(262,.16,.35,"triangle",.18,220)},
+  done(){[523,659,784,1047].forEach((f,i)=>tone(f,i*.12,.35,"triangle",.22))}
+};
+function soundBtn(){return `<button class="btn small" type="button" data-sound aria-pressed="${soundOn}">${soundOn?"Sound on":"Sound off"}</button>`}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-sound]");if(!b)return;soundOn=!soundOn;store.set("aof-sound",soundOn);document.querySelectorAll("[data-sound]").forEach(x=>{x.textContent=soundOn?"Sound on":"Sound off";x.setAttribute("aria-pressed",soundOn)});if(soundOn)sfx.pick()});
+
+/* routing */
+const VIEWS=["home","play","host","edit","prep"];
+let view="home";
+function route(){
+  let h=(location.hash||"").slice(1); if(!VIEWS.includes(h)) h="home"; view=h;
+  VIEWS.forEach(v=>document.getElementById("v-"+v).classList.toggle("on",v===h));
+  document.querySelectorAll("nav.tabs a").forEach(a=>{if(a.getAttribute("href")==="#"+h)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  if(h==="play") renderPlay(); if(h==="host") renderHost(); if(h==="edit") renderEdit();
+  if(h!=="host") stopTimer();
+  document.body.classList.toggle("playing",h==="play");
+}
+addEventListener("hashchange",route);
+
+/* ================= PLAY (phone) ================= */
+function playKey(){return "aof-play-"+playable().map(d=>d.text.length).join(".")}
+let P=null;
+function renderPlay(){
+  const rounds=playable(); const root=document.getElementById("playRoot");
+  if(!rounds.length){root.innerHTML='<div class="panel"><h2>No rounds yet</h2><p class="muted">The facilitator hasn’t added passages to this game.</p></div>';return}
+  P=store.get(playKey(),{i:0,guess:[],shown:[]});
+  const save=()=>store.set(playKey(),P);
+  if(P.i>=rounds.length){
+    const score=rounds.reduce((n,d,k)=>n+(P.guess[k]===d.source?1:0),0);
+    const pct=score/rounds.length;
+    const msg=pct>=.85?"Sharp eye. You’re harder to fool than most.":pct>=.6?"Better than a coin flip. Most rooms land right around here.":"The AI got you. You’re in very good company.";
+    root.innerHTML=`<div class="panel" style="text-align:center"><h2>Your score</h2><p class="score">${score} / ${rounds.length}</p><p>${msg}</p>
+      <div class="row" style="justify-content:center;margin-top:14px"><button class="btn" id="pAgain" type="button">Play again</button>${soundBtn()}</div></div>
+      <h3>How you did</h3><div class="tablewrap"><table class="summary"><thead><tr><th>Round</th><th>Type</th><th>Answer</th><th>You said</th></tr></thead><tbody>
+      ${rounds.map((d,k)=>`<tr><td>${k+1}</td><td>${esc(d.type)}</td><td class="tag ${d.source}">${label(d.source)}</td><td>${P.guess[k]?(P.guess[k]===d.source?"✓ ":"✗ ")+label(P.guess[k]):"—"}</td></tr>`).join("")}</tbody></table></div>`;
+    document.getElementById("pAgain").onclick=()=>{P={i:0,guess:[],shown:[]};save();renderPlay()};
+    return;
+  }
+  const d=rounds[P.i], g=P.guess[P.i], shown=P.shown[P.i];
+  root.innerHTML=`<div class="meta"><span class="round">Round ${P.i+1} of ${rounds.length}</span><span class="type">${esc(d.type)}</span></div>
+    <div class="passage play-pass">${esc(d.text)}<span class="stamp ${d.source} ${shown?"on":""}">${label(d.source)}</span></div>
+    <div class="choices">
+      <button class="choice ai" type="button" data-g="ai" aria-pressed="${g==="ai"}" ${shown?"disabled":""}>AI</button>
+      <button class="choice fac" type="button" data-g="faculty" aria-pressed="${g==="faculty"}" ${shown?"disabled":""}>Faculty</button>
+    </div>
+    <div id="pAfter" aria-live="polite"></div>
+    <div class="row" style="justify-content:space-between;margin-top:18px">
+      <button class="btn small" id="pPrev" type="button" ${P.i===0?"disabled":""}>Previous round</button>${soundBtn()}</div>`;
+  const after=document.getElementById("pAfter");
+  if(shown){
+    const right=g===d.source;
+    after.innerHTML=`<p class="result ${right?"right":"wrong"}">${g?(right?"You got it.":"Fooled you."):"No vote this round."} It was ${label(d.source)}.</p>${d.note?`<p class="muted" style="margin:0">${esc(d.note)}</p>`:""}
+      <button class="btn primary" id="pNext" type="button" style="margin-top:14px">${P.i===rounds.length-1?"See my score":"Next round"}</button>`;
+    document.getElementById("pNext").onclick=()=>{P.i++;save();if(P.i>=rounds.length)sfx.done();renderPlay();scrollTo(0,0)};
+  } else if(g){
+    after.innerHTML=`<p class="muted" style="margin:14px 0 8px">Locked in: <strong>${label(g)}</strong>. Wait for the answer on the screen, then tap below.</p><button class="btn primary" id="pShow" type="button">Show me the answer</button>`;
+    document.getElementById("pShow").onclick=()=>{P.shown[P.i]=true;save();(g===d.source?sfx.right:sfx.wrong)();renderPlay()};
+  } else after.innerHTML='<p class="muted" style="margin:14px 0 0">Tap AI or Faculty to vote. You can change your mind until the answer is shown.</p>';
+  root.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{P.guess[P.i]=b.dataset.g;save();sfx.pick();renderPlay()});
+  document.getElementById("pPrev").onclick=()=>{P.i=Math.max(0,P.i-1);save();renderPlay()};
+}
+
+/* ================= HOST (projector) ================= */
+let H=store.get("aof-host",{i:0,revealed:[],t:[]}); let timerId=null,timeLeft=0;
+const saveH=()=>store.set("aof-host",H);
+function stopTimer(){clearInterval(timerId);timerId=null}
+function renderHost(){
+  document.getElementById("localNotice").hidden=!usingLocal();
+  const rounds=playable(), root=document.getElementById("hostRoot");
+  if(!rounds.length){root.innerHTML='<div class="panel"><h2>No rounds yet</h2><p>Add passages on the <a href="#edit">Edit passages</a> tab first.</p></div>';return}
+  const skipped=deck.length-rounds.length;
+  if(H.i>rounds.length) H.i=rounds.length;
+  if(H.i===rounds.length) return renderSummary(rounds,root);
+  const d=rounds[H.i], rev=!!H.revealed[H.i], t=H.t[H.i]||{ai:0,fac:0};
+  const tot=t.ai+t.fac, pa=tot?Math.round(t.ai/tot*100):0;
+  root.innerHTML=`<div class="host-grid">
+    <div>
+      <div class="meta"><span class="round">Round ${H.i+1} of ${rounds.length}</span><span class="type">${esc(d.type)}</span></div>
+      <div class="passage host-pass">${esc(d.text)}<span class="stamp ${d.source} ${rev?"on":""}" id="stamp">${label(d.source)}</span></div>
+      <div class="reveal-note ${rev&&d.note?"on":""}">${esc(d.note||"")}</div>
+      <div class="row host-actions">
+        <button class="btn small" id="hPrev" type="button" ${H.i===0?"disabled":""}>Previous</button>
+        <button class="btn primary" id="hMain" type="button">${rev?(H.i===rounds.length-1?"See the results":"Next round"):"Reveal the answer"}</button>
+        ${soundBtn()}
+        <button class="btn small" id="hRestart" type="button">Start over</button>
+      </div>
+      <p class="kbd">Keyboard: Space reveals, then moves to the next round. A and F add a vote. Left arrow goes back.</p>
+      ${skipped?`<p class="muted">${skipped} round${skipped>1?"s have":" has"} no text yet and ${skipped>1?"are":"is"} skipped.</p>`:""}
+    </div>
+    <div class="side">
+      <div class="panel">
+        <h3 style="margin-top:0">Timer</h3>
+        <div class="timer" id="timer">${timerId?timeLeft:"0:30"}</div>
+        <div class="row" style="justify-content:center"><button class="btn small" id="tStart" type="button">${timerId?"Stop":"Start 30 seconds"}</button></div>
+      </div>
+      <div class="panel">
+        <h3 style="margin-top:0">Room vote</h3>
+        <p class="muted" style="margin:0 0 10px;font-size:.92rem">“Hands up if you think AI wrote this.” Count, then do Faculty.</p>
+        <div class="tally">
+          <div class="tbox ai"><div class="lab">AI</div><input type="number" min="0" id="vAI" value="${t.ai}" aria-label="Votes for AI"><div class="pm"><button type="button" data-v="ai" data-d="-1" aria-label="One fewer AI vote">−</button><button type="button" data-v="ai" data-d="1" aria-label="One more AI vote">+</button></div></div>
+          <div class="tbox fac"><div class="lab">Faculty</div><input type="number" min="0" id="vFAC" value="${t.fac}" aria-label="Votes for Faculty"><div class="pm"><button type="button" data-v="fac" data-d="-1" aria-label="One fewer Faculty vote">−</button><button type="button" data-v="fac" data-d="1" aria-label="One more Faculty vote">+</button></div></div>
+        </div>
+        <div class="bar" aria-hidden="true"><i class="ai" style="width:${tot?pa:0}%"></i><i class="fac" style="width:${tot?100-pa:0}%"></i></div>
+        <p style="margin:8px 0 0;font-weight:700">${tot?`${pa}% said AI, ${100-pa}% said Faculty`:"No votes counted yet"}${rev&&tot?`<br><span class="tag ${d.source}">${Math.round((d.source==="ai"?t.ai:t.fac)/tot*100)}% of the room got it right</span>`:""}</p>
+      </div>
+    </div></div>`;
+  const setV=(k,v)=>{H.t[H.i]=H.t[H.i]||{ai:0,fac:0};H.t[H.i][k]=Math.max(0,v|0);saveH();renderHost()};
+  root.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{const k=b.dataset.v;setV(k,((H.t[H.i]||{})[k]||0)+(+b.dataset.d))});
+  document.getElementById("vAI").onchange=e=>setV("ai",+e.target.value);
+  document.getElementById("vFAC").onchange=e=>setV("fac",+e.target.value);
+  document.getElementById("hMain").onclick=hostMain;
+  document.getElementById("hPrev").onclick=()=>{H.i=Math.max(0,H.i-1);stopTimer();saveH();renderHost()};
+  document.getElementById("hRestart").onclick=()=>{if(!confirm("Start over? This clears every reveal and vote count."))return;H={i:0,revealed:[],t:[]};stopTimer();saveH();renderHost()};
+  document.getElementById("tStart").onclick=toggleTimer;
+  paintTimer();
+}
+function hostMain(){
+  const rounds=playable(); if(H.i>=rounds.length) return;
+  if(!H.revealed[H.i]){H.revealed[H.i]=true;stopTimer();sfx.stamp();}
+  else {H.i++;stopTimer();if(H.i===rounds.length)sfx.done();}
+  saveH();renderHost();
+}
+function paintTimer(){const el=document.getElementById("timer");if(!el)return;if(!timerId){return}el.textContent="0:"+String(timeLeft).padStart(2,"0");el.classList.toggle("low",timeLeft<=5)}
+function toggleTimer(){
+  if(timerId){stopTimer();renderHost();return}
+  timeLeft=30;ac();
+  timerId=setInterval(()=>{timeLeft--;if(timeLeft<=5&&timeLeft>0)sfx.tick();if(timeLeft<=0){stopTimer();sfx.buzz();const el=document.getElementById("timer");if(el){el.textContent="Time!";el.classList.add("low")}const b=document.getElementById("tStart");if(b)b.textContent="Start 30 seconds";return}paintTimer()},1000);
+  renderHost();
+}
+function renderSummary(rounds,root){
+  let rightSum=0,totSum=0,worst=null;
+  const rows=rounds.map((d,k)=>{const t=H.t[k]||{ai:0,fac:0},tot=t.ai+t.fac,right=d.source==="ai"?t.ai:t.fac;
+    if(tot){rightSum+=right;totSum+=tot;const p=right/tot;if(!worst||p<worst.p)worst={p,k,d}}
+    return `<tr><td>${k+1}</td><td>${esc(d.type)}</td><td class="tag ${d.source}">${label(d.source)}</td><td>${tot?Math.round(right/tot*100)+"%":"—"}</td></tr>`}).join("");
+  root.innerHTML=`<div class="panel"><h2>How the room did</h2>
+    ${totSum?`<p class="score" style="color:var(--ai)">${Math.round(rightSum/totSum*100)}%</p><p style="margin-top:0">of all votes were right. ${rightSum/totSum<.6?"That’s barely better than flipping a coin.":"Better than a coin flip, but not by as much as most people expect."}</p>`:`<p>No votes were counted, so there’s no room score.</p>`}
+    ${worst?`<p><strong>Most convincing round:</strong> Round ${worst.k+1} (${esc(worst.d.type)}). Only ${Math.round(worst.p*100)}% got it right. It was <span class="tag ${worst.d.source}">${label(worst.d.source)}</span>.</p>`:""}
+    <div class="tablewrap"><table class="summary"><thead><tr><th>Round</th><th>Type</th><th>Answer</th><th>Room got it right</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="row" style="margin-top:16px"><button class="btn" id="hBack" type="button">Back to the last round</button><button class="btn" id="hRestart2" type="button">Start over</button><a class="btn" href="#prep">Debrief questions</a></div></div>`;
+  document.getElementById("hBack").onclick=()=>{H.i=rounds.length-1;saveH();renderHost()};
+  document.getElementById("hRestart2").onclick=()=>{if(!confirm("Start over? This clears every reveal and vote count."))return;H={i:0,revealed:[],t:[]};saveH();renderHost()};
+}
+addEventListener("keydown",e=>{
+  if(view!=="host"||e.target.closest("input,textarea,select,button"))return;
+  if(e.key===" "||e.key==="Enter"){e.preventDefault();hostMain()}
+  else if(e.key==="ArrowLeft"){H.i=Math.max(0,H.i-1);stopTimer();saveH();renderHost()}
+  else if(e.key==="ArrowRight"){hostMain()}
+  else if(e.key==="a"||e.key==="f"){const k=e.key==="a"?"ai":"fac";if(H.i<playable().length){H.t[H.i]=H.t[H.i]||{ai:0,fac:0};H.t[H.i][k]++;saveH();renderHost()}}
+});
+
+/* ================= EDIT ================= */
+function saveDeck(msg){store.set("aof-deck",deck);const s=document.getElementById("edStatus");if(s)s.textContent=msg||"Saved on this computer."}
+function counts(){const r=playable();const a=r.filter(d=>d.source==="ai").length;document.getElementById("edCounts").textContent=`${r.length} playable round${r.length===1?"":"s"}: ${a} AI, ${r.length-a} faculty. ${deck.length-r.length?`${deck.length-r.length} still need text.`:""}`}
+function renderEdit(){
+  const list=document.getElementById("edList");
+  list.innerHTML=deck.map((d,k)=>`<div class="ed-item ${d.source} ${d.text.trim()?"":"empty"}" data-k="${k}">
+    <div class="ed-top"><span class="ed-num">${k+1}</span>
+      <input type="text" value="${esc(d.type)}" data-f="type" aria-label="Round ${k+1} writing type" placeholder="Kind of writing, e.g. Syllabus policy">
+      <select data-f="source" aria-label="Round ${k+1} author"><option value="faculty" ${d.source==="faculty"?"selected":""}>Faculty wrote it</option><option value="ai" ${d.source==="ai"?"selected":""}>AI wrote it</option></select>
+      <button class="btn small" type="button" data-act="up" ${k===0?"disabled":""} aria-label="Move round ${k+1} up">Up</button>
+      <button class="btn small" type="button" data-act="down" ${k===deck.length-1?"disabled":""} aria-label="Move round ${k+1} down">Down</button>
+      <button class="btn small" type="button" data-act="del" aria-label="Delete round ${k+1}">Delete</button>
+    </div>
+    <textarea data-f="text" aria-label="Round ${k+1} passage" placeholder="${d.source==="faculty"?"Paste a real faculty-written passage here (60 to 150 words).":"Paste the AI-written passage here."}">${esc(d.text)}</textarea>
+    <input class="note" type="text" value="${esc(d.note||"")}" data-f="note" aria-label="Round ${k+1} reveal note" placeholder="Reveal note shown with the answer, e.g. Written by a nursing instructor">
+  </div>`).join("");
+  list.querySelectorAll(".ed-item").forEach(item=>{
+    const k=+item.dataset.k;
+    item.querySelectorAll("[data-f]").forEach(f=>f.addEventListener("input",()=>{deck[k][f.dataset.f]=f.value;
+      if(f.dataset.f==="source"){item.classList.toggle("ai",f.value==="ai")}
+      if(f.dataset.f==="text"){item.classList.toggle("empty",!f.value.trim())}
+      saveDeck();counts()}));
+    item.querySelectorAll("[data-act]").forEach(b=>b.onclick=()=>{const a=b.dataset.act;
+      if(a==="del"){if(!confirm(`Delete round ${k+1}?`))return;deck.splice(k,1)}
+      if(a==="up"&&k>0)[deck[k-1],deck[k]]=[deck[k],deck[k-1]];
+      if(a==="down"&&k<deck.length-1)[deck[k+1],deck[k]]=[deck[k],deck[k+1]];
+      saveDeck();renderEdit()});
+  });
+  counts();
+}
+document.getElementById("addRound").onclick=()=>{deck.push({type:"",source:"faculty",text:"",note:""});saveDeck("Round added.");renderEdit();const t=document.querySelectorAll("#edList textarea");t[t.length-1].focus()};
+document.getElementById("shuffle").onclick=()=>{for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}saveDeck("Order shuffled.");renderEdit()};
+document.getElementById("resetDeck").onclick=()=>{if(!confirm("Discard your changes and go back to the passages in the uploaded file?"))return;store.del("aof-deck");deck=JSON.parse(JSON.stringify(FILE_DECK));renderEdit();document.getElementById("edStatus").textContent="Back to the passages in the file."};
+function saveFile(name,text,type){const u=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
+document.getElementById("dlGame").onclick=()=>{
+  const json=JSON.stringify(deck,null,2).replace(/</g,"\\u003c");
+  const out=PRISTINE.replace(/(<script type="application\/json" id="deck">)[\s\S]*?(<\/script>)/,(m,a,b)=>a+"\n"+json+"\n"+b);
+  saveFile("ai-or-faculty.html",out,"text/html");
+  document.getElementById("edStatus").textContent="Downloaded ai-or-faculty.html. Upload it to your site in place of the old file.";
+};
+document.getElementById("exportJson").onclick=()=>{saveFile("ai-or-faculty-passages.json",JSON.stringify(deck,null,2),"application/json");document.getElementById("edStatus").textContent="Passages exported."};
+document.getElementById("importJson").onchange=async e=>{const f=e.target.files[0];if(!f)return;
+  try{const d=JSON.parse(await f.text());if(!Array.isArray(d))throw 0;deck=d.map(x=>({type:String(x.type||""),source:x.source==="ai"?"ai":"faculty",text:String(x.text||""),note:String(x.note||"")}));saveDeck("Passages imported.");renderEdit()}
+  catch(err){document.getElementById("edStatus").textContent="That file isn’t a passages export from this game."}
+  e.target.value=""};
+
+/* copy buttons */
+document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{const t=document.getElementById(b.dataset.copy).textContent;const s=document.getElementById("copyStatus");
+  try{await navigator.clipboard.writeText(t);s.textContent="Copied."}catch(e){s.textContent="Select the text and copy it with Ctrl+C."}});
+
+route();
+</script>
+</body>
+</html>
