@@ -472,6 +472,40 @@ function route(){
 addEventListener("hashchange",route);
 
 /* ================= PLAY (phone) ================= */
+/* ---------- live sync ----------
+   The projector posts the current round and whether it has been revealed to a free
+   public relay (ntfy.sh). Phones listen and follow along. Only round numbers are sent,
+   never passages or names. If the relay can't be reached, players use the buttons. */
+const RELAY="https://ntfy.sh/";
+const topic=code=>"bcc-ai-or-faculty-x7q2-"+code;
+let sync={state:"off",code:null,es:null,lastT:0,lastId:null};
+function syncLineText(){return sync.state==="live"?"● Following the screen. Rounds and answers change on their own.":sync.state==="connecting"?"Connecting to the screen…":"Not connected to the screen. Use the buttons to move along."}
+function paintSyncLine(){const el=document.getElementById("syncLine");if(el){el.textContent=syncLineText();el.style.color=sync.state==="live"?"var(--fac)":"var(--ink-soft)"}}
+function stopSync(){if(sync.es){sync.es.close()}sync={state:"off",code:null,es:null,lastT:0,lastId:null}}
+function ensureSync(code){
+  if(sync.code===code&&sync.es) return;
+  stopSync(); if(!window.EventSource) return;
+  sync.code=code; sync.state="connecting";
+  try{
+    const es=new EventSource(RELAY+topic(code)+"/sse?since=20m"); sync.es=es;
+    es.onopen=()=>{sync.state="live";paintSyncLine();if(view==="play")renderPlay()};
+    es.onerror=()=>{sync.state=es.readyState===2?"off":"connecting";paintSyncLine();if(view==="play")renderPlay()};
+    es.onmessage=e=>{let m;try{m=JSON.parse(e.data)}catch(x){return}
+      if(m.event!=="message"||m.id===sync.lastId||m.time<sync.lastT) return; sync.lastT=m.time; sync.lastId=m.id;
+      let st;try{st=JSON.parse(m.message)}catch(x){return} if(st.t!=="s"||st.c!==code) return; applyState(st)};
+  }catch(e){sync.state="off"}
+}
+function applyState(st){
+  P=store.get("aof-p",null); if(!P||P.code!==sync.code) return;
+  const before=P.i, wasDone=!!P.done;
+  if(st.i>=st.n){ P.i=st.n; P.done=true; if(!wasDone) sfx.done(); }
+  else {
+    P.done=false; P.i=st.i;
+    if(st.r && !P.shown[P.i]){ P.shown[P.i]=true; const d=gameOrder(P.code)[P.i]; const g=P.guess[P.i]; if(d&&g)(g===d.source?sfx.right:sfx.wrong)(); }
+  }
+  store.set("aof-p",P);
+  if(view==="play"){renderPlay(); if(before!==P.i) scrollTo(0,0)}
+}
 let P=null;
 function renderPlay(){
   const root=document.getElementById("playRoot");
@@ -487,6 +521,8 @@ function renderPlay(){
     document.getElementById("joinBtn").onclick=go;document.getElementById("joinCode").addEventListener("keydown",e=>{if(e.key==="Enter")go()});
     return;
   }
+  ensureSync(P.code);
+  const live=sync.state==="live";
   const all=gameOrder(P.code);
   const rounds=P.done?all.slice(0,P.i):all;
   if(P.done||P.i>=all.length){
@@ -497,7 +533,7 @@ function renderPlay(){
       <div class="row" style="justify-content:center;margin-top:14px"><button class="btn" id="pAgain" type="button">Join a new game</button>${soundBtn()}</div></div>
       <h3>How you did</h3><div class="tablewrap"><table class="summary"><thead><tr><th>Round</th><th>Type</th><th>Answer</th><th>You said</th></tr></thead><tbody>
       ${rounds.map((d,k)=>`<tr><td>${k+1}</td><td>${esc(d.type)}</td><td class="tag ${d.source}">${label(d.source)}</td><td>${P.guess[k]?(P.guess[k]===d.source?"✓ ":"✗ ")+label(P.guess[k]):"—"}</td></tr>`).join("")}</tbody></table></div>`;
-    document.getElementById("pAgain").onclick=()=>{P=null;store.del("aof-p");renderPlay()};
+    document.getElementById("pAgain").onclick=()=>{P=null;store.del("aof-p");stopSync();renderPlay()};
     return;
   }
   const d=rounds[P.i], g=P.guess[P.i], shown=P.shown[P.i];
@@ -510,17 +546,19 @@ function renderPlay(){
     <div id="pAfter" aria-live="polite"></div>
     <div class="row" style="justify-content:space-between;margin-top:18px">
       <button class="btn small" id="pPrev" type="button" ${P.i===0?"disabled":""}>Previous round</button>${soundBtn()}</div>
-    <p class="muted" style="font-size:.9rem;margin-top:14px">Game ${P.code}. <a href="#play" id="pLeave">Join a different game</a></p>`;
-  document.getElementById("pLeave").onclick=e=>{e.preventDefault();if(confirm("Leave this game? Your answers so far will be cleared.")){P=null;store.del("aof-p");renderPlay()}};
+    <p id="syncLine" style="font-size:.9rem;margin:16px 0 0;font-weight:700"></p>
+    <p class="muted" style="font-size:.9rem;margin-top:4px">Game ${P.code}. <a href="#play" id="pLeave">Join a different game</a></p>`;
+  paintSyncLine();
+  document.getElementById("pLeave").onclick=e=>{e.preventDefault();if(confirm("Leave this game? Your answers so far will be cleared.")){P=null;store.del("aof-p");stopSync();renderPlay()}};
   const after=document.getElementById("pAfter");
   if(shown){
     const right=g===d.source;
     after.innerHTML=`<p class="result ${right?"right":"wrong"}">${g?(right?"You got it.":"Fooled you."):"No vote this round."} It was ${label(d.source)}.</p>${d.note?`<p class="muted" style="margin:0">${esc(d.note)}</p>`:""}
-      <div class="row" style="margin-top:14px"><button class="btn primary" id="pNext" type="button">Next round</button><button class="btn" id="pEnd" type="button">That was the last one. See my score</button></div>`;
+      ${live?`<p class="muted" style="margin:14px 0 6px">The next round appears when the screen moves on.</p><button class="btn small" id="pNext" type="button">Go ahead on my own</button>`:`<div class="row" style="margin-top:14px"><button class="btn primary" id="pNext" type="button">Next round</button><button class="btn" id="pEnd" type="button">That was the last one. See my score</button></div>`}`;
+    if(document.getElementById("pEnd")) document.getElementById("pEnd").onclick=()=>{P.i++;P.done=true;save();sfx.done();renderPlay();scrollTo(0,0)};
     document.getElementById("pNext").onclick=()=>{P.i++;save();renderPlay();scrollTo(0,0)};
-    document.getElementById("pEnd").onclick=()=>{P.i++;P.done=true;save();sfx.done();renderPlay();scrollTo(0,0)};
   } else if(g){
-    after.innerHTML=`<p class="muted" style="margin:14px 0 8px">Locked in: <strong>${label(g)}</strong>. Wait for the answer on the screen, then tap below.</p><button class="btn primary" id="pShow" type="button">Show me the answer</button>`;
+    after.innerHTML=live?`<p class="muted" style="margin:14px 0 8px">Locked in: <strong>${label(g)}</strong>. Your answer shows here when it’s revealed on the screen. You can still change your vote.</p><button class="btn small" id="pShow" type="button">Show me the answer now</button>`:`<p class="muted" style="margin:14px 0 8px">Locked in: <strong>${label(g)}</strong>. Wait for the answer on the screen, then tap below.</p><button class="btn primary" id="pShow" type="button">Show me the answer</button>`;
     document.getElementById("pShow").onclick=()=>{P.shown[P.i]=true;save();(g===d.source?sfx.right:sfx.wrong)();renderPlay()};
   } else after.innerHTML='<p class="muted" style="margin:14px 0 0">Tap AI or Faculty to vote. You can change your mind until the answer is shown.</p>';
   root.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{P.guess[P.i]=b.dataset.g;save();sfx.pick();renderPlay()});
@@ -533,6 +571,16 @@ const freshH=n=>({code:newCode(),n:n||ROUNDS_DEFAULT,i:0,revealed:[],t:[]});
 let H=store.get("aof-host2",null)||freshH(); let timerId=null,timeLeft=0;
 const saveH=()=>store.set("aof-host2",H);
 const hostRounds=()=>gameRounds(H.code,H.n);
+let pub={key:null,state:"idle",hb:null};
+function publishState(force){
+  const st={t:"s",c:H.code,i:H.i,n:Math.min(H.n,playable().length),r:!!H.revealed[H.i]};
+  const key=JSON.stringify(st); if(!force&&key===pub.key) return; pub.key=key;
+  fetch(RELAY+topic(H.code),{method:"POST",body:key}).then(r=>{pub.state=r.ok?"ok":"fail";paintPub()}).catch(()=>{pub.state="fail";paintPub()});
+}
+function paintPub(){const el=document.getElementById("pubLine");if(!el)return;
+  el.textContent=pub.state==="ok"?"● Phones follow this screen automatically.":pub.state==="fail"?"Phones can’t sync right now. Players can still move along with their buttons.":"Connecting phones…";
+  el.style.color=pub.state==="ok"?"var(--fac)":pub.state==="fail"?"var(--red)":"var(--ink-soft)"}
+function startHeartbeat(){ if(pub.hb) return; pub.hb=setInterval(()=>{ if(view==="host") publishState(true) },60000) }
 function stopTimer(){clearInterval(timerId);timerId=null}
 function renderHost(){
   document.getElementById("localNotice").hidden=!usingLocal();
@@ -540,7 +588,7 @@ function renderHost(){
   if(!rounds.length){root.innerHTML='<div class="panel"><h2>No rounds yet</h2><p>Add passages on the <a href="#edit">Edit passages</a> tab first.</p></div>';return}
   const pool=playable(), facN=pool.filter(d=>d.source==="faculty").length;
   if(H.i>rounds.length) H.i=rounds.length;
-  if(H.i===rounds.length) return renderSummary(rounds,root);
+  if(H.i===rounds.length){ publishState(); startHeartbeat(); return renderSummary(rounds,root); }
   const d=rounds[H.i], rev=!!H.revealed[H.i], t=H.t[H.i]||{ai:0,fac:0};
   const tot=t.ai+t.fac, pa=tot?Math.round(t.ai/tot*100):0;
   root.innerHTML=`<div class="host-grid">
@@ -569,6 +617,7 @@ function renderHost(){
           <button class="btn small" id="hNew" type="button">New game</button>
         </div>
         <p class="muted" style="margin:8px 0 0;font-size:.85rem">${pool.length} passages in the bank. Each code picks a different mix.</p>
+        <p id="pubLine" style="margin:8px 0 0;font-size:.88rem;font-weight:700"></p>
       </div>
       <div class="panel">
         <h3 style="margin-top:0">Timer</h3>
@@ -598,6 +647,7 @@ function renderHost(){
   document.getElementById("hN").onchange=e=>{const n=+e.target.value;if(H.revealed.some(Boolean)&&!confirm("Changing the number of rounds starts a new game with a new code."))return renderHost();startNew(n)};
   document.getElementById("tStart").onclick=toggleTimer;
   paintTimer();
+  publishState(); startHeartbeat(); paintPub();
 }
 function hostMain(){
   const rounds=hostRounds(); if(H.i>=rounds.length) return;
