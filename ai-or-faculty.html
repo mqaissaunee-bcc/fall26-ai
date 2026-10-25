@@ -58,6 +58,14 @@ h3{font-family:var(--display);font-weight:500;font-size:1.15rem;margin:18px 0 8p
 .panel{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);padding:20px}
 .notice{background:var(--gold);color:var(--ink);border-radius:10px;padding:10px 14px;margin:0 0 16px;font-weight:700}
 .notice[hidden]{display:none}
+.big-warn{background:var(--red);color:#fff;font-size:1.05rem;margin-top:14px;padding:14px 16px}
+.big-warn a{color:#fff}
+.join{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;margin:6px 0 10px}
+.join .qr{background:#fff;padding:6px;border-radius:8px;line-height:0}
+.join .qr img,.join .qr canvas{width:112px;height:112px}
+.settings summary{cursor:pointer;font-weight:700;font-size:.9rem;text-align:center}
+.join-link{font-weight:700;font-size:.9rem;overflow-wrap:anywhere;max-width:100%}
+.linkbtn{background:none;border:0;padding:0;color:var(--ai);text-decoration:underline;font:inherit;cursor:pointer}
 
 /* home */
 .roles{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:900px}
@@ -86,6 +94,7 @@ h3{font-family:var(--display);font-weight:500;font-size:1.15rem;margin:18px 0 8p
 @media (max-width:900px){.host-grid{grid-template-columns:1fr}}
 .side .panel+.panel{margin-top:16px}
 .tally{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tally[hidden]{display:none}
 .tbox{border-radius:12px;padding:10px;text-align:center}
 .tbox.ai{background:var(--ai-soft)} .tbox.fac{background:var(--fac-soft)}
 .tbox .lab{font-family:var(--display);font-weight:800}
@@ -430,10 +439,13 @@ function shuf(arr,r){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=M
 function gameOrder(code){
   const r=rng(code), pool=playable();
   const ai=shuf(pool.filter(d=>d.source==="ai"),r), fac=shuf(pool.filter(d=>d.source==="faculty"),r);
-  const out=[];
+  /* Aim for 35–50% faculty in every stretch of the game, so any number of
+     rounds gets a real mix (as long as the bank has enough faculty passages). */
+  const target=0.35+r()*0.15, out=[]; let facUsed=0;
   while(ai.length||fac.length){
-    const pickFac=fac.length&&(!ai.length||r()<0.42);
-    out.push(pickFac?fac.shift():ai.shift());
+    const want=(out.length+1)*target+(r()-0.5)*0.9;
+    const pickFac=fac.length&&(!ai.length||facUsed+0.5<want);
+    if(pickFac){out.push(fac.shift());facUsed++} else out.push(ai.shift());
   }
   return out;
 }
@@ -567,6 +579,10 @@ function renderPlay(){
   if(!playable().length){root.innerHTML='<div class="panel"><h2>No rounds yet</h2><p class="muted">The facilitator hasn’t added passages to this game.</p></div>';return}
   P=store.get("aof-p",null);
   const save=()=>store.set("aof-p",P);
+  const urlCode=parseInt(new URLSearchParams(location.search).get("code")||"",10);
+  if(urlCode&&(!P||P.code!==codeFor(urlCode))&&!sessionStorage.getItem("aof-left-"+urlCode)){
+    P={code:codeFor(urlCode),i:0,guess:[],shown:[],done:false};save();
+  }
   if(!P||!P.code){
     root.innerHTML=`<div class="panel"><h2>Join the game</h2><p class="muted" style="margin-top:0">Enter the game code on the screen at the front of the room.</p>
       <div class="row"><input type="number" id="joinCode" inputmode="numeric" aria-label="Game code" placeholder="Game code" style="font:800 1.6rem var(--display);width:7em;padding:8px 12px;border-radius:10px;border:2px solid var(--line);background:var(--paper);color:var(--ink)">
@@ -604,7 +620,7 @@ function renderPlay(){
     <p id="syncLine" style="font-size:.9rem;margin:16px 0 0;font-weight:700"></p>
     <p class="muted" style="font-size:.9rem;margin-top:4px">Game ${P.code}. <a href="#play" id="pLeave">Join a different game</a></p>`;
   paintSyncLine();
-  document.getElementById("pLeave").onclick=e=>{e.preventDefault();if(confirm("Leave this game? Your answers so far will be cleared.")){P=null;store.del("aof-p");stopSync();renderPlay()}};
+  document.getElementById("pLeave").onclick=e=>{e.preventDefault();if(confirm("Leave this game? Your answers so far will be cleared.")){if(P)try{sessionStorage.setItem("aof-left-"+P.code,"1")}catch(x){};P=null;store.del("aof-p");stopSync();renderPlay()}};
   const after=document.getElementById("pAfter");
   if(shown){
     const right=g===d.source;
@@ -626,7 +642,17 @@ const freshH=n=>({code:newCode(),n:n||ROUNDS_DEFAULT,i:0,revealed:[],t:[]});
 let H=store.get("aof-host2",null)||freshH(); let timerId=null,timeLeft=0;
 const saveH=()=>store.set("aof-host2",H);
 const hostRounds=()=>gameRounds(H.code,H.n);
+function joinURL(){return location.origin+location.pathname+"?code="+H.code+"#play"}
+let qrLib=null;
+function loadQR(){ if(!qrLib) qrLib=loadScript("https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js").catch(()=>null); return qrLib; }
+function paintQR(){
+  const box=document.getElementById("qrBox"); if(!box) return;
+  const url=joinURL(); if(box.dataset.url===url) return;
+  loadQR().then(()=>{ const b=document.getElementById("qrBox"); if(!b||!window.QRCode) { if(b) b.style.display="none"; return; }
+    b.innerHTML=""; b.dataset.url=url; new QRCode(b,{text:url,width:264,height:264,correctLevel:QRCode.CorrectLevel.M}); });
+}
 let pub={key:null,state:"idle",hb:null};
+let handsOpen=false;
 /* phone votes for the current game, by round: {ai, fac} */
 let PV=[];
 let fbHost={code:null,ready:null,votesRef:null};
@@ -689,11 +715,12 @@ function renderHost(){
   document.getElementById("localNotice").hidden=!usingLocal();
   const rounds=hostRounds(), root=document.getElementById("hostRoot");
   if(!rounds.length){root.innerHTML='<div class="panel"><h2>No rounds yet</h2><p>Add passages on the <a href="#edit">Edit passages</a> tab first.</p></div>';return}
-  const pool=playable(), facN=pool.filter(d=>d.source==="faculty").length;
+  const pool=playable(), facN=pool.filter(d=>d.source==="faculty").length, gameFac=rounds.filter(d=>d.source==="faculty").length;
   if(H.i>rounds.length) H.i=rounds.length;
   if(H.i===rounds.length){ publishState(); startHeartbeat(); return renderSummary(rounds,root); }
   const d=rounds[H.i], rev=!!H.revealed[H.i], t=handsOf(H.i), ph=phonesOf(H.i), V=votesOf(H.i), live=FB.mode==="on";
   const tot=V.ai+V.fac, pa=tot?Math.round(V.ai/tot*100):0;
+  const showHands=!live||handsOpen||(t.ai+t.fac)>0;
   root.innerHTML=`<div class="host-grid">
     <div>
       <div class="meta"><span class="round">Round ${H.i+1} of ${rounds.length}</span><span class="type">${esc(d.type)}</span></div>
@@ -707,38 +734,43 @@ function renderHost(){
         <button class="btn small" id="hRestart" type="button">Start over</button>
       </div>
       <p class="kbd">Keyboard: Space reveals, then moves to the next round. A and F add a vote. Left arrow goes back.</p>
-      ${facN===0?`<p class="notice" style="margin-top:14px">Every passage in this game is AI-written. Add real faculty writing on the Edit passages tab before you play with a group.</p>`:""}
+      ${facN===0?`<div class="notice big-warn" role="alert"><strong>Every round in this game is AI-written.</strong> The passage bank has no faculty writing yet, so the answer is always “AI.” Add real faculty passages on the <a href="#edit">Edit passages</a> tab before you play with a group.</div>`:gameFac<Math.ceil(rounds.length*0.35)?`<p class="notice" style="margin-top:14px">This game has only ${gameFac} faculty round${gameFac===1?"":"s"} out of ${rounds.length}, because the bank has ${facN} faculty passage${facN===1?"":"s"}. Add more on the <a href="#edit">Edit passages</a> tab for a better mix.</p>`:""}
     </div>
     <div class="side">
-      <div class="panel" style="text-align:center">
-        <h3 style="margin-top:0">Game code</h3>
-        <div class="timer" style="color:var(--ai)">${H.code}</div>
-        <p class="muted" style="margin:0 0 10px;font-size:.92rem">Players open “Play on my phone” and enter this code.</p>
-        <div class="row" style="justify-content:center">
-          <label for="hN" class="muted" style="font-size:.92rem">Rounds</label>
-          <select id="hN" style="font:700 1rem var(--body);padding:6px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink)">${[6,8,10,12,15,20].filter(x=>x<=pool.length||x===6).map(x=>`<option ${x===H.n?"selected":""}>${x}</option>`).join("")}</select>
-          <button class="btn small" id="hNew" type="button">New game</button>
-        </div>
-        <p class="muted" style="margin:8px 0 0;font-size:.85rem">${pool.length} passages in the bank. Each code picks a different mix.</p>
-        <p id="pubLine" style="margin:8px 0 0;font-size:.88rem;font-weight:700"></p>
-      </div>
       <div class="panel">
-        <h3 style="margin-top:0">Timer</h3>
-        <div class="timer" id="timer">${timerId?timeLeft:"0:30"}</div>
-        <div class="row" style="justify-content:center"><button class="btn small" id="tStart" type="button">${timerId?"Stop":"Start 30 seconds"}</button></div>
+        <div class="join">
+          <div class="qr" id="qrBox" aria-hidden="true"></div>
+          <div style="text-align:center"><h3 style="margin:0">Game code</h3><div class="timer" style="color:var(--ai);margin:2px 0 0">${H.code}</div></div>
+        </div>
+        <p class="muted" style="margin:0;font-size:.88rem;text-align:center">Scan to join, or go to</p>
+        <p class="join-link" style="text-align:center;margin:0 0 6px">${esc(joinURL().replace(/^https?:\/\//,""))}</p>
+        <p id="pubLine" style="margin:0 0 6px;font-size:.86rem;font-weight:700;text-align:center"></p>
+        <details class="settings"><summary>Game settings</summary>
+          <div class="row" style="justify-content:center;margin-top:8px"><label for="hN" class="muted" style="font-size:.92rem">Rounds</label>
+          <select id="hN" style="font:700 1rem var(--body);padding:6px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink)">${[6,8,10,12,15,20].filter(x=>x<=pool.length||x===6).map(x=>`<option ${x===H.n?"selected":""}>${x}</option>`).join("")}</select>
+          <button class="btn small" id="hNew" type="button">New game</button></div>
+          <p class="muted" style="margin:8px 0 0;font-size:.85rem;text-align:center">${pool.length} passages in the bank (${facN} faculty). Each code picks a different mix. Laptops can join too.</p>
+        </details>
       </div>
       <div class="panel">
         <h3 style="margin-top:0">Room vote</h3>
-        ${live?`<p style="margin:0 0 4px;font-weight:700">Phones: <span class="tag ai">${ph.ai} AI</span>, <span class="tag faculty">${ph.fac} Faculty</span></p>
-        <p class="muted" style="margin:0 0 10px;font-size:.9rem">Add hands here for anyone playing without a phone.</p>`:`<p class="muted" style="margin:0 0 10px;font-size:.92rem">“Hands up if you think AI wrote this.” Count, then do Faculty.</p>`}
-        <div class="tally">
+        ${live?`<p style="margin:0 0 4px;font-weight:700">Devices: <span class="tag ai">${ph.ai} AI</span>, <span class="tag faculty">${ph.fac} Faculty</span></p>
+        ${showHands?`<p class="muted" style="margin:0 0 10px;font-size:.9rem">Hand votes, for anyone playing without a device. <button type="button" class="linkbtn" id="hideHands" ${t.ai+t.fac?"hidden":""}>Hide</button></p>`:`<p style="margin:0 0 10px;font-size:.9rem"><button type="button" class="linkbtn" id="showHands">Add votes by hand</button></p>`}`:`<p class="muted" style="margin:0 0 10px;font-size:.92rem">“Hands up if you think AI wrote this.” Count, then do Faculty.</p>`}
+        <div class="tally" ${showHands?"":"hidden"}>
           <div class="tbox ai"><div class="lab">${live?"AI hands":"AI"}</div><input type="number" min="0" id="vAI" value="${t.ai}" aria-label="Votes for AI"><div class="pm"><button type="button" data-v="ai" data-d="-1" aria-label="One fewer AI vote">−</button><button type="button" data-v="ai" data-d="1" aria-label="One more AI vote">+</button></div></div>
           <div class="tbox fac"><div class="lab">${live?"Faculty hands":"Faculty"}</div><input type="number" min="0" id="vFAC" value="${t.fac}" aria-label="Votes for Faculty"><div class="pm"><button type="button" data-v="fac" data-d="-1" aria-label="One fewer Faculty vote">−</button><button type="button" data-v="fac" data-d="1" aria-label="One more Faculty vote">+</button></div></div>
         </div>
         <div class="bar" aria-hidden="true"><i class="ai" style="width:${tot?pa:0}%"></i><i class="fac" style="width:${tot?100-pa:0}%"></i></div>
         <p style="margin:8px 0 0;font-weight:700">${tot?`${pa}% said AI, ${100-pa}% said Faculty`:"No votes counted yet"}${tot?`<br><span class="muted" style="font-weight:400">${tot} vote${tot===1?"":"s"} in all</span>`:""}${rev&&tot?`<br><span class="tag ${d.source}">${Math.round((d.source==="ai"?V.ai:V.fac)/tot*100)}% of the room got it right</span>`:""}</p>
       </div>
+      <div class="panel">
+        <h3 style="margin-top:0">Timer</h3>
+        <div class="timer" id="timer">${timerId?timeLeft:"0:30"}</div>
+        <div class="row" style="justify-content:center"><button class="btn small" id="tStart" type="button">${timerId?"Stop":"Start 30 seconds"}</button></div>
+      </div>
     </div></div>`;
+  const sh=document.getElementById("showHands"); if(sh) sh.onclick=()=>{handsOpen=true;renderHost();const f=document.getElementById("vAI");if(f)f.focus()};
+  const hh=document.getElementById("hideHands"); if(hh) hh.onclick=()=>{handsOpen=false;renderHost()};
   const setV=(k,v)=>{H.t[H.i]=H.t[H.i]||{ai:0,fac:0};H.t[H.i][k]=Math.max(0,v|0);saveH();renderHost()};
   root.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{const k=b.dataset.v;setV(k,((H.t[H.i]||{})[k]||0)+(+b.dataset.d))});
   document.getElementById("vAI").onchange=e=>setV("ai",+e.target.value);
@@ -751,12 +783,12 @@ function renderHost(){
   document.getElementById("hN").onchange=e=>{const n=+e.target.value;if(H.revealed.some(Boolean)&&!confirm("Changing the number of rounds starts a new game with a new code."))return renderHost();startNew(n)};
   document.getElementById("tStart").onclick=toggleTimer;
   paintTimer();
-  publishState(); startHeartbeat(); paintPub();
+  publishState(); startHeartbeat(); paintPub(); paintQR();
 }
 function hostMain(){
   const rounds=hostRounds(); if(H.i>=rounds.length) return;
   if(!H.revealed[H.i]){H.revealed[H.i]=true;stopTimer();sfx.stamp();}
-  else {H.i++;stopTimer();if(H.i===rounds.length)sfx.done();}
+  else {H.i++;stopTimer();handsOpen=false;if(H.i===rounds.length)sfx.done();}
   saveH();renderHost();
 }
 function paintTimer(){const el=document.getElementById("timer");if(!el)return;if(!timerId){return}el.textContent="0:"+String(timeLeft).padStart(2,"0");el.classList.toggle("low",timeLeft<=5)}
