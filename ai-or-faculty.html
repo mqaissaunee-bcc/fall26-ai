@@ -477,7 +477,15 @@ addEventListener("hashchange",route);
    of null. See firebase-setup.html, step 7. While this is null, the game
    uses the free public relay below for syncing and votes are counted by hand.
    ===================================================================== */
-const FIREBASE_CONFIG = null;
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCGw2xgxlDlEl0_a1b7r_ihuEpOMYDbQ60",
+  authDomain: "ai-or-faculty.firebaseapp.com",
+  databaseURL: "https://ai-or-faculty-default-rtdb.firebaseio.com",
+  projectId: "ai-or-faculty",
+  storageBucket: "ai-or-faculty.firebasestorage.app",
+  messagingSenderId: "69571644810",
+  appId: "1:69571644810:web:4278c4d71bd0eb38facc73"
+};
 
 const FB={mode:FIREBASE_CONFIG?"loading":"off",db:null,uid:null,err:""};
 function loadScript(src){return new Promise((res,rej)=>{const el=document.createElement("script");el.src=src;el.onload=res;el.onerror=()=>rej(new Error("Couldn’t load "+src));document.head.appendChild(el)})}
