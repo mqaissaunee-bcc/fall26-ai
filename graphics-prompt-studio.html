@@ -330,6 +330,25 @@
     color: var(--ink-soft);
   }
 
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  /* ====== Graphic type recommendations ====== */
+  .type-rec { margin: 0 0 14px; padding: 14px 16px; border: 1px dashed var(--rule); border-radius: 2px; background: var(--paper-deep); }
+  .type-rec-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; margin-bottom: 10px; }
+  .type-rec-head strong { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); }
+  .type-rec-basis { font-family: 'Fraunces', serif; font-style: italic; font-size: 13.5px; color: var(--ink-soft); }
+  .type-rec-empty, .type-rec-note { margin: 0; font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
+  .rec-list { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); }
+  .rec-list:empty { display: none; }
+  .rec-item { text-align: left; font-family: inherit; color: inherit; background: var(--card-bg); border: 1px solid var(--rule); border-radius: 2px; padding: 10px 12px; cursor: pointer; min-height: 44px; position: relative; transition: border-color 0.15s ease; }
+  .rec-item:hover { border-color: var(--ink); }
+  .rec-item.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .rec-rank { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 2px; }
+  .rec-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; display: block; padding-right: 16px; }
+  .rec-why { font-size: 12.5px; color: var(--ink-soft); line-height: 1.45; display: block; margin-top: 4px; }
+  .rec-item.selected::after { content: '✓'; position: absolute; top: 8px; right: 10px; color: var(--accent); font-weight: 600; font-size: 13px; }
+  .rec-ai { margin: 0 0 18px; }
+  .rec-ai .rec-list { margin-top: 4px; }
+
   /* ====== Fit note ====== */
   .fit-note {
     margin-top: 18px;
@@ -572,6 +591,7 @@
     align-items: center;
     margin-bottom: 32px;
   }
+  .preset-break { flex-basis: 100%; height: 0; }
   .preset-label {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px;
@@ -809,6 +829,14 @@
       <button class="preset-btn" data-preset="college">Lecture</button>
       <button class="preset-btn" data-preset="cyber">Training</button>
       <button class="preset-btn" data-preset="exec">Learning Summary</button>
+      <span class="preset-break" aria-hidden="true"></span>
+      <span class="preset-label">Made for →</span>
+      <button class="preset-btn" data-preset="slide">Slide Visual</button>
+      <button class="preset-btn" data-preset="handout">Printed Handout</button>
+      <button class="preset-btn" data-preset="lms">LMS Page</button>
+      <button class="preset-btn" data-preset="jobaid">Job Aid</button>
+      <button class="preset-btn" data-preset="safety">Lab &amp; Shop Safety</button>
+      <button class="preset-btn" data-preset="poster">Wall Poster</button>
     </div>
 
     <!-- Section 1: Discipline, Course, Lesson -->
@@ -980,6 +1008,31 @@
         <h2 class="section-title">Graphic Type</h2>
         <span class="section-hint">how the information is shaped</span>
       </div>
+      <div class="type-rec" id="typeRec">
+        <div class="type-rec-head"><strong>Suggested for this lesson</strong><span class="type-rec-basis" id="recBasis"></span></div>
+        <div class="rec-list" id="recList"></div>
+        <p class="type-rec-empty" id="recEmpty">Enter a topic or learning objective in § 02, or choose a lesson, and suggested graphic types will appear here.</p>
+        <p class="sr-only" id="recLive" role="status" aria-live="polite"></p>
+      </div>
+      <details class="bring rec-ai" id="recAi">
+        <summary>Ask AI to recommend a graphic type</summary>
+        <div class="bring-body">
+          <p class="type-rec-note">The suggestions above come from keywords in your topic and objective. For a second opinion that weighs the whole lesson, ask an AI assistant to choose from the same 40 types.</p>
+          <p class="bring-step">1. Copy this prompt into any AI assistant <span>(Claude, Copilot, ChatGPT, Gemini)</span></p>
+          <textarea id="recPrompt" class="mono" rows="9" readonly aria-label="Graphic type recommendation prompt"></textarea>
+          <div class="bring-row">
+            <button type="button" class="mini-btn primary" id="recCopy">Copy prompt</button>
+          </div>
+          <p class="bring-step">2. Paste the AI's answer</p>
+          <textarea id="recPaste" class="mono" rows="4" placeholder="worked | Students need to see every step of the calculation with the reasoning.&#10;equation | ...&#10;sequence | ..."></textarea>
+          <div class="bring-row">
+            <button type="button" class="mini-btn primary" id="recLoad">Show the AI's picks</button>
+            <button type="button" class="mini-btn" id="recClear">Clear</button>
+          </div>
+          <div class="bring-status" id="recStatus" role="status" aria-live="polite"></div>
+          <div class="rec-list" id="aiRecList"></div>
+        </div>
+      </details>
       <div class="card-grid" id="typeGrid"></div>
       <div class="fit-note" id="fitNote">
         <strong>Why this fits</strong>
@@ -3470,6 +3523,217 @@ function renderTypeCards() {
   });
 }
 
+/* ============================================================
+   Graphic type recommendations
+   Keyword cues from the topic, objective, lesson, and selected
+   concepts, plus an optional AI prompt and paste-back.
+============================================================ */
+const TYPE_CUES = [
+  { re: /\b(?:compar|contrast|differentiat|distinguish|versus|vs\b|similarit|difference)\w*/i, ids: ['comparison', 'venn', 'matrix'] },
+  { re: /\b(?:steps?\b|procedur|perform|configur|install|set ?up|assembl|demonstrat|operat|carry out|how to)\w*/i, ids: ['sequence', 'jobaid', 'flowchart'] },
+  { re: /\b(?:process|workflow|pipeline|algorithm)\w*/i, ids: ['flowchart', 'sequence', 'swimlane'] },
+  { re: /\b(?:identify|label|parts?\b|components?|structures?|anatom|locate)\w*/i, ids: ['diagram', 'anatomy', 'exploded'] },
+  { re: /\b(?:inside|internal|cross[- ]?section|cutaway)\w*/i, ids: ['anatomy', 'diagram'] },
+  { re: /\b(?:disassembl|exploded|replace the|repair)\w*/i, ids: ['exploded', 'sequence'] },
+  { re: /\b(?:calculat|solv|comput|deriv|estimat|convert)\w*/i, ids: ['worked', 'equation'] },
+  { re: /\b(?:formula|equation|theorem|law of|'s law)\w*/i, ids: ['equation', 'worked'] },
+  { re: /\b(?:diagnos|troubleshoot|decid|decision|choos|select the|classif|triage)\w*/i, ids: ['decision', 'flowchart'] },
+  { re: /\b(?:cause|causes|caused|root cause|factors?|contribut|leads? to|leading to|effects?)\b/i, ids: ['fishbone', 'causal'] },
+  { re: /\b(?:feedback|ecosystem|system dynamics|supply and demand|equilibrium)\w*/i, ids: ['causal', 'concept-map'] },
+  { re: /\b(?:histor|chronolog|timeline|eras?\b|centur|decades?|evolution of|development of|milestones?)\w*/i, ids: ['timeline'] },
+  { re: /\b(?:cycle|cyclical|loops?\b|recurring|lifecycle|life cycle)\w*/i, ids: ['cycle'] },
+  { re: /\b(?:hierarch|taxonom|classification|org chart|organizational chart|chain of command|branches of)\w*/i, ids: ['hierarchy', 'layered'] },
+  { re: /\b(?:layers?\b|layered|stack|pyramid|tiers?\b|osi)\w*/i, ids: ['layered', 'hierarchy'] },
+  { re: /\b(?:data\b|statistic|trends?\b|percent|graphs?\b|survey|distribution|rates?\b)\w*/i, ids: ['data-viz', 'infographic'], w: 0.8 },
+  { re: /\b(?:remember|recall|memoriz|list the|name the|order of)\w*/i, ids: ['mnemonic', 'jobaid'] },
+  { re: /\b(?:roles?\b|responsibilit|hand-?offs?|departments?|who does)\w*/i, ids: ['swimlane'] },
+  { re: /\b(?:journey|touchpoints?|customer experience|patient experience|student experience)\w*/i, ids: ['journey', 'storyboard'] },
+  { re: /\b(?:safety|hazards?|safe\b|safely|proper technique|correct technique|avoid|common mistakes?|common errors?|best practices?)\w*/i, ids: ['dodont', 'jobaid'] },
+  { re: /\b(?:maps?\b|regions?\b|geograph|territor|routes?\b|spatial)\w*/i, ids: ['map'] },
+  { re: /\b(?:scale\b|magnitude|how (?:big|small|large|far)|microscopic|relative size)\w*/i, ids: ['scale'] },
+  { re: /\b(?:spectrum|continuum|degrees? of|range of)\w*/i, ids: ['continuum'] },
+  { re: /\b(?:before and after|transform|improv|revis)\w*/i, ids: ['beforeafter'], w: 0.8 },
+  { re: /\b(?:software|interface|click|screens?\b|menus?\b|dashboard|portal|navigat)\w*/i, ids: ['screenshot', 'sequence'] },
+  { re: /\b(?:scenario|case stud|ethic|communicat|customer service|interpersonal|soft skills?|conflict|role[- ]?play)\w*/i, ids: ['storyboard', 'dodont'] },
+  { re: /\b(?:analog|metaphor|abstract|concept of)\w*/i, ids: ['analogy', 'concept-map'], w: 0.8 },
+  { re: /\b(?:summar|overview|recap|key points|main ideas)\w*/i, ids: ['sketchnote', 'infographic', 'poster'], w: 0.8 },
+  { re: /\b(?:relationships?|relate|connect|interrelat|associat|influence)\w*/i, ids: ['concept-map', 'mindmap'] },
+  { re: /\b(?:brainstorm|explore|generate ideas)\w*/i, ids: ['mindmap'] },
+  { re: /\b(?:reference|quick|cheat sheet|commands?\b|checklist|inspect|shortcuts?)\w*/i, ids: ['jobaid', 'poster'] },
+  { re: /\b(?:prioritiz|urgent|risk|swot|quadrant)\w*/i, ids: ['matrix'] }
+];
+const REC_FIELD_WEIGHT = { objective: 3, topic: 2, lesson: 1.5, concepts: 1 };
+const REC_FIELD_LABEL = { objective: 'learning objective', topic: 'topic', lesson: 'lesson', concepts: 'selected concepts' };
+let recSignature = '';
+state.aiRecs = [];
+
+function recSources() {
+  const L = getLesson();
+  const concepts = selectedScope().flatMap(sec => sec.topics.flatMap(tp => [tp.t].concat(tp.concepts)));
+  return {
+    objective: state.objective.trim(),
+    topic: state.topic.trim(),
+    lesson: L ? [L.title, L.label].filter(Boolean).join(' ') : '',
+    concepts: concepts.join('; ')
+  };
+}
+
+function recommendTypes() {
+  const src = recSources();
+  const known = new Set(GRAPHIC_TYPES.map(t => t.id));
+  const scores = {};
+  Object.keys(src).forEach(field => {
+    const text = src[field];
+    if (!text) return;
+    TYPE_CUES.forEach(cue => {
+      const m = text.match(cue.re);
+      if (!m) return;
+      cue.ids.forEach((id, i) => {
+        if (!known.has(id)) return;
+        const pts = REC_FIELD_WEIGHT[field] * (cue.w || 1) * (i === 0 ? 1 : i === 1 ? 0.7 : 0.5);
+        const cur = scores[id] || { id, score: 0, best: 0, word: '', field: '' };
+        cur.score += pts;
+        if (pts > cur.best) { cur.best = pts; cur.word = m[0].toLowerCase(); cur.field = field; }
+        scores[id] = cur;
+      });
+    });
+  });
+  const c = getCourse();
+  if (c && c.level && c.level !== 'credit') {
+    ['jobaid', 'sequence'].forEach(id => {
+      if (!known.has(id)) return;
+      const cur = scores[id] || { id, score: 0, best: 0, word: '', field: 'level' };
+      cur.score += 0.6; scores[id] = cur;
+    });
+  }
+  return Object.values(scores).sort((a, b) => b.score - a.score).slice(0, 3);
+}
+
+function recItem(t, rank, why) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'rec-item' + (state.graphicType === t.id ? ' selected' : '');
+  b.setAttribute('aria-pressed', state.graphicType === t.id);
+  b.dataset.type = t.id;
+  b.innerHTML = `<span class="rec-rank">${escapeHTML(rank)}</span><span class="rec-name">${escapeHTML(t.name)}</span><span class="rec-why">${escapeHTML(why)}</span>`;
+  b.addEventListener('click', () => {
+    state.graphicType = t.id;
+    renderTypeCards();
+    renderFitNote();
+    updatePrompt();
+    const card = document.querySelector('#typeGrid .gcard.selected');
+    if (card && card.scrollIntoView) card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  });
+  return b;
+}
+
+function renderTypeRecs() {
+  const list = $('recList');
+  if (!list) return;
+  const recs = recommendTypes();
+  const src = recSources();
+  const hasText = Object.values(src).some(Boolean);
+  list.innerHTML = '';
+  let picks = recs;
+  let basis = '';
+  if (!picks.length && hasText) {
+    picks = ['concept-map', 'infographic', 'analogy'].map(id => ({ id, field: '', word: '' }));
+    basis = 'general starting points; add a learning objective for sharper suggestions';
+  } else if (picks.length) {
+    const fields = [...new Set(picks.map(r => r.field).filter(f => REC_FIELD_LABEL[f]))].map(f => REC_FIELD_LABEL[f]);
+    basis = 'based on your ' + (fields.length > 1 ? fields.slice(0, -1).join(', ') + ' and ' + fields[fields.length - 1] : fields[0] || 'course');
+  }
+  picks.forEach((r, i) => {
+    const t = GRAPHIC_TYPES.find(x => x.id === r.id);
+    if (!t) return;
+    let why;
+    if (r.word && REC_FIELD_LABEL[r.field]) why = `Your ${REC_FIELD_LABEL[r.field]} mentions \u201C${r.word}.\u201D ${t.purpose}: ${t.desc.charAt(0).toLowerCase() + t.desc.slice(1)}`;
+    else if (r.field === 'level') why = `Workforce and certification courses benefit from task-ready visuals. ${t.purpose}.`;
+    else why = `${t.purpose}: ${t.desc.charAt(0).toLowerCase() + t.desc.slice(1)}`;
+    list.appendChild(recItem(t, i === 0 ? 'Best match' : `Option ${i + 1}`, why));
+  });
+  $('recBasis').textContent = basis;
+  $('recEmpty').hidden = picks.length > 0;
+  const sig = picks.map(r => r.id).join(',');
+  if (sig !== recSignature) {
+    recSignature = sig;
+    $('recLive').textContent = sig ? `Suggested graphic types: ${picks.map(r => (GRAPHIC_TYPES.find(x => x.id === r.id) || {}).name).filter(Boolean).join(', ')}.` : '';
+  }
+  renderAiRecs();
+  if ($('recAi').open) $('recPrompt').value = buildRecPrompt();
+}
+
+function buildRecPrompt() {
+  const src = recSources();
+  const c = getCourse();
+  const L = getLesson();
+  const lines = ['I teach at a two-year college and am making one instructional graphic. Recommend the three graphic types from the list below that would best help these learners meet the objective.', ''];
+  if (c) lines.push('Course: ' + (c.title || c.name || '') + (c.level && c.level !== 'credit' ? ` (${c.level})` : ''));
+  if (L && L.title) lines.push('Lesson: ' + L.title);
+  if (src.topic) lines.push('Topic: ' + src.topic);
+  if (state.subject) lines.push('Subject area: ' + state.subject);
+  if (state.grade) lines.push('Audience: ' + state.grade);
+  lines.push('Learning objective: ' + (src.objective || '(not specified)'));
+  if (src.concepts) lines.push('Key concepts to include: ' + src.concepts.split('; ').slice(0, 20).join('; '));
+  lines.push('', 'Choose based on what learners must do with the content (compare, follow steps, identify parts, solve, decide, remember, and so on), not only on the subject.',
+    'Reply with exactly three lines, best first, in this format and nothing else:',
+    'type-id | one-sentence reason', '', 'Graphic types (type-id: name, purpose):');
+  GRAPHIC_TYPES.forEach(t => lines.push(`${t.id}: ${t.name}, ${t.purpose.toLowerCase()}. ${t.desc}`));
+  return lines.join('\n');
+}
+
+function parseAiRecs(text) {
+  const byLength = GRAPHIC_TYPES.slice().sort((a, b) => b.id.length - a.id.length);
+  const norm = s => s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const out = [];
+  text.split(/\n+/).forEach(raw => {
+    if (out.length >= 3) return;
+    const line = raw.replace(/^[\s\-*\d.)#>`]+/, '').trim();
+    if (!line) return;
+    const head = line.split('|')[0];
+    const idRe = x => new RegExp('(^|[^a-z-])' + x.id.replace(/-/g, '\\-') + '($|[^a-z-])', 'i');
+    const nh = norm(head);
+    // 1) a type-id at the start of the line, 2) a full type name, 3) a type-id anywhere
+    let t = byLength.find(x => new RegExp('^' + x.id.replace(/-/g, '\\-') + '($|[^a-z-])', 'i').test(head.trim()))
+      || GRAPHIC_TYPES.slice().sort((a, b) => b.name.length - a.name.length).find(x => nh.includes(norm(x.name)))
+      || byLength.find(x => idRe(x).test(head));
+    if (!t || out.some(o => o.id === t.id)) return;
+    let why = line.includes('|') ? line.split('|').slice(1).join('|') : line.replace(new RegExp(t.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), '').replace(new RegExp('^' + t.id.replace(/-/g, '\\-'), 'i'), '');
+    why = why.replace(/^[\s:\u2014\u2013-]+/, '').replace(/\*\*/g, '').trim();
+    out.push({ id: t.id, why: why || t.purpose });
+  });
+  return out;
+}
+
+function renderAiRecs() {
+  const list = $('aiRecList');
+  list.innerHTML = '';
+  state.aiRecs.forEach((r, i) => {
+    const t = GRAPHIC_TYPES.find(x => x.id === r.id);
+    if (t) list.appendChild(recItem(t, i === 0 ? 'AI\u2019s top pick' : `AI option ${i + 1}`, r.why));
+  });
+}
+
+function initTypeRecs() {
+  $('recAi').addEventListener('toggle', () => { if ($('recAi').open) $('recPrompt').value = buildRecPrompt(); });
+  $('recCopy').addEventListener('click', () => { $('recPrompt').value = buildRecPrompt(); copyText($('recPrompt').value, 'Prompt copied. Paste it into your AI assistant.'); });
+  $('recLoad').addEventListener('click', () => {
+    const recs = parseAiRecs($('recPaste').value);
+    const st = $('recStatus');
+    if (!recs.length) {
+      st.textContent = 'No graphic types found in that answer. Paste the AI\u2019s three lines as written, each starting with a type-id such as worked or flowchart.';
+      st.classList.add('error');
+      return;
+    }
+    state.aiRecs = recs;
+    st.classList.remove('error');
+    st.textContent = `Found ${recs.length} pick${recs.length > 1 ? 's' : ''}. Select one to use it.`;
+    renderAiRecs();
+  });
+  $('recClear').addEventListener('click', () => { state.aiRecs = []; $('recPaste').value = ''; $('recStatus').textContent = ''; renderAiRecs(); });
+  renderTypeRecs();
+}
+
 function renderFitNote() {
   const note = $('fitNote');
   if (!state.graphicType) { note.classList.remove('visible'); return; }
@@ -3671,6 +3935,7 @@ function hasContent() {
 }
 
 function updatePrompt() {
+  renderTypeRecs();
   $('modelTag').textContent = `→ For ${MODEL_NAMES[state.model]}`;
   const preview = $('preview');
   if (!hasContent()) {
@@ -4173,17 +4438,47 @@ function applyPreset(name) {
     cyber: { subject: 'Cybersecurity', grade: 'Adult Workforce Training', style: 'Cybersecurity / HUD aesthetic', tone: 'Authoritative / technical', color: 'Cybersecurity (dark teal, cyan, amber)', density: 'Rich — comprehensive reference', iconPref: 'Mix of icons and illustrations', textAmount: 'Full teaching graphic — self-contained learning resource' },
     exec: { grade: 'Executive / Industry Audience', style: 'Infographic with data viz', tone: 'Professional / formal', color: 'Cool & analytical (slate blue, charcoal, white)', density: 'Minimal — single concept, sparse', iconPref: 'Icons only', textAmount: 'Minimal labels — title + key terms only' }
   };
-  const labels = { k12: 'Classroom Activity', college: 'Lecture', cyber: 'Training', exec: 'Learning Summary' };
-  const p = presets[name];
+  /* "Made for" presets change only output settings, so they combine with the audience presets above. */
+  const PNG = 'png|Best for screen display and presentations with transparency support';
+  const PDF = 'pdf|Best for print handouts, posters, and crisp scalable text';
+  const output = {
+    slide: { sizePreset: 'slide-16-9', orientation: 'As specified by size preset', format: PNG, resolution: '150 DPI (high-quality screen)', density: 'Minimal — single concept, sparse', textAmount: 'Minimal labels — title + key terms only', toggles: { transparent: true, bleed: false, readable: true } },
+    handout: { sizePreset: 'letter-portrait', orientation: 'As specified by size preset', format: PDF, resolution: '300 DPI (print quality)', color: 'Monochrome grayscale', density: 'Moderate — balanced detail', textAmount: 'Moderate explanation — short captions per section', toggles: { transparent: false, bleed: true }, personasAdd: ['print', 'plain'] },
+    lms: { sizePreset: 'slide-16-9', orientation: 'As specified by size preset', format: PNG, resolution: '150 DPI (high-quality screen)', density: 'Moderate — balanced detail', textAmount: 'Moderate explanation — short captions per section', toggles: { transparent: false, bleed: false, altText: true, readable: true } },
+    jobaid: { graphicType: 'jobaid', sizePreset: 'letter-portrait', orientation: 'As specified by size preset', format: PDF, resolution: '300 DPI (print quality)', density: 'Rich — comprehensive reference', textAmount: 'Moderate explanation — short captions per section', iconPref: 'Icons only', toggles: { bleed: true, readable: true }, personasAdd: ['industry', 'plain'] },
+    safety: { graphicType: 'dodont', sizePreset: 'poster-small', orientation: 'As specified by size preset', format: PDF, resolution: '300 DPI (print quality)', density: 'Moderate — balanced detail', textAmount: 'Minimal labels — title + key terms only', iconPref: 'Illustrations of people', toggles: { bleed: true, readable: true }, personasAdd: ['safety', 'industry', 'culture'] },
+    poster: { graphicType: 'poster', sizePreset: 'poster-large', orientation: 'As specified by size preset', format: PDF, resolution: '300 DPI (print quality)', density: 'Rich — comprehensive reference', textAmount: 'Full teaching graphic — self-contained learning resource', toggles: { bleed: true, readable: true }, personasAdd: ['print'] }
+  };
+  const labels = { k12: 'Classroom Activity', college: 'Lecture', cyber: 'Training', exec: 'Learning Summary',
+    slide: 'Slide Visual', handout: 'Printed Handout', lms: 'LMS Page', jobaid: 'Job Aid', safety: 'Lab & Shop Safety', poster: 'Wall Poster' };
+  const p = presets[name] || output[name];
   if (!p) return;
   Object.entries(p).forEach(([k, v]) => {
+    if (k === 'toggles') {
+      Object.entries(v).forEach(([key, on]) => {
+        state.toggles[key] = on;
+        const tog = document.querySelector(`.toggle[data-toggle="${key}"]`);
+        if (tog) { tog.classList.toggle('on', on); tog.setAttribute('aria-checked', on); }
+      });
+      return;
+    }
+    if (k === 'personasAdd') return;
+    if (k === 'graphicType') { state.graphicType = v; renderTypeCards(); renderFitNote(); return; }
     state[k] = v;
     const el = $(k);
     if (el) el.value = v;
   });
+  if (output[name]) {
+    /* Swap out personas the previous "Made for" chip added; keep any the user chose. */
+    (state.outputPersonas || []).forEach(id => state.personas.delete(id));
+    state.outputPersonas = (p.personasAdd || []).filter(id => !state.personas.has(id));
+    state.outputPersonas.forEach(id => state.personas.add(id));
+    renderPersonas();
+  }
+  if (p.sizePreset) ['customWGroup', 'customHGroup', 'customUnitGroup'].forEach(id => { if ($(id)) $(id).style.display = p.sizePreset === 'custom' ? '' : 'none'; });
   document.querySelectorAll('#iconChips .chip').forEach(c => c.classList.toggle('selected', c.dataset.val === state.iconPref));
   updatePrompt();
-  showToast(`Applied: ${labels[name]} preset`);
+  showToast(output[name] ? `Made for: ${labels[name]}${p.graphicType ? ' (graphic type set too)' : ''}` : `Applied: ${labels[name]} preset`);
 }
 
 /* ============================================================
@@ -4211,6 +4506,7 @@ function showToast(msg) {
   renderCourseMeta();
   renderPersonas();
   renderTypeCards();
+  initTypeRecs();
   renderLesson();
   wireInputs();
   wireBring();
