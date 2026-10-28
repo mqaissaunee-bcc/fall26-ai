@@ -555,8 +555,19 @@
   }
 
   /* ====== Model selector ====== */
-  .model-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-  @media (max-width: 700px) { .model-grid { grid-template-columns: repeat(2, 1fr); } }
+  .model-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (max-width: 420px) { .model-grid { grid-template-columns: 1fr; } }
+  .model-row-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 8px; }
+  .model-grid + .model-row-label { margin-top: 18px; }
+  .mslot { display: flex; flex-direction: column; gap: 4px; }
+  .mslot .mcard { width: 100%; }
+  .model-side .mcard { padding: 10px 12px; }
+  .model-side .mcard-name { font-size: 15px; }
+  .mlink { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+  .mlink:hover { color: var(--accent-deep); }
+  .model-note { margin: 12px 0 0; font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
+  .open-model { display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 18px 12px; background: var(--paper); font-size: 13px; color: var(--accent); text-underline-offset: 3px; }
+  .open-model:hover { color: var(--accent-deep); }
   .mcard {
     background: var(--card-bg);
     border: 1px solid var(--rule);
@@ -904,7 +915,7 @@
             <textarea id="bSyllabus" rows="5" placeholder="Paste your syllabus, course outline, schedule, or learning outcomes. Leave blank to search for typical course content."></textarea>
           </label>
 
-          <p class="bring-step">2. Copy this prompt into any AI assistant <span>(Claude, Copilot, ChatGPT, Gemini)</span></p>
+          <p class="bring-step">2. Copy this prompt into any AI assistant <span>(ChatGPT, Gemini, Claude, Copilot)</span></p>
           <textarea id="bPrompt" class="mono" rows="9" readonly aria-label="Topic search prompt"></textarea>
           <div class="bring-row">
             <button type="button" class="mini-btn primary" id="bCopy">Copy prompt</button>
@@ -1018,7 +1029,7 @@
         <summary>Ask AI to recommend a graphic type</summary>
         <div class="bring-body">
           <p class="type-rec-note">The suggestions above come from keywords in your topic and objective. For a second opinion that weighs the whole lesson, ask an AI assistant to choose from the same 40 types.</p>
-          <p class="bring-step">1. Copy this prompt into any AI assistant <span>(Claude, Copilot, ChatGPT, Gemini)</span></p>
+          <p class="bring-step">1. Copy this prompt into any AI assistant <span>(ChatGPT, Gemini, Claude, Copilot)</span></p>
           <textarea id="recPrompt" class="mono" rows="9" readonly aria-label="Graphic type recommendation prompt"></textarea>
           <div class="bring-row">
             <button type="button" class="mini-btn primary" id="recCopy">Copy prompt</button>
@@ -1272,23 +1283,42 @@
         <span class="section-hint">tailored phrasing</span>
       </div>
 
-      <div class="model-grid" id="modelGrid">
-        <button class="mcard selected" data-model="claude">
-          <div class="mcard-name">Claude</div>
-          <div class="mcard-tag">Structured · Anthropic</div>
-        </button>
-        <button class="mcard" data-model="chatgpt">
-          <div class="mcard-name">ChatGPT</div>
-          <div class="mcard-tag">Conversational · OpenAI</div>
-        </button>
-        <button class="mcard" data-model="gemini">
-          <div class="mcard-name">Gemini</div>
-          <div class="mcard-tag">Multimodal · Google</div>
-        </button>
-        <button class="mcard" data-model="perplexity">
-          <div class="mcard-name">Perplexity</div>
-          <div class="mcard-tag">Research-first</div>
-        </button>
+      <div class="model-wrap" id="modelGrid">
+        <p class="model-row-label">Makes the image</p>
+        <div class="model-grid model-main">
+          <div class="mslot">
+            <button class="mcard selected" data-model="chatgpt" aria-pressed="true">
+              <div class="mcard-name">ChatGPT</div>
+              <div class="mcard-tag">Images · OpenAI</div>
+            </button>
+            <a class="mlink" href="https://chatgpt.com" target="_blank" rel="noopener">Open ChatGPT<span class="sr-only"> (opens in new tab)</span><span aria-hidden="true"> ↗</span></a>
+          </div>
+          <div class="mslot">
+            <button class="mcard" data-model="gemini" aria-pressed="false">
+              <div class="mcard-name">Gemini</div>
+              <div class="mcard-tag">Images · Google</div>
+            </button>
+            <a class="mlink" href="https://gemini.google.com" target="_blank" rel="noopener">Open Gemini<span class="sr-only"> (opens in new tab)</span><span aria-hidden="true"> ↗</span></a>
+          </div>
+        </div>
+        <p class="model-row-label">Plan or check first</p>
+        <div class="model-grid model-side">
+          <div class="mslot">
+            <button class="mcard" data-model="claude" aria-pressed="false">
+              <div class="mcard-name">Claude</div>
+              <div class="mcard-tag">Code-drawn SVG or design spec</div>
+            </button>
+            <a class="mlink" href="https://claude.ai" target="_blank" rel="noopener">Open Claude<span class="sr-only"> (opens in new tab)</span><span aria-hidden="true"> ↗</span></a>
+          </div>
+          <div class="mslot">
+            <button class="mcard" data-model="perplexity" aria-pressed="false">
+              <div class="mcard-name">Perplexity</div>
+              <div class="mcard-tag">Research &amp; cite the facts</div>
+            </button>
+            <a class="mlink" href="https://www.perplexity.ai" target="_blank" rel="noopener">Open Perplexity<span class="sr-only"> (opens in new tab)</span><span aria-hidden="true"> ↗</span></a>
+          </div>
+        </div>
+        <p class="model-note">ChatGPT and Gemini draw the graphic and let you revise it in the same chat. Claude writes the graphic as code, or a detailed design spec to hand to an image tool. Perplexity is best for checking facts, numbers, and sources before you build.</p>
       </div>
     </section>
 
@@ -1303,7 +1333,7 @@
   <aside class="preview-panel">
     <div class="preview-head">
       <h2>The Generated Prompt</h2>
-      <span class="preview-model-tag" id="modelTag">→ For Claude</span>
+      <span class="preview-model-tag" id="modelTag">→ For ChatGPT</span>
     </div>
     <div class="preview-stats" id="previewStats">0 words</div>
     <div class="preview-body" id="preview">
@@ -1314,6 +1344,7 @@
       <button class="btn" id="downloadBtn">Download .txt</button>
       <button class="btn" id="resetBtn">Reset</button>
     </div>
+    <a class="open-model" id="openModel" href="https://chatgpt.com" target="_blank" rel="noopener">Copy the prompt, then open ChatGPT<span class="sr-only"> (opens in new tab)</span><span aria-hidden="true">&nbsp;↗</span></a>
   </aside>
 </main>
 
@@ -3105,7 +3136,7 @@ const state = {
     transparent: false, bleed: true, readable: true, colorblind: true,
     accuracy: true, altText: true, hierarchy: true, citations: false
   },
-  model: 'claude'
+  model: 'chatgpt'
 };
 
 const SIZE_PRESETS = {
@@ -3913,6 +3944,7 @@ function buildModelNotes(model) {
    Render preview + plain text
 ============================================================ */
 const MODEL_NAMES = { claude: 'Claude', chatgpt: 'ChatGPT', gemini: 'Gemini', perplexity: 'Perplexity' };
+const MODEL_URLS = { chatgpt: 'https://chatgpt.com', gemini: 'https://gemini.google.com', claude: 'https://claude.ai', perplexity: 'https://www.perplexity.ai' };
 
 function promptBlocks() {
   const parts = buildPromptParts();
@@ -3937,6 +3969,8 @@ function hasContent() {
 function updatePrompt() {
   renderTypeRecs();
   $('modelTag').textContent = `→ For ${MODEL_NAMES[state.model]}`;
+  const om = $('openModel');
+  if (om) { om.href = MODEL_URLS[state.model]; om.firstChild.textContent = `Copy the prompt, then open ${MODEL_NAMES[state.model]}`; }
   const preview = $('preview');
   if (!hasContent()) {
     preview.innerHTML = `<div class="placeholder-text">Choose a lesson or enter a topic, then select a graphic type. Your prompt will compose itself here.</div>`;
@@ -4375,8 +4409,9 @@ function wireInputs() {
 
   $('modelGrid').querySelectorAll('.mcard').forEach(card => {
     card.addEventListener('click', () => {
-      $('modelGrid').querySelectorAll('.mcard').forEach(c => c.classList.remove('selected'));
+      $('modelGrid').querySelectorAll('.mcard').forEach(c => { c.classList.remove('selected'); c.setAttribute('aria-pressed', 'false'); });
       card.classList.add('selected');
+      card.setAttribute('aria-pressed', 'true');
       state.model = card.dataset.model;
       updatePrompt();
     });
