@@ -11,8 +11,7 @@
   - When materials are ready: set data-ready="true", replace the "coming soon" <span> with a link
     (<a class="btn" href="your-file.html" target="_blank" rel="noopener">Open workshop materials <span class="newtab">(opens in new tab)</span> <span aria-hidden="true">↗</span></a>), and update the "In this session" list.
   - data-date (YYYY-MM-DD) drives the automatic "Next up" and "Completed" labels.
-  Icebreakers are <article class="ice"> blocks in the "Icebreakers" section; copy one to add another.
-  Keep this file in the same folder as the workshop HTML files (including excuse-bingo.html and ai-or-faculty.html).
+  Keep this file in the same folder as the workshop HTML files.
 -->
 <style>
 :root{
@@ -113,27 +112,6 @@ h2{font-family:var(--font-head);font-size:clamp(1.4rem,1.2rem + .8vw,1.8rem);mar
   .date .dd{font-size:1.4rem}
 }
 
-/* Collapsible section */
-.acc{margin:var(--s7) 0 0}
-.acc>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:var(--s3);margin:0 0 var(--s4);border-radius:var(--r-sm)}
-.acc>summary::-webkit-details-marker{display:none}
-.acc>summary h2{margin:0}
-.acc>summary::before{content:"";width:.6em;height:.6em;border-right:3px solid var(--ink-soft);border-bottom:3px solid var(--ink-soft);transform:rotate(-45deg);transition:transform .15s;flex:none;margin-left:2px}
-.acc[open]>summary::before{transform:rotate(45deg)}
-.acc-hint{font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft);background:var(--sunk);border-radius:99px;padding:2px 10px}
-.acc:not([open]){margin-bottom:0}
-
-/* Icebreakers */
-.ice{display:grid;grid-template-columns:auto 1fr;gap:var(--s5);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s5);margin-bottom:var(--s4)}
-.ice-mark{width:92px;aspect-ratio:1;border-radius:var(--r-sm);background:var(--tba-soft);display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:10px;align-self:start}
-.ice-mark span{background:var(--surface);border-radius:3px}
-.ice-mark span.x{background:var(--c2)}
-.ice h3{font-family:var(--font-head);font-size:clamp(1.25rem,1.1rem + .5vw,1.5rem);line-height:1.2;margin:0 0 var(--s2)}
-.ice p{margin:0 0 var(--s3);max-width:68ch}
-.ice ul{margin:0 0 var(--s4);padding-left:1.2rem;font-size:.95rem}
-.ice .meta{font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft);margin:0 0 var(--s4)}
-@media (max-width:600px){.ice{grid-template-columns:1fr;gap:var(--s3);padding:var(--s4)}.ice-mark{width:64px;padding:7px}}
-
 .about{display:grid;gap:var(--s4);grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr))}
 .about div{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4)}
 .about h3{font-family:var(--font-ui);font-size:1rem;margin:0 0 var(--s2)}
@@ -171,39 +149,6 @@ html{scroll-behavior:smooth}
 </header>
 
 <main id="main" class="wrap">
-  <details class="acc" id="icebreakers" open>
-  <summary><h2>Icebreakers</h2><span class="acc-hint">2 games</span></summary>
-
-  <article class="ice" id="excuse-bingo">
-    <div class="ice-mark" aria-hidden="true"><span class="x"></span><span></span><span></span><span></span><span class="x"></span><span></span><span></span><span></span><span class="x"></span></div>
-    <div>
-      <div class="ws-top"><span class="num">Icebreaker</span><span class="pill ready">Ready to play</span></div>
-      <h3>Student Excuse Bingo</h3>
-      <p>Every attendee gets a unique bingo card filled with excuses we’ve all heard, from “my grandmother passed away” to “I emailed it to you, didn’t you get it?” The facilitator spins the wheel, people circle what’s called, and the first five in a row wins. A short debrief connects the laughs to the real pressures behind many excuses.</p>
-      <p class="meta">About 10 minutes for a round, plus 5 for the debrief. Works on phones or printed cards.</p>
-      <div class="btn-row">
-        <a class="btn" href="excuse-bingo.html#card" target="_blank" rel="noopener">Get my bingo card <span class="newtab">(opens in new tab)</span> <span aria-hidden="true">↗</span></a>
-        <a class="btn ghost" href="excuse-bingo.html#spin" target="_blank" rel="noopener">Facilitator spinner <span class="newtab">(opens in new tab)</span> <span aria-hidden="true">↗</span></a>
-        <a class="btn ghost" href="excuse-bingo.html#print" target="_blank" rel="noopener">Print cards <span class="newtab">(opens in new tab)</span> <span aria-hidden="true">↗</span></a>
-      </div>
-    </div>
-  </article>
-
-  <article class="ice" id="ai-or-faculty">
-    <div class="ice-mark" aria-hidden="true" style="background:var(--c4-soft)"><span class="x" style="background:var(--c4)"></span><span></span><span class="x" style="background:var(--c1)"></span><span></span><span class="x" style="background:var(--c4)"></span><span></span><span class="x" style="background:var(--c1)"></span><span></span><span class="x" style="background:var(--c4)"></span></div>
-    <div>
-      <div class="ws-top"><span class="num">Icebreaker</span><span class="pill ready">Ready to play</span></div>
-      <h3>AI or Faculty?</h3>
-      <p>Each round shows a short piece of teaching writing, like a late-work policy or feedback on a student paper. Some were written by colleagues and some by AI. Everyone makes the call on their phone, the room votes by show of hands, and the reveal shows how often we really can tell. It leads straight into a conversation about AI-resistant assignments.</p>
-      <p class="meta">About 10 minutes for 8 to 12 rounds, plus 5 for the debrief. Players follow along on their phones.</p>
-      <div class="btn-row">
-        <a class="btn" href="ai-or-faculty.html#play" target="_blank" rel="noopener">Play on my phone <span class="newtab">(opens in new tab)</span> <span aria-hidden="true">↗</span></a>
-        <a class="btn ghost" href="ai-or-faculty.html#host" target="_blank" rel="noopener">Run the game <span class="newtab">(opens in new tab)</span> <span aria-hidden="true">↗</span></a>
-      </div>
-    </div>
-  </article>
-  </details>
-
   <h2>The workshops</h2>
 
   <article class="ws w1" id="w1" data-date="2026-09-24" data-ready="true">
@@ -240,7 +185,7 @@ html{scroll-behavior:smooth}
       </ul>
       <div class="btn-row">
         <a class="btn" href="images-infographics-workshop.html" target="_blank" rel="noopener">Open workshop materials <span class="newtab">(opens in new tab)</span> <span aria-hidden="true">↗</span></a>
-        <a class="btn ghost" href="https://mqaissaunee-bcc.github.io/AI_Examples/graphics-prompt-builder.html" target="_blank" rel="noopener">Graphics prompt builder <span class="newtab">(opens in new tab)</span> <span aria-hidden="true">↗</span></a>
+        <a class="btn ghost" href="https://mqaissaunee-bcc.github.io/AI_Examples/graphics-prompt-studio.html" target="_blank" rel="noopener">Graphics Prompt Studio <span class="newtab">(opens in new tab)</span> <span aria-hidden="true">↗</span></a>
       </div>
     </div>
   </article>
@@ -284,11 +229,6 @@ html{scroll-behavior:smooth}
 </footer>
 
 <script>
-(function(){
-  var acc=document.getElementById("icebreakers");
-  try{ if(localStorage.getItem("ice-open")==="0") acc.removeAttribute("open"); }catch(e){}
-  acc.addEventListener("toggle",function(){ try{ localStorage.setItem("ice-open",acc.open?"1":"0"); }catch(e){} });
-})();
 (function(){
   "use strict";
   var today = new Date(); today.setHours(0,0,0,0);
