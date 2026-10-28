@@ -194,6 +194,21 @@ body.lb-open{overflow:hidden}
 .shot figcaption{font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft);margin-top:var(--s2)}
 .shot figcaption b{color:var(--ink)}
 
+
+/* ---------- Sample gallery ---------- */
+.samples{display:grid;gap:var(--s4);grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));margin:var(--s5) 0;align-items:start}
+.sample{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s3)}
+.sample .shot{margin:0}
+.sample .shot.has-image .shot-frame{width:100%}
+.sample .shot figcaption{text-align:left}
+.sample-meta{display:flex;flex-wrap:wrap;gap:6px;margin:var(--s3) 0 var(--s2)}
+.sample h4{margin:0 0 var(--s1);font-size:1rem}
+.sample p{font-size:.93rem;margin:0 0 var(--s2)}
+.sample details{border-top:1px solid var(--line);margin-top:var(--s2)}
+.sample summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-family:var(--font-ui);font-size:.9rem;font-weight:600;color:var(--accent)}
+.sample details ul{font-size:.92rem;padding-left:1.2rem;margin:0 0 var(--s2)}
+.sample details li{margin-bottom:var(--s2)}
+
 /* ---------- Interface schematic ---------- */
 .schematic{display:grid;grid-template-columns:1fr;gap:var(--s3);margin:var(--s5) 0;font-family:var(--font-ui)}
 @media (min-width:720px){.schematic{grid-template-columns:1fr 1.6fr 1fr}}
@@ -503,6 +518,81 @@ a.btn{text-decoration:none}
     </div>
     <figcaption>Image models have improved a lot at text, but they still slip, especially with many labels or technical terms. Code writes text exactly.</figcaption>
   </figure>
+
+  <h3>Samples: what image generators can do now</h3>
+  <p>These four infographics were made with AI image generators for courses in different disciplines. At a glance, each looks ready to post, and the text is far better than it was a year ago. Every one still has at least one problem worth catching. Select an image to enlarge it, look for problems yourself, then open <strong>What to check</strong>.</p>
+  <div class="samples">
+    <article class="sample">
+      <figure class="shot" data-src="img/samples/sample-trig-graphs.webp" data-scale="1" data-alt="AI-generated math infographic titled Graphs of Trigonometric Functions, with key terms, standard forms, graphs of sine, cosine, and tangent, four transformation examples, and a tidal height model.">
+        <div class="shot-frame"><div class="placeholder"><span class="ph-num">Sample</span><p class="ph-what">Graphs of Trigonometric Functions</p><code>img/samples/sample-trig-graphs.webp</code></div></div>
+      </figure>
+      <div class="sample-meta"><span class="pill">Mathematics</span></div>
+      <h4>Graphs of Trigonometric Functions</h4>
+      <p><strong>What works:</strong> The formulas, definitions, and bullet lists are correct, and the sine, cosine, and tidal graphs match their equations.</p>
+      <details>
+        <summary>What to check (look first, then open)</summary>
+        <ul>
+          <li><strong>Tangent graph:</strong> the asymptotes and zero crossings don&#8217;t line up with the axis labels. One asymptote sits at <em>x</em> = 0, where tan <em>x</em> is actually 0, so the picture contradicts the correct bullets beneath it. Two labels also run together as &#8220;&#8722;&#960; &#960;/2.&#8221;</li>
+          <li><strong>Phase shift example:</strong> the green curve doesn&#8217;t match <em>y</em> = sin(<em>x</em> &#8722; &#960;/2). That graph should start at &#8722;1, not 0, and its low point is too shallow.</li>
+          <li><strong>Key features graph:</strong> the second peak is lower than the first, so the amplitude isn&#8217;t constant, and the period arrow doesn&#8217;t span a full cycle.</li>
+          <li>These are the errors a student would copy into their notes. Text and formulas came out right; the drawn curves are where the model guessed.</li>
+        </ul>
+      </details>
+    </article>
+    <article class="sample">
+      <figure class="shot" data-src="img/samples/sample-global-inequality.webp" data-scale="1" data-alt="AI-generated sociology poster titled Global Inequality, with a world map of high- and low-income nations, three types of poverty, three theories of global inequality, and four effects of globalization.">
+        <div class="shot-frame"><div class="placeholder"><span class="ph-num">Sample</span><p class="ph-what">Global Inequality</p><code>img/samples/sample-global-inequality.webp</code></div></div>
+      </figure>
+      <div class="sample-meta"><span class="pill">Sociology</span></div>
+      <h4>Global Inequality</h4>
+      <p><strong>What works:</strong> A clear four-part structure, and the three theories are summarized accurately at an introductory level.</p>
+      <details>
+        <summary>What to check (look first, then open)</summary>
+        <ul>
+          <li><strong>Garbled word:</strong> the Modernization Theory key idea ends &#8220;through m&#8856;ation&#8221; instead of &#8220;modernization.&#8221; Long words in small text are where image generators still slip.</li>
+          <li><strong>The map:</strong> it sorts every country into two groups, but the World Bank uses four income levels. Check the country colors against a current source before using it.</li>
+          <li><strong>The sources line:</strong> the generator wrote &#8220;World Bank (2024), United Nations (2024)&#8221; itself. It didn&#8217;t consult those sources, so verify the content or remove the citation.</li>
+        </ul>
+      </details>
+    </article>
+    <article class="sample">
+      <figure class="shot" data-src="img/samples/sample-resumes.webp" data-scale="1" data-alt="AI-generated hand-drawn style infographic titled Résumés and Application Materials, covering résumé formats, achievement bullets and action verbs, applicant tracking systems, cover letter structure, supporting documents, and a final review checklist.">
+        <div class="shot-frame"><div class="placeholder"><span class="ph-num">Sample</span><p class="ph-what">Résumés and Application Materials</p><code>img/samples/sample-resumes.webp</code></div></div>
+      </figure>
+      <div class="sample-meta"><span class="pill">Career development</span></div>
+      <h4>Résumés and Application Materials</h4>
+      <p><strong>What works:</strong> Lots of text with almost no spelling errors, a consistent hand-drawn style, and sound general advice.</p>
+      <details>
+        <summary>What to check (look first, then open)</summary>
+        <ul>
+          <li><strong>Small inconsistencies:</strong> the title says &#8220;Résumés,&#8221; but the drawn document says &#8220;RESUME&#8221; without accents. Read every word, including the ones inside icons.</li>
+          <li><strong>Generic advice:</strong> tips like &#8220;Save as a PDF&#8221; and &#8220;Include 2&#8211;3 people&#8221; are common rules of thumb, not universal. Compare them with what your career services office tells students.</li>
+          <li><strong>Accessibility:</strong> this much text needs a full text version or long description for screen reader users.</li>
+        </ul>
+      </details>
+    </article>
+    <article class="sample">
+      <figure class="shot" data-src="img/samples/sample-self-assessment.webp" data-scale="1" data-alt="AI-generated career infographic titled Self-Assessment: Interests and Values, in three steps: explore your interests with tools such as the RIASEC hexagon, identify intrinsic and extrinsic work values, and understand your results.">
+        <div class="shot-frame"><div class="placeholder"><span class="ph-num">Sample</span><p class="ph-what">Self-Assessment: Interests and Values</p><code>img/samples/sample-self-assessment.webp</code></div></div>
+      </figure>
+      <div class="sample-meta"><span class="pill">Career development</span></div>
+      <h4>Self-Assessment: Interests and Values</h4>
+      <p><strong>What works:</strong> A clean three-step flow with clear headings and icons that support the text.</p>
+      <details>
+        <summary>What to check (look first, then open)</summary>
+        <ul>
+          <li><strong>Fake transparency:</strong> the gray checkerboard is painted into the picture. Image generators often do this when asked for a transparent background, so the file isn&#8217;t actually transparent and the pattern shows on any slide.</li>
+          <li><strong>The RIASEC hexagon:</strong> Holland&#8217;s model places the six types in a fixed order around a ring (R, I, A, S, E, C) so that similar types sit next to each other. Here Conventional is in the center and the order is scrambled, which misrepresents the model.</li>
+          <li><strong>The tools:</strong> the Strong Interest Inventory is a paid assessment that students usually take through career services, while the O*NET Interest Profiler is free. Students may need that context.</li>
+        </ul>
+      </details>
+    </article>
+  </div>
+  <div class="callout caution">
+    <p class="c-title">The pattern to notice</p>
+    <p>Headings, definitions, and short phrases mostly came out right. The mistakes are in drawn graphs, small or long words, structural diagrams like the RIASEC hexagon, and claims the image makes on its own, such as the map categories and the sources line. Those are also the hardest things to spot when you skim.</p>
+  </div>
+  <div class="facil"><strong>Facilitator:</strong> Give the room two minutes with the sample closest to their discipline and ask each table to call out one problem before revealing the notes. The math sample works well even for non-math faculty: the bullet list under the tangent graph is correct, and the graph above it isn't.</div>
 
   <h3>Three ways to make a graphic</h3>
   <div class="grid">
@@ -1146,7 +1236,7 @@ a.btn{text-decoration:none}
       var zoom = document.createElement("button");
       zoom.type = "button";
       zoom.className = "zoom-btn";
-      zoom.setAttribute("aria-label", "Enlarge screenshot: " + (fig.dataset.alt || "screenshot"));
+      zoom.setAttribute("aria-label", "Enlarge image: " + (fig.dataset.alt || "image"));
       zoom.appendChild(img);
       var hint = document.createElement("span");
       hint.className = "zoom-hint"; hint.setAttribute("aria-hidden","true");
