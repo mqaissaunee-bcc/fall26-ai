@@ -813,10 +813,26 @@
 
   a.pill { text-decoration: none; display: inline-flex; align-items: center; }
   a.pill:hover { background: var(--ink); color: var(--paper); }
-  #leanWrap { margin-top: 12px; }
   .masthead-actions { flex-wrap: wrap; }
   .pill { white-space: nowrap; }
+  #leanWrap { margin-top: 12px; }
   #discRulesNote:empty, #scenarioHint:empty { display: none; }
+  .scale-pick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+  @media (max-width: 820px) { .scale-pick { grid-template-columns: 1fr; } }
+  #collectionWrap { margin-bottom: 18px; }
+  .scale-btn { text-align: left; background: var(--card-bg); border: 1px solid var(--rule); padding: 14px 16px; cursor: pointer; color: inherit; font: inherit; border-radius: 2px; display: flex; flex-direction: column; gap: 4px; min-height: 44px; }
+  .scale-btn:hover { border-color: var(--ink); }
+  .scale-btn.selected { border-color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
+  .scale-btn.selected .scale-name::before { content: '\2713\00a0'; color: var(--accent); }
+  .scale-name { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 500; }
+  .scale-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.45; }
+  #viewsWrap { margin-top: 18px; }
+  .phase { border: 1px solid var(--rule); background: var(--card-bg); padding: 14px 16px; margin-top: 10px; border-radius: 2px; }
+  .phase-head { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .phase-title { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 500; }
+  .phase-desc { font-size: 13px; color: var(--ink-soft); margin: 4px 0 8px; }
+  .phase textarea { width: 100%; }
+  #collectionWrap .field { margin-top: 10px; }
 </style>
 </head>
 <body>
@@ -830,7 +846,7 @@
       <div class="subtitle">Compose expert-panel prompts that build interactive, classroom-ready simulations and virtual labs in any discipline, from transfer courses to workforce training.</div>
     </div>
     <div class="masthead-actions">
-      <span class="pill">v1.1</span>
+      <span class="pill">v1.3</span>
       <a class="pill" href="graphics-prompt-studio.html">Graphics studio</a>
       <button class="pill" id="themeBtn" type="button" aria-label="Toggle dark mode">Dark mode</button>
       <span class="pill accent">For educators</span>
@@ -849,6 +865,8 @@
       <button class="preset-btn" data-preset="exam">Exam Practice</button>
       <button class="preset-btn" data-preset="case">Case Study</button>
       <button class="preset-btn" data-preset="game">Game Review</button>
+      <button class="preset-btn" data-preset="twin">Full System</button>
+      <button class="preset-btn" data-preset="collection">Lab Collection</button>
       <span class="preset-break" aria-hidden="true"></span>
       <span class="preset-label">Made for →</span>
       <button class="preset-btn" data-preset="projector">Projector</button>
@@ -1044,6 +1062,30 @@
         <h2 class="section-title">Simulation Type</h2>
         <span class="section-hint">how the learner interacts</span>
       </div>
+      <div class="scale-pick" role="radiogroup" aria-label="Simulation scale">
+        <button type="button" class="scale-btn selected" data-scale="focused" role="radio" aria-checked="true">
+          <span class="scale-name">Focused activity</span>
+          <span class="scale-desc">One skill or concept, a set of tasks with feedback, 10–60 minutes.</span>
+        </button>
+        <button type="button" class="scale-btn" data-scale="system" role="radio" aria-checked="false">
+          <span class="scale-name">Full system simulator</span>
+          <span class="scale-desc">A running model of a whole system to operate and explore, with several views, faults, and exercises. Built in phases.</span>
+        </button>
+        <button type="button" class="scale-btn" data-scale="collection" role="radio" aria-checked="false">
+          <span class="scale-name">Lab collection</span>
+          <span class="scale-desc">Several related simulators in one file, one per unit, sharing navigation and a learning panel. Built in phases.</span>
+        </button>
+      </div>
+      <div id="collectionWrap" hidden>
+        <div class="card-group-label">Modules in the collection</div>
+        <p class="type-rec-note">Topics you tick in the lesson in § 01 become modules. Choose “Whole course: all units” there to make one module per unit. To set them yourself, list one module per line here instead.</p>
+        <label class="field">
+          <span class="field-label">Modules (optional, one per line)</span>
+          <textarea id="modulesText" rows="4" placeholder="Kinematics: free throw; car on a road&#10;Newton's laws: shopping cart&#10;Work and energy: skateboarder in a half-pipe"></textarea>
+        </label>
+        <p class="type-rec-note" id="modulesPreview" role="status" aria-live="polite"></p>
+        <p class="type-rec-note">The simulation type you pick below is each module’s default; the panel may choose a better fit for individual modules and will say so.</p>
+      </div>
       <div class="type-rec" id="typeRec">
         <div class="type-rec-head"><strong>Suggested for this lesson</strong><span class="type-rec-basis" id="recBasis"></span></div>
         <div class="rec-list" id="recList"></div>
@@ -1070,6 +1112,14 @@
         </div>
       </details>
       <div class="card-grid" id="typeGrid"></div>
+      <div id="viewsWrap" hidden>
+        <div class="card-group-label">Views and tools in the simulator</div>
+        <p class="type-rec-note">Each one you pick adds a build specification to the prompt. Leave off what the topic does not need.</p>
+        <div class="chips" id="viewChips"></div>
+        <div class="toggles" style="margin-top: 12px;">
+          <div class="toggle" data-toggle="phased" tabindex="0" role="switch"><div class="toggle-box">✓</div><span>Build in phases (recommended)</span></div>
+        </div>
+      </div>
       <div class="fit-note" id="fitNote">
         <strong>Why this fits</strong>
         <span id="fitText"></span>
@@ -1125,6 +1175,17 @@
           <span class="field-label">Scenario Narrative (optional)</span>
           <textarea id="narrative" placeholder="Who the learner is, what is happening, and what success looks like. Leave blank and the panel will write a short briefing."></textarea>
         </label>
+        <label class="field">
+          <span class="field-label">Standards &amp; Limits to Score Against (optional)</span>
+          <input type="text" id="standards" placeholder="e.g., NPDES permit limits, NEC ampacity tables, normal adult vital-sign ranges, OSHA exposure limits" autocomplete="off">
+        </label>
+        <label class="field">
+          <span class="field-label">Real-World Case to Tie In (optional)</span>
+          <input type="text" id="realcase" placeholder="e.g., the 2021 Oldsmar water plant intrusion, the 2003 Northeast blackout, a recall or case study" autocomplete="off">
+        </label>
+        <div class="toggles">
+          <div class="toggle" data-toggle="everyday" tabindex="0" role="switch"><div class="toggle-box">✓</div><span>Anchor concepts in everyday scenarios</span></div>
+        </div>
       </div>
     </section>
 
@@ -1185,6 +1246,7 @@
           <div class="toggle" data-toggle="badges" tabindex="0" role="switch"><div class="toggle-box">✓</div><span>Achievement badges</span></div>
           <div class="toggle" data-toggle="walkthrough" tabindex="0" role="switch"><div class="toggle-box">✓</div><span>Guided walkthrough mode</span></div>
           <div class="toggle" data-toggle="report" tabindex="0" role="switch"><div class="toggle-box">✓</div><span>Printable completion report</span></div>
+          <div class="toggle" data-toggle="learnPanel" tabindex="0" role="switch"><div class="toggle-box">✓</div><span>Learning panel: big idea, key equations, try this, check yourself</span></div>
         </div>
       </div>
     </section>
@@ -1208,6 +1270,7 @@
               <option>Illustrated storybook (friendly scenes and characters)</option>
               <option>Terminal / HUD (monospace, glowing accents)</option>
               <option>Gamified arcade (levels, XP bars, bold color)</option>
+              <option>ISA-101 high-performance HMI (gray, color only for abnormal states)</option>
               <option>Institutional (match my college colors)</option>
             </select>
           </label>
@@ -1244,6 +1307,11 @@
         <div class="toggles">
           <div class="toggle" data-toggle="sound" tabindex="0" role="switch"><div class="toggle-box">✓</div><span>Optional sound cues (muted by default)</span></div>
           <div class="toggle" data-toggle="visibleObjective" tabindex="0" role="switch"><div class="toggle-box">✓</div><span>Objective and current task always visible</span></div>
+        </div>
+        <div>
+          <div class="card-group-label">Representations shown together</div>
+          <p class="type-rec-note">Linked views of the same live model. Each one you pick is kept in sync with the others.</p>
+          <div class="chips" id="repChips"></div>
         </div>
       </div>
     </section>
@@ -1382,8 +1450,21 @@
     <section class="section" id="fixSection">
       <div class="section-header">
         <span class="section-number">§ 11</span>
-        <h2 class="section-title">Test &amp; Revise</h2>
-        <span class="section-hint">after the first build</span>
+        <h2 class="section-title">Build &amp; Revise</h2>
+        <span class="section-hint">after the first prompt</span>
+      </div>
+      <div id="phaseWrap" hidden>
+        <div class="card-group-label">Phased build plan</div>
+        <p class="type-rec-note">A full system simulator or lab collection is too large for one reply, so the main prompt asks for Phase 1 only. When a phase works, copy the next phase prompt into the same chat. Use the revision tools below between phases if something breaks.</p>
+        <label class="field" style="max-width: 420px;">
+          <span class="field-label">What each phase sends back</span>
+          <select id="phaseReturn">
+            <option value="full">The complete updated file</option>
+            <option value="diff">Only new and changed parts (for very large builds)</option>
+          </select>
+        </label>
+        <div id="phaseList"></div>
+        <div class="card-group-label" style="margin-top: 1.5rem;">Test &amp; revise</div>
       </div>
       <p class="type-rec-note">Most simulations need a round or two of fixes. Try yours, mark what went wrong, and paste the revision prompt into the same chat that built it.</p>
       <div id="fixGroups"></div>
@@ -3503,6 +3584,7 @@ const SIM_TYPES = [
   { id: 'graphing', group: 'explore', basis: 'equation', name: 'Interactive Graph Explorer', purpose: 'Connect equation and graph', desc: 'Drag points or change coefficients and watch the equation and graph change together.', use: 'Use for functions and transformations, linear regression, cost curves, Bode plots, or kinematics graphs.', traits: 'a coordinate plane with draggable points and coefficient sliders linked to the displayed equation, tables of values, and challenge prompts that ask the learner to match a target graph' },
   { id: 'stats', group: 'explore', basis: 'stochastic', name: 'Probability & Statistics Lab', purpose: 'Watch randomness add up', desc: 'Run thousands of trials, sample, and watch distributions form.', use: 'Use for sampling distributions, confidence intervals, genetics crosses, quality control, or risk.', traits: 'a trial runner with run-1, run-100, and run-10,000 controls, a live histogram and summary statistics, adjustable sample size and parameters, and a seed so results can be repeated' },
   { id: 'systems', group: 'explore', basis: 'equation', name: 'Systems & Population Dynamics', purpose: 'See feedback over time', desc: 'Stocks, flows, and feedback loops play out over simulated time.', use: 'Use for predator\u2013prey, epidemics, ecosystems, inventory, climate, or economic systems.', traits: 'a stock-and-flow or population model stepped over time, with adjustable rates, a time-series graph, a diagram of the feedback loops, and what-if scenarios the learner can run and compare' },
+  { id: 'twin', group: 'explore', basis: 'equation', name: 'Digital Twin / Live System Simulator', purpose: 'Operate a whole system', desc: 'A continuously running model of a plant, grid, body, or network that learners operate, disturb, and troubleshoot.', use: 'Use for water and wastewater plants, power grids, HVAC and building systems, patient physiology, ecosystems, manufacturing lines, supply chains, or network operations centers.', traits: 'a continuously running, time-stepped model of the whole system with a simulation clock and speed controls, an overview of every stage or subsystem, operator controls whose effects propagate through linked variables over simulated time, and several professional views of the same live state' },
   { id: 'calculator', group: 'explore', basis: 'equation', name: 'Calculator / Modeler', purpose: 'Quantify a decision', desc: 'An interactive calculator that shows its work and compares scenarios.', use: 'Use for dosage calculations, load and stress, risk (SLE/ARO/ALE), loan payments, unit conversion, or nutrition.', traits: 'an interactive calculator with labeled inputs and units that shows each step of the calculation, flags unreasonable inputs, lets the learner save and compare scenarios, and includes worked examples to load' },
   /* Build & design */
   { id: 'circuit', group: 'build', basis: 'equation', name: 'Circuit Builder', purpose: 'Wire it and test it', desc: 'Place components, wire them, and measure voltage and current that follow the real laws.', use: 'Use for series and parallel circuits, Ohm\u2019s law, digital logic, motor controls, or sensor wiring.', traits: 'a breadboard or schematic canvas with a component palette, snap-to wiring, a virtual multimeter, and a solver that computes real voltages and currents; faults such as shorts and open circuits behave realistically and are explained' },
@@ -3558,6 +3640,7 @@ const SIM_TYPES = [
    concepts, plus an optional AI prompt and paste-back.
 ============================================================ */
 const TYPE_CUES = [
+  { re: /\b(?:plant|operat(?:e|or|ions)|control room|scada|grid|digital twin|treatment|whole system|facility|physiolog)\w*/i, ids: ['twin', 'panel', 'systems'] },
   { re: /\b(?:predict|relationship between|effect of|how (?:does|do) .{0,30} change|variabl|parameters?|depend)\w*/i, ids: ['sandbox', 'graphing', 'phenomenon'] },
   { re: /\b(?:experiment|lab\b|labs\b|measure|titrat|hypothes|investigat\w* how|data collection)\w*/i, ids: ['virtuallab', 'sandbox'] },
   { re: /\b(?:motion|force|velocit|accelerat|projectile|orbit|gravity|wave|field|energy|momentum|pendulum)\w*/i, ids: ['sandbox', 'phenomenon', 'graphing'] },
@@ -3610,7 +3693,7 @@ const TYPE_CUES = [
    State
 ============================================================ */
 const TOGGLE_DEFAULTS = {
-  lean: false,
+  lean: false, phased: true, everyday: true, learnPanel: true,
   predict: true, scoring: true, progress: true, timer: false, reset: true, randomize: false,
   notebook: false, badges: false, walkthrough: true, report: false,
   sound: false, visibleObjective: true,
@@ -3620,7 +3703,7 @@ const TOGGLE_DEFAULTS = {
 };
 const SELECT_IDS = ['grade', 'duration', 'modelBasis', 'fidelity', 'feedback', 'hints', 'difficulty', 'taskCount',
   'aesthetic', 'theme', 'layout', 'animation', 'codeFormat', 'persistence', 'devices', 'deployment'];
-const TEXT_IDS = ['topic', 'objective', 'setting', 'learnerRole', 'org', 'narrative'];
+const TEXT_IDS = ['topic', 'objective', 'setting', 'learnerRole', 'org', 'narrative', 'standards', 'realcase'];
 
 const state = {
   discipline: '',
@@ -3632,7 +3715,7 @@ const state = {
   autoTopic: '',         // last topic text filled automatically
   personas: new Set(['sme', 'id', 'assess', 'ux', 'web']),
   topic: '', subject: '', grade: '', objective: '',
-  setting: '', learnerRole: '', org: '', narrative: '',
+  setting: '', learnerRole: '', org: '', narrative: '', standards: '', realcase: '',
   simType: null,
   toggles: { ...TOGGLE_DEFAULTS },
   model: 'claude',
@@ -4086,6 +4169,7 @@ function recommendTypes() {
       });
     });
   });
+  if (isSystem()) { const cur = scores.twin || { id: 'twin', score: 0, best: 0, word: '', field: 'scale' }; cur.score += 4; scores.twin = cur; }
   const c = getCourse();
   if (c && c.level && c.level !== 'credit') {
     ['procedure', 'pbq'].forEach(id => {
@@ -4134,7 +4218,8 @@ function renderTypeRecs() {
     const t = SIM_TYPES.find(x => x.id === r.id);
     if (!t) return;
     let why;
-    if (r.word && REC_FIELD_LABEL[r.field]) why = `Your ${REC_FIELD_LABEL[r.field]} mentions \u201C${r.word}.\u201D ${t.purpose}: ${t.desc.charAt(0).toLowerCase() + t.desc.slice(1)}`;
+    if (r.word && REC_FIELD_LABEL[r.field]) why = `Your ${REC_FIELD_LABEL[r.field]} ${r.field === 'concepts' ? 'include' : 'mentions'} \u201C${r.word}.\u201D ${t.purpose}: ${t.desc.charAt(0).toLowerCase() + t.desc.slice(1)}`;
+    else if (r.field === 'scale') why = `You chose a full system simulator. ${t.purpose}: ${t.desc.charAt(0).toLowerCase() + t.desc.slice(1)}`;
     else if (r.field === 'level') why = `Workforce and certification courses benefit from hands-on rehearsal. ${t.purpose}.`;
     else why = `${t.purpose}: ${t.desc.charAt(0).toLowerCase() + t.desc.slice(1)}`;
     list.appendChild(recItem(t, i === 0 ? 'Best match' : `Option ${i + 1}`, why));
@@ -4276,7 +4361,7 @@ function ctx() {
   const t = SIM_TYPES.find(x => x.id === state.simType) || null;
   return {
     course: getLesson() ? getCourse() : null, lesson: getLesson(), type: t,
-    subject: state.subject || (getCourse() && getCourse().subject) || 'general education',
+    subject: state.subject || (getCourse() && getCourse().subject) || 'interdisciplinary',
     grade: state.grade || 'general learners'
   };
 }
@@ -4289,7 +4374,7 @@ function buildRole(c) {
   const ps = activePersonas();
   if (!ps.length) return `You are a senior instructional designer and front-end developer who builds interactive ${c.subject} simulations for ${c.grade}. ${MODEL_FLAVOR[state.model]}`;
   return `You are a coordinated expert panel building an interactive ${c.subject} simulation for ${c.grade}. Work as each of the following personas. Every persona contributes to the build and reviews it from its own perspective before the final version is delivered:\n`
-    + ps.map(p => '\n\u2022 ' + p.role(c)).join('')
+    + ps.map(p => { const r = p.role(c); return '\n\u2022 ' + r.charAt(0).toUpperCase() + r.slice(1); }).join('')
     + `\n\nWhere personas disagree, resolve the conflict in favor of accuracy and safety first, then learning effectiveness, then accessibility, then visual polish, and note the trade-off. ${MODEL_FLAVOR[state.model]}`;
 }
 
@@ -4305,7 +4390,12 @@ function buildTask(c) {
     copilot: ' Return the finished code first, then the explanations.',
     perplexity: ' Base every value, procedure, and behavior on current, verifiable sources.'
   };
-  return base + extra[state.model];
+  if (isCollection()) {
+    const n = collectionModules().length;
+    return `Build a lab collection titled \u201C${topic}\u201D: ${n ? n + ' ' : 'several '}highly interactive, visually appealing simulators in one file, one per unit, behind shared navigation. Every module puts its concept in a familiar, real-world scenario, shows the same live model through several linked representations, and pairs it with the same learning panel, so the collection feels like one coherent lab.` + extra[state.model];
+  }
+  const sys = isSystem() ? ' It is a full system simulator: a live, continuously running model of the whole system that learners operate, disturb, and troubleshoot through several connected views, with exercises and challenges layered on top.' : '';
+  return base + sys + extra[state.model];
 }
 
 function buildLessonContext(c) {
@@ -4350,6 +4440,16 @@ function buildSimDesign(c) {
   const t = c.type;
   const b = basisFor(t);
   const lines = [];
+  if (isCollection()) {
+    const ms = collectionModules();
+    lines.push(ms.length ? 'Modules, in order:\n' + ms.map(moduleLine).join('\n') : 'Modules: choose 6\u201310 modules that cover the course or lesson in teaching order, and list them before building.');
+    lines.push(`Each module: one or two everyday scenarios that show the concept (with a scenario switcher when there are two); an interactive simulation that uses ${t ? 'the ' + t.name.toLowerCase() + ' interaction by default (' + t.traits + ')' : 'the interaction that best fits the concept'}, choosing a different interaction for a module when it fits better and saying so; a live readings panel; and ${LEARN_PANEL}.`);
+    lines.push('Shared framework: one module registry, one UI builder for controls, shared drawing and graph helpers, one palette, and one animation loop, so all modules look and behave the same and new modules can be added by editing the registry.');
+    lines.push(state.modelBasis && state.modelBasis !== 'auto' ? `Model basis: ${BASIS[state.modelBasis]}.` : 'Model basis: choose per module and say which (equation-driven for physical laws, rule-based for procedures and logic, scripted for scenarios, randomized for probability).');
+    if (b === 'equation' || !state.modelBasis || state.modelBasis === 'auto') lines.push('Wherever a module is equation-driven, compute every displayed value from the model on each step; never hard-code results. Show units on every value and verify each model against hand-checked cases.');
+    lines.push(`Fidelity: ${state.fidelity}.`);
+    return lines.join('\n');
+  }
   if (t) {
     lines.push(`Simulation type: ${t.name} (${t.purpose.toLowerCase()})`);
     lines.push(`Core interface: ${t.traits}.`);
@@ -4361,6 +4461,11 @@ function buildSimDesign(c) {
   if (b === 'equation') lines.push('Compute every displayed value from the model each time an input changes; never hard-code results. Show units on every value, keep inputs within physically meaningful ranges, and verify the model against at least three hand-checked cases.');
   if (b === 'stochastic') lines.push('Use a seeded random number generator so an instructor can reproduce a run, and show learners the sample size behind every result.');
   if (b === 'scripted') lines.push('Write a realistic outcome for every accepted action and a helpful response for anything else the learner might try.');
+  if (isSystem()) {
+    lines.push('Time model: the simulation runs continuously on a fixed time step with a visible clock, pause, and speed controls. Variables are linked, so changes propagate downstream with realistic delays, and the system keeps evolving when the learner does nothing.');
+    const v = chosenViews();
+    if (v.length) lines.push('Views and tools:\n' + v.map(x => `- ${x.name}: ${x.spec}.`).join('\n'));
+  }
   lines.push(`Fidelity: ${state.fidelity}.`);
   return lines.join('\n');
 }
@@ -4370,17 +4475,29 @@ function buildScenario() {
   const setting = state.setting.trim();
   const role = state.learnerRole.trim();
   const lines = [];
+  if (isCollection() && !setting && !role && !state.narrative.trim()) {
+    lines.push('Settings: each module uses its own everyday scenario rather than one shared setting.');
+    lines.push('Opening: a short welcome screen that explains how the collection works, how to move between modules, and how to use the learning panel.');
+  } else {
   lines.push(setting ? `Setting: ${setting}` : `Setting: choose a realistic setting${d.settings && d.settings.length ? ' (for example, ' + d.settings.slice(0, 3).join(', ').toLowerCase() + ')' : ''} that fits the objective.`);
   lines.push(role ? `Learner plays: ${role}` : `Learner plays: choose a realistic role${d.roles && d.roles.length ? ' (for example, ' + d.roles.slice(0, 3).join(', ').toLowerCase() + ')' : ''} for this audience.`);
   if (state.org.trim()) lines.push(`Organization or place: ${state.org.trim()} (fictional)`);
   if (state.narrative.trim()) lines.push(`Opening narrative: ${state.narrative.trim()}`);
   else lines.push('Opening narrative: write a short, realistic briefing that tells the learner who they are, what is happening, and what success looks like.');
+  }
+  const std = state.standards.trim(), rc = state.realcase.trim();
+  if (std) lines.push(`Standards and limits: score outcomes against ${std}. Use the real published values, show each limit next to the value it governs, and note where the simulation simplifies how the standard is applied.`);
+  else if (isSystem()) lines.push('Standards and limits: score outcomes against the real standards, regulations, or accepted ranges that govern this system, and show each limit next to the value it governs.');
+  if (state.toggles.everyday) lines.push('Everyday anchors: introduce each concept through a familiar, real-world scenario (for example a free throw, a shopping cart, a kitchen, a commute, or a workplace task) before the formal model, and keep the scenario visible while learners work.');
+  if (rc) lines.push(`Real-world case: tie in ${rc}. Describe it accurately and briefly, connect it to what learners do in the simulation, and flag any detail that should be verified.`);
   return lines.join('\n');
 }
 
 function buildInteraction() {
   const T = state.toggles;
   const lines = [
+    isCollection() ? 'Structure: in each module, learners explore the scenario freely, then work through the try-this challenges and the check-yourself question. Modules can be done in any order, with the recommended order shown.' :
+    isSystem() ? 'Structure: exploration first. The simulation runs continuously and learners operate it freely; the guided exercises, faults, and challenges in the views give it structure.' :
     state.taskCount.startsWith('Open') ? 'Tasks: open exploration with optional challenges that guide learners toward the objective.' : `Tasks: ${state.taskCount}, sequenced from guided to independent.`,
     `Feedback: ${state.feedback}.`, `Hints: ${state.hints}.`, `Difficulty: ${state.difficulty}.`
   ];
@@ -4395,6 +4512,7 @@ function buildInteraction() {
   if (T.badges) feats.push('achievement badges for milestones');
   if (T.walkthrough) feats.push('an optional guided walkthrough mode that demonstrates the first task');
   if (T.report) feats.push('a printable completion report with score, time, and task results');
+  if (T.learnPanel && !isCollection()) feats.push(LEARN_PANEL);
   if (feats.length) lines.push(`Include: ${feats.join('; ')}.`);
   return lines.join('\n');
 }
@@ -4402,6 +4520,8 @@ function buildInteraction() {
 function buildVisual() {
   const lines = [`Aesthetic: ${state.aesthetic}.`, `Theme: ${state.theme}.`, `Layout: ${state.layout}.`, `Animation: ${state.animation}; respect prefers-reduced-motion.`,
     'Make it visually appealing: a clear focal area for the simulation, consistent spacing, polished controls, and distinct status colors for success, warning, and error.'];
+  if (state.aesthetic.startsWith('ISA-101')) lines.push('Follow ISA-101 high-performance HMI practice: muted gray backgrounds and equipment, color reserved for abnormal and alarm states, analog-style indicators that show the normal range, a consistent screen hierarchy (overview, unit, detail), and the same placement for the same controls on every screen.');
+  const rl = repsLine(); if (rl) lines.push(rl);
   if (state.toggles.sound) lines.push('Sound: optional subtle cues for success and error, muted by default with a visible toggle.');
   if (state.toggles.visibleObjective) lines.push('Keep the learning objective and current task visible on screen at all times.');
   return lines.join('\n');
@@ -4413,7 +4533,7 @@ function buildTechnical() {
   if (state.persistence.startsWith('Save')) lines.push('Wrap every storage call in try/catch so the simulation still runs where browser storage is blocked, such as some LMS frames and AI chat previews.');
   if (state.deployment.includes('LMS')) lines.push('It must run inside an LMS iframe: no inline event handlers (bind events with addEventListener), no pop-up windows, and no reliance on the parent page.');
   if (T.zeroDeps) lines.push('No external libraries, CDNs, fonts, or images; everything is embedded (use inline SVG for equipment, scenes, and diagrams).');
-  if (T.keyboard) lines.push('Every interaction must be operable by keyboard, with visible focus states and a keyboard alternative to every drag.');
+  if (T.keyboard) lines.push('Every interaction must be operable by keyboard, with visible focus states and a keyboard alternative to every drag; hold-to-act buttons also respond to holding Space or Enter.');
   if (T.answerKey) lines.push('Include an instructor answer-key mode (toggled by a discreet control) that reveals the correct actions or values for each task.');
   if (T.commented) lines.push('Keep tasks, model parameters, expected answers, and feedback text in one clearly commented data object near the top of the script so instructors can edit the activity without touching the logic.');
   if (T.instructorPanel) lines.push('Add an instructor settings panel where key parameters, difficulty, and timing can be changed without editing code.');
@@ -4443,7 +4563,7 @@ function buildConstraints() {
 function buildDeliverables(c) {
   const ps = activePersonas();
   if (!ps.length) return '';
-  let s = 'Along with the simulation, return each of the following as its own clearly labeled section';
+  let s = isPhased() ? 'In the final phase, return each of the following as its own clearly labeled section' : 'Along with the simulation, return each of the following as its own clearly labeled section';
   s += state.toggles.lean ? ', kept to one short paragraph each:\n' : ':\n';
   s += ps.map((p, i) => `\n${i + 1}. ${p.deliverable(c)}`).join('');
   return s;
@@ -4456,6 +4576,16 @@ function buildModelNotes() {
     gemini: 'Use Canvas so the simulation can be previewed. Return the complete runnable code in one block, then explain how to test it in a browser and on a phone, followed by the panel deliverables.',
     copilot: 'Return the complete code in one block that can be copied into a plain-text file saved with an .html extension and opened in a web browser. Do not shorten or skip any part of the code. After the code, give the panel deliverables and one sentence on how to open the file.',
     perplexity: 'First list the authoritative sources used to verify values, procedures, and behavior, with citations. Then return the complete runnable code and the panel deliverables, flagging anything you could not verify.'
+  }[state.model];
+}
+
+function buildPhasedModelNotes() {
+  return {
+    claude: 'If any requirement is ambiguous, ask a clarifying question before building. Build each phase as a runnable artifact so it can be tested in the chat, and keep updating the same artifact in later phases.',
+    chatgpt: 'Use Canvas so each phase can be previewed and revised, and keep building in the same Canvas. Do not summarize or abbreviate the code.',
+    gemini: 'Use Canvas so each phase can be previewed, and keep building in the same Canvas. After each phase, explain how to test it in a browser.',
+    copilot: 'Return each phase as complete code in one block that can be saved as an .html file and opened in a web browser. Do not shorten or skip any part of the code.',
+    perplexity: 'Before Phase 1, list the authoritative sources used for the models\u2019 equations, constants, and limits, with citations. Flag anything you could not verify.'
   }[state.model];
 }
 
@@ -4477,7 +4607,9 @@ function promptBlocks() {
   blocks.push(['Technical Build', buildTechnical()]);
   const k = buildConstraints(); if (k.length) blocks.push(['Pedagogical & Safety Constraints', k.map(x => '\u2022 ' + x).join('\n')]);
   const d = buildDeliverables(c); if (d) blocks.push(['Panel Deliverables', d]);
-  blocks.push([`Model-Specific Notes (${MODEL_NAMES[state.model]})`, buildModelNotes()]);
+  const phased = isPhased();
+  if (phased) blocks.push(['Build Plan', buildPhasePlanBlock()]);
+  blocks.push([`Model-Specific Notes (${MODEL_NAMES[state.model]})`, phased ? buildPhasedModelNotes() : buildModelNotes()]);
   return blocks;
 }
 
@@ -4487,6 +4619,7 @@ function hasContent() {
 
 function updatePrompt() {
   renderTypeRecs();
+  renderPhases();
   $('modelTag').textContent = `\u2192 For ${MODEL_NAMES[state.model]}`;
   const om = $('openModel');
   if (om) { om.href = MODEL_URLS[state.model]; om.firstChild.textContent = `Copy the prompt, then open ${MODEL_NAMES[state.model]}`; }
@@ -4506,7 +4639,9 @@ function updatePrompt() {
 
 function buildPlainTextPrompt() {
   if (!hasContent()) return '';
-  let out = `# INTERACTIVE SIMULATION PROMPT \u2014 for ${MODEL_NAMES[state.model]}\n\n`;
+  const kind = isCollection() ? 'LAB COLLECTION PROMPT' : isSystem() ? 'FULL SYSTEM SIMULATOR PROMPT' : 'INTERACTIVE SIMULATION PROMPT';
+  const head = isPhased() ? `${kind} (PHASE 1 OF ${getPhases().length})` : kind;
+  let out = `# ${head} \u2014 for ${MODEL_NAMES[state.model]}\n\n`;
   promptBlocks().forEach(([label, body]) => {
     out += `## ${label.toUpperCase()}\n${body.replace(/^\u2022 /gm, '- ')}\n\n`;
   });
@@ -4853,6 +4988,239 @@ function copyText(txt, msg) {
 }
 
 /* ============================================================
+   Full system simulators: views, scale, and the phased build plan
+============================================================ */
+const VIEWS = [
+  { id: 'scene', phase: 2, name: 'Clickable live scene', spec: 'an animated, drawn scene of the whole system (inline SVG or canvas) driven by the live state; every major object is clickable and opens an inspector panel with its name or tag, its role, and its live values; toggles for name labels and live-value overlays; the consequences of the system state are visible in the scene itself' },
+  { id: 'stages', phase: 2, name: 'Stage navigation', spec: 'navigation between a whole-system overview and each stage or subsystem, each with its own controls and key readouts' },
+  { id: 'faceplates', phase: 3, name: 'Equipment controls', spec: 'operator-style controls (faceplates) for each major component: setpoints, start and stop, manual and automatic modes, and tuning parameters where relevant; every control writes to the model and its effect propagates through the system over simulated time' },
+  { id: 'loops', phase: 3, name: 'Cause-and-effect loops', spec: 'a live block diagram of the key cause-and-effect or control loops (measurement, decision, action), showing which loops are acting normally and which show a problem' },
+  { id: 'modes', phase: 3, name: 'Modes, interlocks & E-stop', spec: 'operating modes (Manual and Auto) with Start, Stop, Reset, and an emergency stop that drops outputs at once and latches until released and reset; safety interlocks that block unsafe actions in Auto and are bypassed in Manual (with visible consequences); and hold-to-jog controls that act only while held, by pointer or keyboard' },
+  { id: 'logic', phase: 3, name: 'Live logic view', spec: 'a live view of the logic that runs the system (for example ladder logic, a state machine, code, a clinical protocol, or decision rules) that highlights in real time which conditions are true and which outputs are active, so learners can read cause and effect directly' },
+  { id: 'recipes', phase: 3, name: 'Recipes & presets', spec: 'recipes or product presets that load a coherent set of setpoints at once, with quality checked against a separate specification so a wrong setpoint shows up as rejects, defects, or out-of-range results' },
+  { id: 'trends', phase: 3, name: 'Trend charts', spec: 'time-series trend charts of the key variables over the last simulated day (or another fitting window), grouped by subsystem and drawn without external libraries' },
+  { id: 'alarms', phase: 3, name: 'Alarms & event log', spec: 'alarms with priorities and an acknowledge workflow (unacknowledged alarms flash; cleared alarms stay listed until acknowledged), plus a timestamped event log of learner actions and system events' },
+  { id: 'data', phase: 3, name: 'Raw data table', spec: 'a live table of the underlying values (for example, a tag database, lab sheet, patient chart, or ledger) so learners can compare the raw data with what the main display shows' },
+  { id: 'kpi', phase: 3, name: 'Performance scoreboard', spec: 'a scoreboard of outcome measures scored against the real standards or limits, with a running percentage of time within limits' },
+  { id: 'events', phase: 4, name: 'Events & disturbances', spec: 'realistic natural variation (such as daily cycles or demand patterns) and buttons that trigger disturbances (such as a storm, a demand surge, a complication, or an outage)' },
+  { id: 'faults', phase: 4, name: 'Fault injection lab', spec: 'a lab where learners or instructors inject specific equipment, process, or human faults and then find them using the other views, with clear-all and restart controls' },
+  { id: 'mystery', phase: 4, name: 'Mystery fault challenge', spec: 'a challenge mode that injects a random hidden fault or event, lets the learner investigate at a faster clock speed, and checks a submitted diagnosis with feedback' },
+  { id: 'spoof', phase: 4, name: 'Display vs. truth', spec: 'faults or attacks that make the main display disagree with the underlying truth (a failed or drifting sensor, a stale value, or a spoofed screen), with a raw-data view learners can use to catch the discrepancy' },
+  { id: 'attacks', phase: 4, name: 'Cyber attacks & defenses', spec: 'scripted cyber attack scenarios against the system\u2019s control network with toggleable defenses and a restore-from-known-good-backup action, all simulated with no real network or exploit code' },
+  { id: 'explainer', phase: 4, name: 'How it works, with formulas', spec: 'a \u201CHow it works\u201D section that explains each stage or component with its governing formulas, typical ranges, and why they matter' },
+  { id: 'exercises', phase: 4, name: 'Guided exercises', spec: '6\u201310 guided exercises that tell the learner what to change, what to watch, and what to explain, progressing from observation to diagnosis' },
+  { id: 'glossary', phase: 4, name: 'Glossary flip cards', spec: 'a glossary of key terms as flip cards (operable by keyboard)' },
+  { id: 'quiz', phase: 4, name: 'Graded quiz', spec: 'a graded, resettable multiple-choice quiz with an explanation for each answer' }
+];
+state.scale = 'focused';
+state.views = new Set(['scene', 'stages', 'faceplates', 'modes', 'trends', 'alarms', 'kpi', 'events', 'faults', 'mystery', 'explainer', 'exercises', 'glossary', 'quiz']);
+const isSystem = () => state.scale === 'system';
+const isCollection = () => state.scale === 'collection';
+const isPhased = () => (isSystem() || isCollection()) && state.toggles.phased;
+const chosenViews = phase => VIEWS.filter(v => state.views.has(v.id) && (phase === undefined || v.phase === phase));
+
+const REPS = [
+  { id: 'readouts', name: 'Live readings panel', spec: 'a live readings panel of the key quantities with units' },
+  { id: 'graphs', name: 'Linked live graphs', spec: 'live graphs that plot the key quantities as the simulation runs (for example position, velocity, and acceleration against time), with the current moment marked and the theoretical curve shown faintly for comparison' },
+  { id: 'fbd', name: 'Free-body or vector diagram', spec: 'a live free-body, vector, or force diagram whose arrows change length and direction with the model' },
+  { id: 'trails', name: 'Motion trails or strobe', spec: 'motion trails or strobe images at equal time steps so learners can see patterns in spacing and direction' },
+  { id: 'ghost', name: 'Ghost of the prediction', spec: 'a faint ghost of the learner\u2019s prediction drawn beside the actual result' },
+  { id: 'compare', name: 'Side-by-side compare', spec: 'a side-by-side or overlay comparison of two settings or scenarios' },
+  { id: 'dualunits', name: 'Dual units', spec: 'everyday units beside SI or technical units where they help (for example km/h and mph beside m/s)' },
+  { id: 'audio', name: 'Sound of the model', spec: 'optional sound generated from the model (for example a tone at a string\u2019s frequency or a Geiger click rate), off by default with a visible toggle' }
+];
+state.reps = new Set(['readouts', 'graphs']);
+
+function renderRepChips() {
+  $('repChips').innerHTML = REPS.map(r => `<button type="button" class="chip${state.reps.has(r.id) ? ' selected' : ''}" data-rep="${r.id}" aria-pressed="${state.reps.has(r.id)}">${escapeHTML(r.name)}</button>`).join('');
+}
+function repsLine() {
+  const r = REPS.filter(x => state.reps.has(x.id));
+  return r.length ? 'Representations, kept in sync with the model and with each other: ' + r.map(x => x.spec).join('; ') + '.' : '';
+}
+
+const LEARN_PANEL = 'a learning panel beside the simulation with four parts: The big idea (2\u20134 plain sentences); Key equations or rules (3\u20135, with symbols defined); Try this (3\u20134 challenges that ask learners to predict, find, or explain something using the simulation); and Check yourself (one multiple-choice question with an explanation for the correct answer and for each wrong one)';
+
+function collectionModules() {
+  const typed = ($('modulesText') ? $('modulesText').value : '').split(/\n+/).map(x => x.trim()).filter(Boolean);
+  if (typed.length) return typed.map(line => { const k = line.indexOf(':'); return k > 0 ? { t: line.slice(0, k).trim(), c: [line.slice(k + 1).trim()] } : { t: line, c: [] }; });
+  const out = [];
+  selectedScope().forEach(sec => sec.topics.forEach(tp => out.push({ t: tp.t, c: tp.concepts.filter(x => x !== tp.t) })));
+  return out;
+}
+function moduleLine(m, i) { return `${i + 1}. ${m.t}${m.c.length ? ' \u2014 ' + m.c.join('; ') : ''}`; }
+function renderModulesPreview() {
+  const el = $('modulesPreview');
+  if (!el) return;
+  const ms = collectionModules();
+  if (!ms.length) el.textContent = 'No modules yet. Choose a lesson in \u00A7 01 and tick its topics, or list modules above.';
+  else el.textContent = `${ms.length} module${ms.length === 1 ? '' : 's'}: ${ms.map(m => m.t).join(', ')}.` + (ms.length > 12 ? ' That is a lot for one file; consider splitting it into two collections.' : '');
+}
+
+function renderViewChips() {
+  $('viewChips').innerHTML = VIEWS.map(v => `<button type="button" class="chip${state.views.has(v.id) ? ' selected' : ''}" data-view="${v.id}" aria-pressed="${state.views.has(v.id)}">${escapeHTML(v.name)}</button>`).join('');
+}
+
+function setScale(s, quiet) {
+  state.scale = s;
+  document.querySelectorAll('.scale-btn').forEach(b => {
+    const on = b.dataset.scale === s;
+    b.classList.toggle('selected', on); b.setAttribute('aria-checked', on);
+  });
+  $('viewsWrap').hidden = !isSystem();
+  $('collectionWrap').hidden = !isCollection();
+  $('phaseWrap').hidden = !isPhased();
+  if (isSystem() && !state.simType) { state.simType = 'twin'; renderTypeCards(); renderFitNote(); }
+  if (isCollection() && !state.simType) { state.simType = 'sandbox'; renderTypeCards(); renderFitNote(); }
+  if (s !== 'focused') $('duration').value = 'Multi-part activity (60+ minutes)';
+  if (isCollection()) renderModulesPreview();
+  if (!quiet) { updatePrompt(); showToast({ focused: 'Focused activity', system: 'Full system simulator: built in phases', collection: 'Lab collection: built in phases' }[s]); }
+}
+
+const SYSTEM_PHASES = [
+  { title: 'Model engine', desc: 'The running model, clock, and a plain readout, with built-in test cases.' },
+  { title: 'The scene', desc: 'The drawn, animated system and how learners move around it.' },
+  { title: 'Controls and views', desc: 'Equipment controls and the professional views of the live state.' },
+  { title: 'Scenarios and learning', desc: 'Disturbances, faults, challenges, and the learning layer.' },
+  { title: 'Polish and handoff', desc: 'Accessibility, mobile, performance, answer key, and the panel deliverables.' }
+];
+
+function polishContents(extra) {
+  const T = state.toggles;
+  return [
+    'a full accessibility pass against the requirements in the original prompt (keyboard operation, live-region announcements, text equivalents for the scene and charts, contrast, reduced motion)',
+    'a phone and tablet layout check, plus dark mode',
+    'performance: smooth animation at every speed, with the main loop paused while the tab is hidden',
+    ...(extra || []),
+    T.answerKey ? 'the instructor answer-key mode' : 'an instructor notes panel',
+    'a short instructor guide (how to open it, how to edit parameters, suggested classroom use)',
+    'the panel deliverables listed in the original prompt'
+  ];
+}
+
+function systemContents(i) {
+  const T = state.toggles;
+  if (i === 0) return [
+    'a single documented state object and a plain constants block for every model parameter (with units and sources noted in comments)',
+    'a step(dt) function that advances the model by a fixed time step using the governing equations, with sub-stepping at high clock speeds so the model stays stable',
+    'a simulation clock with pause and speed controls (for example 1\u00D7, 5\u00D7, 20\u00D7, 60\u00D7) and a clear statement of how much simulated time passes per real second',
+    'linked variables with realistic lags, so a change in one place reaches downstream values over simulated time',
+    'a simple numeric readout panel of the key variables (this will be replaced by the scene and views later)',
+    'a built-in model check: at least three test cases with hand-calculated expected values that run on load and show pass or fail in a small panel'
+  ];
+  if (i === 4) return polishContents();
+  const n = i + 1;
+  const v = chosenViews(n).map(x => x.spec);
+  if (n === 2) { const r = repsLine(); if (r) v.push(r.replace(/\.$/, '').replace(/^Representations/, 'representations')); }
+  if (n === 3 && !v.length) v.push('the controls and readouts learners need to operate the system');
+  if (n === 4) {
+    const extra = [];
+    if (T.scoring) extra.push('scoring tied to the outcome measures');
+    if (T.report) extra.push('a printable completion report');
+    if (T.debrief) extra.push('a debrief screen with key takeaways and reflection prompts');
+    if (extra.length) v.push(extra.join('; '));
+    if (!v.length) v.push('a short set of guided exercises and a debrief');
+  }
+  return v;
+}
+
+function collectionPhases() {
+  const ms = collectionModules();
+  const names = ms.length ? ms.map(m => m.t) : ['Module 1', 'Module 2', 'Module 3'];
+  const first = names.slice(0, 2), rest = names.slice(2);
+  const P = [{ title: 'Framework and first modules', desc: `The shared framework, navigation, and learning panel, plus ${first.join(' and ')}.`, contents: [
+    'a module registry in one clearly commented data structure; each module has an id, title, subtitle, one or two scenarios, an intro, key equations, try-this challenges, and a check-yourself question',
+    'a shared UI builder for sliders, segmented buttons, checkboxes, hold-to-act buttons, and a live readings panel, so every module looks and behaves the same and every control is keyboard-operable',
+    'shared drawing and graphing helpers, a common color palette, and consistent units and number formatting',
+    'one main animation loop that runs only the active module\u2019s step and draw functions, pauses while the tab is hidden, and fully tears down a module when the learner switches',
+    'unit navigation with the current module marked, and a scenario switcher for modules that have two scenarios',
+    LEARN_PANEL,
+    `the first ${first.length === 1 ? 'module' : 'two modules'}, complete and working: ${first.join('; ')}`
+  ] }];
+  const groups = Math.ceil(rest.length / 3), per = groups ? Math.ceil(rest.length / groups) : 0;
+  for (let i = 0; i < rest.length; i += per) {
+    const chunk = rest.slice(i, i + per);
+    P.push({ title: `Modules: ${chunk.join(', ')}`, desc: `${chunk.length} more module${chunk.length === 1 ? '' : 's'} on the same framework.`, contents: [
+      `${chunk.length === 1 ? 'this module, complete and' : 'these modules, each complete and'} built on the existing framework and learning panel template: ${chunk.join('; ')}`,
+      'the same control placement, colors, units, and panel structure as the existing modules; extend the shared helpers rather than writing one-off versions'
+    ] });
+  }
+  P.push({ title: 'Polish and handoff', desc: 'Consistency across modules, accessibility, mobile, and the panel deliverables.', contents: polishContents(['a consistency review across every module (control placement, colors, units, wording, and difficulty)']) });
+  return P;
+}
+
+function getPhases() {
+  if (isCollection()) return collectionPhases().map((p, i) => ({ n: i + 1, ...p }));
+  return SYSTEM_PHASES.map((p, i) => ({ n: i + 1, ...p, contents: systemContents(i) }));
+}
+const phaseContents = n => getPhases()[n - 1].contents;
+
+function buildPhasePlanBlock() {
+  const P = getPhases();
+  const what = isCollection() ? 'lab collection' : 'simulator';
+  const lines = [`This ${what} is too large to build well in one reply, so build it in ${P.length} phases. I will ask for each phase in turn.`, ''];
+  P.forEach(p => lines.push(`Phase ${p.n} \u2014 ${p.title}: ${p.contents.join('; ')}.`));
+  lines.push('', isCollection()
+    ? 'In this reply, build Phase 1 only, as complete, runnable code. Design the framework so later modules plug into the registry without changing the framework. Briefly explain the framework and how to add a module, then stop and wait for Phase 2.'
+    : 'In this reply, build Phase 1 only, as complete, runnable code. Design the state object so the later phases can attach to it without rewriting the model. Briefly list the variables, equations, and assumptions you used, show the model-check results, then stop and wait for Phase 2.');
+  return lines.join('\n');
+}
+
+function buildPhasePrompt(n) {
+  const P = getPhases(), p = P[n - 1], total = P.length;
+  const ret = $('phaseReturn').value;
+  const L = [`Continue building the ${isCollection() ? 'lab collection' : 'simulator'}. This is Phase ${n} of ${total}: ${p.title}.`, '', 'Add:'];
+  p.contents.forEach(x => L.push('- ' + x.charAt(0).toUpperCase() + x.slice(1) + '.'));
+  L.push('', 'Rules:');
+  L.push(isCollection() ? '- Keep every existing module and the framework working. Add new modules through the registry and shared helpers.' : '- Keep everything from earlier phases working. Do not simplify or replace the model to make room for new features.');
+  if (!isCollection()) L.push('- Every new control or view reads from and writes to the same state object.');
+  L.push('- Follow the design, accessibility, and safety requirements from the original prompt.');
+  L.push(ret === 'full' ? '- Return the complete updated file in one block, with no placeholders or skipped sections.' : '- Return only the new and changed code, each part with a clear note of exactly where it goes.');
+  if (state.model === 'claude') L.push('- Update the same artifact.');
+  if (state.model === 'chatgpt' || state.model === 'gemini') L.push('- Update the same Canvas.');
+  if (state.model === 'copilot') L.push('- Do not shorten any part of the code; I will save it as an .html file.');
+  L.push(n < total ? `- End with what you added and 3 quick things to test, then stop and wait for Phase ${n + 1}.` : '- End with a final test checklist covering every module, view, and control.');
+  return L.join('\n') + '\n';
+}
+
+function renderPhases() {
+  $('phaseWrap').hidden = !isPhased();
+  if (isCollection()) renderModulesPreview();
+  if (!isPhased()) return;
+  $('phaseList').innerHTML = getPhases().map(p => p.n === 1
+    ? `<div class="phase"><div class="phase-head"><span class="phase-title">Phase 1: ${escapeHTML(p.title)}</span></div><p class="phase-desc">${escapeHTML(p.desc)} This is the main prompt on the right; copy it from there.</p></div>`
+    : `<div class="phase"><div class="phase-head"><span class="phase-title">Phase ${p.n}: ${escapeHTML(p.title)}</span><button type="button" class="mini-btn primary" data-phase="${p.n}">Copy Phase ${p.n} prompt</button></div><p class="phase-desc">${escapeHTML(p.desc)}</p><textarea class="mono" rows="6" readonly aria-label="Phase ${p.n} prompt">${escapeHTML(buildPhasePrompt(p.n))}</textarea></div>`
+  ).join('');
+}
+
+function wireSystem() {
+  renderViewChips();
+  document.querySelectorAll('.scale-btn').forEach(b => b.addEventListener('click', () => setScale(b.dataset.scale)));
+  $('viewChips').addEventListener('click', e => {
+    const b = e.target.closest('[data-view]');
+    if (!b) return;
+    const id = b.dataset.view;
+    state.views.has(id) ? state.views.delete(id) : state.views.add(id);
+    renderViewChips(); updatePrompt();
+  });
+  $('phaseReturn').addEventListener('change', renderPhases);
+  renderRepChips();
+  $('repChips').addEventListener('click', e => {
+    const b = e.target.closest('[data-rep]');
+    if (!b) return;
+    const id = b.dataset.rep;
+    state.reps.has(id) ? state.reps.delete(id) : state.reps.add(id);
+    renderRepChips(); updatePrompt();
+  });
+  $('modulesText').addEventListener('input', () => { renderModulesPreview(); updatePrompt(); });
+  $('phaseList').addEventListener('click', e => {
+    const b = e.target.closest('[data-phase]');
+    if (b) copyText(buildPhasePrompt(+b.dataset.phase), `Phase ${b.dataset.phase} prompt copied. Paste it into the same chat.`);
+  });
+}
+
+
+/* ============================================================
    Test & Revise: revision prompt for a second round
 ============================================================ */
 const FIX_GROUPS = [
@@ -5139,6 +5507,12 @@ const PRESETS = {
   case: { row: 'start', label: 'Case Study', simType: 'case',
     set: { duration: '45–60 minutes', feedback: 'On check / submit — per task', hints: 'Progressive tiered hints (nudge → clue → answer)', layout: 'Tabbed — Briefing / Activity / Debrief', aesthetic: 'Modern dashboard (cards, gauges, live data)' },
     toggles: { predict: false, debrief: true, report: true, timer: false }, personasAdd: ['narrative'] },
+  twin: { row: 'start', label: 'Full System', simType: 'twin', scale: 'system',
+    set: { duration: 'Multi-part activity (60+ minutes)', feedback: 'Immediate — after every action', hints: 'Progressive tiered hints (nudge → clue → answer)', layout: 'Full-screen simulation with collapsible task drawer', aesthetic: 'Modern dashboard (cards, gauges, live data)', animation: 'Rich — continuous motion and live effects', modelBasis: 'equation', fidelity: 'High-fidelity — close replica of real equipment or tools' },
+    toggles: { predict: false, timer: false, walkthrough: false, report: false, debrief: true, assumptions: true }, personasAdd: ['modeler', 'industry', 'qa'] },
+  collection: { row: 'start', label: 'Lab Collection', simType: 'sandbox', scale: 'collection',
+    set: { duration: 'Multi-part activity (60+ minutes)', feedback: 'Immediate — after every action', hints: 'Progressive tiered hints (nudge → clue → answer)', layout: 'Split view — instructions left, simulation right', aesthetic: 'Clean lab notebook (light, calm, readable)', animation: 'Rich — continuous motion and live effects', modelBasis: 'auto' },
+    toggles: { predict: true, learnPanel: true, everyday: true, timer: false, walkthrough: false, scoring: false, report: false }, personasAdd: ['modeler', 'learnsci'] },
   game: { row: 'start', label: 'Game Review', simType: 'challenge',
     set: { aesthetic: 'Gamified arcade (levels, XP bars, bold color)', difficulty: 'Adaptive — difficulty rises with success', feedback: 'Immediate — after every action', animation: 'Moderate — animate cause and effect' },
     toggles: { badges: true, scoring: true, randomize: true, progress: true, timer: false }, personasAdd: ['game'] },
@@ -5165,6 +5539,7 @@ function applyPreset(name) {
   if (!p) return;
   Object.entries(p.set || {}).forEach(([k, v]) => { state[k] = v; if ($(k)) $(k).value = v; });
   Object.assign(state.toggles, p.toggles || {});
+  if (p.row === 'start') setScale(p.scale || 'focused', true);
   if (p.simType) { state.simType = p.simType; renderTypeCards(); renderFitNote(); }
   /* Swap out personas the previous chip in the same row added; keep any the user chose. */
   state.presetPersonas[p.row].forEach(id => state.personas.delete(id));
@@ -5211,6 +5586,7 @@ function showToast(msg) {
   wireBring();
   wireLessonPanel();
   wireFix();
+  wireSystem();
   updatePrompt();
 })();
 </script>
