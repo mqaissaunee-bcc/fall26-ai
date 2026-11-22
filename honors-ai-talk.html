@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Honors in Action AI Talk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: one slide at a time between a slim control bar and a slim pager;
+   tool slides are card grids where each card links out and can be starred. */
+:root{
+  --paper:#f2f5f8;
+  --panel:#ffffff;
+  --ink:#14213d;
+  --muted:#55627a;
+  --line:#d3dbe5;
+  --accent:#d9501a;
+  --accent-ink:#ffffff;
+  --teal:#0d7377;
+  --pick:#fff1e6;
+  --display:"Bricolage Grotesque","Trebuchet MS",Verdana,sans-serif;
+  --body:"IBM Plex Sans","Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",Consolas,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0f1626;--panel:#18223a;--ink:#e9eef7;--muted:#a3b0c7;--line:#2c3a59;
+    --accent:#ff8a4c;--accent-ink:#1a0f06;--teal:#55c9c4;--pick:#3a2616;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0f1626;--panel:#18223a;--ink:#e9eef7;--muted:#a3b0c7;--line:#2c3a59;
+  --accent:#ff8a4c;--accent-ink:#1a0f06;--teal:#55c9c4;--pick:#3a2616;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;display:flex;flex-direction:column}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:var(--teal)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel)}
+.bar .name{font-family:var(--display);font-weight:700;margin-right:auto}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 12px;font-size:14px;font-weight:500}
+.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.count{font-family:var(--mono);font-size:13px;color:var(--muted)}
+
+main{flex:1;min-height:0;overflow-y:auto;padding:28px 16px 40px}
+.slide{display:none;max-width:1100px;margin:0 auto}
+.slide.on{display:block}
+.eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+h1,h2{font-family:var(--display);font-weight:700;line-height:1.1;text-wrap:balance;margin:0 0 16px}
+h1{font-size:clamp(34px,6vw,64px)}
+h2{font-size:clamp(26px,4vw,42px)}
+.lede{font-size:clamp(18px,2.2vw,22px);color:var(--muted);max-width:60ch;margin:0 0 24px}
+.byline{font-weight:600;margin:24px 0 0}
+.byline span{display:block;font-weight:400;color:var(--muted)}
+
+.agenda{list-style:none;margin:0;padding:0;display:grid;gap:10px;max-width:760px}
+.agenda li{display:grid;grid-template-columns:64px 1fr;gap:14px;align-items:baseline;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+.agenda .min{font-family:var(--mono);color:var(--accent);font-variant-numeric:tabular-nums}
+.agenda strong{display:block}
+.agenda span.note{color:var(--muted);font-size:15px}
+
+.big{list-style:none;margin:0;padding:0;display:grid;gap:14px;max-width:820px}
+.big li{background:var(--panel);border-left:5px solid var(--teal);border-radius:0 10px 10px 0;padding:14px 18px;font-size:clamp(18px,2.2vw,23px)}
+.big li small{display:block;color:var(--muted);font-size:15px;margin-top:4px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.card.picked{background:var(--pick);border-color:var(--accent)}
+.card h3{font-family:var(--body);font-size:17px;font-weight:600;line-height:1.25;margin:0}
+.card h3 a{text-decoration-thickness:1px;text-underline-offset:3px}
+.card p{margin:0;font-size:14.5px;color:var(--muted);flex:1}
+.card .row{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.tag{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);border:1px dashed var(--accent);border-radius:6px;padding:2px 6px}
+.src{font-size:12.5px;color:var(--muted)}
+.pickbtn{border:1px solid var(--line);background:transparent;border-radius:999px;padding:4px 12px;font-size:13.5px;font-weight:500}
+.pickbtn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.empty{color:var(--muted);font-style:italic;display:none}
+body.only .card:not(.picked){display:none}
+body.only .slide.noPicks .empty{display:block}
+
+.scen{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.scen button{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;font-size:18px;font-weight:500;line-height:1.3}
+.scen button span{display:none;margin-top:10px;font-size:15px;font-weight:400;color:var(--muted)}
+.scen button[aria-expanded="true"]{border-color:var(--teal)}
+.scen button[aria-expanded="true"] span{display:block}
+.hint{color:var(--muted);font-size:15px;margin:14px 0 0}
+
+.pager{display:flex;align-items:center;gap:12px;padding:10px 16px;border-top:1px solid var(--line);background:var(--panel)}
+.pager .where{flex:1;text-align:center;font-family:var(--mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.pager .btn{padding:8px 18px;font-size:15px}
+.pager .btn:disabled{opacity:.4;cursor:default}
+
+.sheet{position:fixed;inset:0;background:rgba(10,15,30,.55);display:none;align-items:center;justify-content:center;padding:16px}
+.sheet.on{display:flex}
+.sheet .box{background:var(--panel);color:var(--ink);border-radius:12px;padding:20px;width:min(640px,100%);max-height:90%;display:flex;flex-direction:column;gap:12px}
+.sheet h2{font-size:24px;margin:0}
+.sheet textarea{width:100%;min-height:240px;font-family:var(--mono);font-size:13px;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px;resize:vertical}
+.sheet .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+@media (max-width:480px){body{font-size:16px}main{padding:20px 16px 32px}.agenda li{grid-template-columns:52px 1fr}}
+@media (prefers-reduced-motion:no-preference){.slide.on{animation:in .18s ease-out}@keyframes in{from{transform:translateY(6px)}to{transform:none}}}
+</style>
+</head>
+<body>
+<header class="bar">
+  <span class="name">AI Talk for Honors in Action</span>
+  <span class="count" id="pickCount">0 picked</span>
+  <button class="btn" id="onlyBtn" aria-pressed="false">Show my picks only</button>
+  <button class="btn" id="listBtn">List my picks</button>
+  <button class="btn" id="fsBtn">Full screen</button>
+</header>
+
+<main id="main" tabindex="-1">
+
+<section class="slide" data-title="Title">
+  <p class="eyebrow">Honors in Action · What's Next? Imagining the Future</p>
+  <h1>Building AI tools for learning</h1>
+  <p class="lede">What happens when a professor starts solving classroom problems with AI, and what that means for how you learn.</p>
+  <p class="byline">Michael Qaissaunee<span>Professor of Engineering &amp; Technology, Brookdale Community College</span></p>
+</section>
+
+<section class="slide" data-title="Plan">
+  <p class="eyebrow">90 minutes</p>
+  <h2>How we'll spend the time</h2>
+  <ol class="agenda">
+    <li><span class="min">10 min</span><div><strong>Quick poll</strong><span class="note">How are you using AI right now?</span></div></li>
+    <li><span class="min">10 min</span><div><strong>Why I build</strong><span class="note">The problem that started it</span></div></li>
+    <li><span class="min">25 min</span><div><strong>Tour and demo</strong><span class="note">Tools across majors, from two colleges</span></div></li>
+    <li><span class="min">15 min</span><div><strong>Build one live</strong><span class="note">Your problem, your major</span></div></li>
+    <li><span class="min">15 min</span><div><strong>Helps or replaces?</strong><span class="note">Using AI responsibly</span></div></li>
+    <li><span class="min">15 min</span><div><strong>What's next, and your questions</strong></div></li>
+  </ol>
+</section>
+
+<section class="slide" data-title="Poll">
+  <p class="eyebrow">Hands up</p>
+  <h2>Where are you with AI today?</h2>
+  <ul class="big">
+    <li>Who used an AI tool this week?<small>For class, work, or anything else</small></li>
+    <li>Who has used one to study for an exam?</li>
+    <li>Who has felt unsure whether a use was allowed?</li>
+    <li>Who has had an AI give a confident wrong answer?</li>
+  </ul>
+</section>
+
+<section class="slide" data-title="Why I build">
+  <p class="eyebrow">Origin</p>
+  <h2>Why I started building</h2>
+  <ul class="big">
+    <li>Start with a real problem<small>Something a student, tutor or colleague keeps running into</small></li>
+    <li>Describe it to an AI in plain language<small>What it should do, who uses it, what good looks like</small></li>
+    <li>Test it, fix it, share it<small>Each tool is a web page anyone can open</small></li>
+  </ul>
+</section>
+
+<div id="toolSlides"></div>
+
+<section class="slide" data-title="Build live">
+  <p class="eyebrow">Your turn</p>
+  <h2>Let's build one right now</h2>
+  <ul class="big">
+    <li>What's your major?</li>
+    <li>What's one thing in it that is hard to learn, practice, or keep track of?</li>
+    <li>Who would use a tool for that, and what would it show them?</li>
+  </ul>
+  <p class="hint">We'll turn one answer into a working page before this section ends.</p>
+</section>
+
+<section class="slide" data-title="Helps or replaces">
+  <p class="eyebrow">Responsible use</p>
+  <h2>Does it help you learn, or replace the learning?</h2>
+  <div class="scen" id="scen"></div>
+  <p class="hint">Vote by hand, then select a card for the follow-up question.</p>
+</section>
+
+<section class="slide" data-title="What's next">
+  <p class="eyebrow">Imagining the future</p>
+  <h2>What's next in higher education</h2>
+  <ul class="big">
+    <li>A course assistant that knows your course<small>Answers from the course materials, at any hour</small></li>
+    <li>Tools made for one class, by the person teaching it</li>
+    <li>Assignments that ask what you can do with AI, not despite it</li>
+    <li>Knowing when not to use it becomes a skill employers ask for</li>
+  </ul>
+</section>
+
+<section class="slide" data-title="Questions">
+  <p class="eyebrow">Thank you</p>
+  <h2>Your questions</h2>
+  <p class="lede">Every tool from today, and many more, is free to open and use.</p>
+  <p style="font-size:clamp(18px,2.4vw,26px);font-weight:600;overflow-wrap:anywhere"><a href="https://mqaissaunee-bcc.github.io/AI_Examples/" target="_blank" rel="noopener">mqaissaunee-bcc.github.io/AI_Examples</a></p>
+  <p style="font-size:clamp(18px,2.4vw,26px);font-weight:600;overflow-wrap:anywhere"><a href="https://sands-mvcc.github.io/MVCC/" target="_blank" rel="noopener">sands-mvcc.github.io/MVCC</a><span style="display:block;font-size:15px;font-weight:400;color:var(--muted)">John Sands, Moraine Valley Community College</span></p>
+</section>
+
+</main>
+
+<nav class="pager" aria-label="Slides">
+  <button class="btn" id="prev">Back</button>
+  <span class="where" id="where"></span>
+  <button class="btn" id="next">Next</button>
+</nav>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetH">
+  <div class="box">
+    <h2 id="sheetH">My picks</h2>
+    <label for="pickText" class="count">Title and link for each tool you starred</label>
+    <textarea id="pickText" readonly></textarea>
+    <div class="row">
+      <button class="btn" id="copyBtn">Copy list</button>
+      <button class="btn" id="clearBtn">Clear all picks</button>
+      <button class="btn" id="closeBtn">Close</button>
+      <span class="count" id="copyMsg" role="status"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+var B="https://mqaissaunee-bcc.github.io/AI_Examples/", J="https://sands-mvcc.github.io/MVCC/";
+var GROUPS=[
+ {id:"students",name:"Made for students",blurb:"Study, practice and planning tools for any major.",tools:[
+  ["The Rehearsal Room","Record a practice speech and get feedback on pace, fillers and pauses. Recordings stay on your device.",B+"speech-rehearsal-studio.html"],
+  ["Brookdale Pathway Planners","Pick careers, build your semester-by-semester plan and plan your transfer. Planners for Business Administration, Psychology, Engineering and Paralegal Studies.","https://mqaissaunee-bcc.github.io/ai_projects/pathway_planner/"],
+  ["Study Smarter with Gemini Notebook","Turn your own notes, slides and readings into flashcards, practice quizzes and audio overviews, and study with them the right way.","https://mqaissaunee-bcc.github.io/fall26-ai/gemini-notebook-student-study-guide.html"],
+  ["Career exploration","Explore career paths.",J+"CareerExploration.html",1],
+  ["Career planner","Career planning tool.",J+"careerplanner.html",1],
+  ["COSTAR method","Structure your answers to interview questions.",J+"costar.html",1],
+  ["Student AI resources","Links and guides for students using AI.","https://sands-mvcc.github.io/AI/chatgtpstudents.html#links",1],
+  ["Presentation Openers","Ways to start a talk.",B+"presentation-opener-explorer.html"],
+  ["Note Taking Tutorials","Note-taking methods compared.",B+"note_taking.html"],
+  ["Time Management Strategies","Approaches to managing your week.",B+"time_management.html"],
+  ["3-3-3 Daily Productivity Method","A simple daily planning method.",B+"three-three-three-app.html"],
+  ["Pomodoro Timer","Focus timer for study sessions.",B+"pomodoro_timer.html"],
+  ["Techniques for Building Confidence","Confidence-building techniques.","https://mqaissaunee-bcc.github.io/personal/confidence_builder_v2.html"],
+  ["Credit Internship Process","How credit internships work at Brookdale.",B+"brookdale-credit-internship-process.html"]
+ ]},
+ {id:"writing",name:"Writing, speech and literature",blurb:"English, communication and the humanities.",tools:[
+  ["Hamlet study","Interactive study of Shakespeare's Hamlet.",J+"hamlet.html",1],
+  ["Hamlet chronology","Character relationships across the play.",J+"hamletchrono.html",1],
+  ["Academic writing","Write with clarity, precision and authority.",J+"academic_writing.html",1],
+  ["Common writing mistakes","Interactive lesson.",J+"commonwritingmistakes.html",1],
+  ["Descriptive writing","Interactive lesson.",J+"descriptive.html",1],
+  ["Sentence anatomy","Take a sentence apart, piece by piece.",J+"sentenceanatomy.html",1],
+  ["Sentence diagram","Interactive sentence diagrammer.",J+"sentencediagram.html",1],
+  ["Professional writing fundamentals","Writing for the workplace.",J+"composition.html",1],
+  ["Fundamentals of Speech","Interactive lesson.",J+"speech.html",1],
+  ["GPS for Speech Writing","A route-planner approach to writing a speech.",J+"gps-speech.html",1],
+  ["AI in Speech Communication","AI in speech communication courses.",B+"ai_in_speech_guide.html"],
+  ["Reading Countdown to Zero Day","Interactive module built around a book.",B+"lesson-interactive-book-engagement.html"]
+ ]},
+ {id:"health",name:"Health sciences and biology",blurb:"Nursing, anatomy and genetics.",tools:[
+  ["Nursing 101","Clinical reasoning lab.",J+"nurse101.html",1],
+  ["Nursing Concepts","Bedside lab.",J+"nursing-concepts.html",1],
+  ["Phlebotomy problem-solving","Phlebotomy lesson.",J+"phlebotomy.html",1],
+  ["Stroke study guide","Interactive stroke study guide.",J+"stroke.html",1],
+  ["Anatomy: Cardiovascular System","Interactive activity.",J+"anatomy-cardiovascular.html",1],
+  ["Anatomy: Nervous System","Interactive activity.",J+"anatomy-nervous.html",1],
+  ["Anatomy: Skeletal System","Interactive activity.",J+"anatomy-skeletal.html",1],
+  ["Anatomy: Muscular System","Interactive activity.",J+"anatomy-muscular.html",1],
+  ["Punnett square","Genetics calculator.",J+"punnett.html",1],
+  ["Genetics","Genetics fundamentals.",J+"genetics.html",1]
+ ]},
+ {id:"history",name:"History, philosophy and art",blurb:"Timelines and big ideas.",tools:[
+  ["Greek and Roman History","History of Western Civilization.",J+"greco-roman.html",1],
+  ["Renaissance and Reform","History of Western Civilization.",J+"renaissance.html",1],
+  ["The Age of Revolutions","History of Western Civilization.",J+"revolution.html",1],
+  ["US history timeline","Interactive timeline.",J+"timeline.html",1],
+  ["Great philosophers through history","Philosophy.",J+"philosophers.html",1],
+  ["When Is It Art?","Interactive timeline on what counts as art.",B+"lesson-interactive-timeline.html"],
+  ["Khans: The World Conquerors","Timeline of the Khans.",B+"genghis_khan_timeline.html"],
+  ["History of Communication Timeline","Interactive timeline of communication.",B+"communication-history-timeline.html"],
+  ["History of Radio Timeline","Radio history timeline.",B+"radio_history_timeline.html"],
+  ["The Secret History of the Pencil","Pencil history timeline.",B+"pencil-timeline.html"],
+  ["Suminagashi: Floating Ink","Interactive floating-ink art.",B+"suminagashi.html"]
+ ]},
+ {id:"business",name:"Business and economics",blurb:"Finance, accounting and markets.",tools:[
+  ["Bloomberg Terminal Simulator","Practice on a simulated finance terminal.",B+"bloomberg-terminal-enhanced.html"],
+  ["Bloomberg Market Concepts Prep Course","Prep for Bloomberg Market Concepts.",B+"bloomberg_bmc_prep_v4.html"],
+  ["Business Economics Interactive","Interactive business economics.",B+"business-economics-interactive.html"],
+  ["Business Economics Flashcards","Economics flashcards.",B+"economics-flashcards.html"],
+  ["Circular flow of income","Economics: how income flows.",J+"flow-of-income.html",1],
+  ["GAAP","Generally accepted accounting principles.",J+"gaap.html",1],
+  ["AI Finance Risk Lesson","AI and finance risk.",B+"AI-finance-risk-lesson.html"],
+  ["Retail AI Game","A game about AI in retail.",B+"retail_AI_game.html"],
+  ["Automated Warehouse Animation","Watch an automated warehouse at work.",B+"symbot_alphabot.html"],
+  ["Process Improvement Frameworks","Process improvement frameworks.",B+"process_improvement.html"]
+ ]},
+ {id:"science",name:"Science",blurb:"Chemistry, physics, earth science and astronomy.",tools:[
+  ["Interactive Periodic Table","Chemistry.",J+"periodic.html",1],
+  ["Chemistry 101 Lesson","Atomic structure and periodicity.",J+"chem101-lesson.html",1],
+  ["Major Concepts of Physics","Physics.",J+"physics.html",1],
+  ["Six Simple Machines","Simple machine simulator.",J+"machines.html",1],
+  ["Earth as an Interconnected System","Earth sciences.",J+"earth.html",1],
+  ["Ocean Systems","Earth sciences.",J+"ocean.html",1],
+  ["Inside Earth","Earth sciences: tectonic plates.",J+"techtronic.html",1],
+  ["PHYS 106 Astronomy","Open online textbook chapters for astronomy.","https://mqaissaunee-bcc.github.io/phys106/"]
+ ]},
+ {id:"games",name:"Games",blurb:"Learning by playing.",tools:[
+  ["Hangman","Word guessing game.",J+"hangman.html",1],
+  ["Pictionary","Picture game.",J+"pictionary.html",1],
+  ["Noun detective","Noun identification game.",J+"noundetective.html",1],
+  ["Equine game","Horse-related educational game.",J+"equinegame.html",1],
+  ["Cyber board game","Cybersecurity board game.",J+"boardgame.html",1],
+  ["Attack game","Cybersecurity attack simulator.",J+"attackgame.html",1],
+  ["Python Learning Game","Learn Python by playing.",B+"pythonquest.html"],
+  ["Regex CTF","Capture-the-flag game for regular expressions.",B+"regex_ctf.html"]
+ ]},
+ {id:"ai",name:"Understanding AI",blurb:"How it works, and what it means for careers.",tools:[
+  ["How LLMs Learn","Interactive explainer on how language models are trained.",B+"How_LLMs_Learn_Interactive.html"],
+  ["How AI Generates Images","Interactive explainer on image generation.",B+"How_AI_Generates_Images_Interactive.html"],
+  ["LLM Tokenization Lesson","See how text is split into tokens.",B+"llm_tokenization_lesson.html"],
+  ["AI Myths and Misconceptions","24 common AI myths set against the evidence, with discussion questions.",B+"ai_myths_workshop_edition.html"],
+  ["The Turing Test and Eliza","The Turing test and the Eliza chatbot.",B+"turing-test.html"],
+  ["A Brief History of AI","How we got here.",B+"AI_history.html"],
+  ["AI prompting guide","Interactive study guide.",J+"better.html",1],
+  ["AI assessment scale (AIAS)","Levels of permitted AI use in assessment.",J+"AIAS.html",1],
+  ["AI detection: burstiness and perplexity","Interactive guide.",J+"burst.html",1],
+  ["Ethics and AI","Study guide.",J+"ethics.html",1],
+  ["AI Ethics","Lesson on AI ethics.",B+"AI_ethics.html"],
+  ["Everything Is a Remix and AI","Remix culture and AI ethics.",B+"everything-is-a-remix-ai-ethics.html"],
+  ["AI Impact on Career Paths","Dashboard on how AI affects careers.",B+"ai-job-impact-dashboard.html"],
+  ["AI Impact on Occupations","Explore research data by occupation.",B+"ai_occupation_explorer_2025.html"],
+  ["AI Safety: Protecting Sensitive Information","Course on protecting sensitive information when using AI.",B+"AI_Safety_Course_Enhanced.html"]
+ ]},
+ {id:"math",name:"Math and engineering",blurb:"Math you can see and move.",tools:[
+  ["Quantitative Exam Builder","Builds show-your-work exams, homework and in-class examples with verified answers.",B+"exam-builder.html"],
+  ["Descriptive statistics","Statistics miner.",J+"statistics.html",1],
+  ["Distribution and probability","Statistics and probability.",J+"distprob.html",1],
+  ["Coordinate plotting activity","Plotting x-y coordinates.",J+"plotting.html",1],
+  ["Interactive Trigonometry Review","Trigonometry review.",B+"Trig_Lesson_Enhanced.html"],
+  ["Calculus Fundamentals","Calculus basics.",B+"calculus_fundamentals.html"],
+  ["Linear Algebra Interactive","Interactive linear algebra.",B+"linear_algebra_interactive.html"],
+  ["Math in Everyday Life","Everyday math applications.",B+"math-everyday-life.html"],
+  ["Virtual Slide Rule","A slide rule in the browser.",B+"virtual-slide-rule.html"],
+  ["Rock Crushing Mechanism","Four-bar linkage mechanism.",B+"4-bar_linkage_crushing_mechanism.html"]
+ ]},
+ {id:"tech",name:"Technology and security",blurb:"Real attacks, simulated systems.",tools:[
+  ["WannaCry ransomware attack","Explore how the outbreak spread.",J+"wannacry.html",1],
+  ["Colonial Pipeline case study","Ransomware attack on a fuel pipeline.",J+"pipeline.html",1],
+  ["Wastewater Treatment Plant Simulator","Run a treatment plant, change flow and storms, then diagnose faults and cyber attacks.",J+"wastewater.html",1],
+  ["Bottle Filling and Capping Simulator","Run a bottling line from the operator screen, inspect the controller logic, and defend it against injected attacks.","https://sands-mvcc.github.io/ot/ics.html",1],
+  ["Vehicle Network Lab","See how a car's networks and modules talk to each other, then diagnose faults and decode messages.",J+"vehicle.html",1],
+  ["Simulated SOC","Simulated security operations center.","https://mqaissaunee-bcc.github.io/SOC/"],
+  ["The Canvas Breach of 2026","Case study of the Canvas breach.",B+"canvas-breach-2026.html"],
+  ["Safe and Secure Online Shopping","Guide to safe online shopping.",B+"secure_shopping_guide.html"],
+  ["Security+ Interactive Textbook","Open online textbook for Security+.","https://mqaissaunee-bcc.github.io/sec_plus/"],
+  ["Wire Decoder","Step through 21 network and security protocols one packet at a time, and compare what an eavesdropper sees with what the endpoint decrypts.",B+"security-protocol-explorer.html"]
+ ]},
+ {id:"faculty",name:"For faculty and tutors",blurb:"Tools that help the people who teach.",tools:[
+  ["Course Assistant Walkthrough","Step-by-step guide to adding an Ask the assistant button to course pages.",B+"course-assistant-walkthrough.html"],
+  ["Chatbot Builder","Guided form that writes the system prompt for a custom chatbot.",B+"chatbot_builder.html"],
+  ["Prompt Architect, Faculty Edition","Builds structured prompts for teaching, course design and feedback.",B+"prompt_architect.html"],
+  ["AI Resistance Studio","Design assignments that hold up in an AI-assisted world.",B+"ai_resistance_studio.html"],
+  ["AI Use Policy Builder","Generates AI use policies for a syllabus, course or department.",B+"ai_policy_builder.html"],
+  ["Rubric generator","Build assessment rubrics.",J+"rubric.html",1],
+  ["ADA Accessibility Repair Studio","Accessibility repair tool.",J+"ada-tool.html",1],
+  ["Interactive Module Prompt Builder","One prompt that generates an accessible learning module.",B+"module_prompt_builder.html"],
+  ["Case Study Prompt Builder","Interactive case studies across six genres and 40 templates.",B+"case_study_builder.html"],
+  ["QTI Prompt Generator","Turns course files into quiz banks for Canvas or Moodle.",B+"qti-prompt-generator.html"],
+  ["Whiteboard Infographic Studio","Design whiteboard-style infographics in the browser.",B+"whiteboard-infographic-studio.html"],
+  ["Pathway Pack Builder","Faculty build a semester-by-semester pathway planner for their program: AI drafts it from the catalog page, you check it, then post it for students.","https://mqaissaunee-bcc.github.io/ai_projects/pathway_planner/pathway-pack-builder.html"],
+  ["Graphics Prompt Studio","Builds prompts for instructional graphics in any discipline.","https://mqaissaunee-bcc.github.io/fall26-ai/graphics-prompt-studio.html"]
+ ]},
+ {id:"college",name:"Running the college",blurb:"AI-built tools for the work behind the scenes.",tools:[
+  ["The Enrollment Dashboard","Brookdale enrollment by discipline, with fill rates, waitlists and trends.",B+"enrollment_dashboard.html"],
+  ["Schedule Development Tool","Plan a semester schedule in a weekly grid with conflict checks.",B+"schedule_tool.html"],
+  ["Faculty Schedule Builder","Turns the published course schedule into the faculty teaching and office hours form.","https://mqaissaunee-bcc.github.io/ai_projects/faculty-schedule/"],
+  ["Workforce Prompt Builder","Prompts for course demand checks and program feasibility studies.",B+"prompt_builder.html"],
+  ["NSF FY 2027 Budget Explorer","The FY 2027 NSF budget request against what Congress enacted for FY 2026.",B+"nsf_budget_fy27.html"]
+ ]}
+];
+/* Tools hidden from this published version. Delete a title here to show it again. */
+var HIDE={
+ "students": [
+  "Career exploration",
+  "Career planner",
+  "COSTAR method",
+  "Credit Internship Process"
+ ],
+ "writing": [
+  "Hamlet chronology",
+  "Common writing mistakes",
+  "Descriptive writing",
+  "Sentence diagram",
+  "Professional writing fundamentals",
+  "Fundamentals of Speech",
+  "AI in Speech Communication",
+  "Reading Countdown to Zero Day"
+ ],
+ "health": [
+  "Nursing Concepts",
+  "Phlebotomy problem-solving",
+  "Anatomy: Nervous System",
+  "Anatomy: Skeletal System",
+  "Anatomy: Muscular System",
+  "Genetics"
+ ],
+ "history": [
+  "Renaissance and Reform",
+  "The Age of Revolutions"
+ ],
+ "business": [
+  "Bloomberg Market Concepts Prep Course",
+  "Business Economics Flashcards",
+  "GAAP",
+  "AI Finance Risk Lesson",
+  "Process Improvement Frameworks"
+ ],
+ "science": [
+  "Chemistry 101 Lesson",
+  "Major Concepts of Physics",
+  "Earth as an Interconnected System",
+  "Ocean Systems"
+ ],
+ "games": [
+  "Hangman",
+  "Equine game",
+  "Attack game",
+  "Regex CTF"
+ ],
+ "ai": [
+  "AI assessment scale (AIAS)",
+  "AI detection: burstiness and perplexity",
+  "Ethics and AI",
+  "AI Impact on Career Paths"
+ ],
+ "math": [
+  "Quantitative Exam Builder",
+  "Distribution and probability",
+  "Coordinate plotting activity",
+  "Linear Algebra Interactive"
+ ],
+ "tech": [
+  "Colonial Pipeline case study",
+  "Simulated SOC",
+  "Security+ Interactive Textbook"
+ ]
+};
+var HIDE_ALL={college:1}, KEEP_ONLY={faculty:["Chatbot Builder","Graphics Prompt Studio"]};
+GROUPS.forEach(function(g){g.tools=g.tools.filter(function(t){if(HIDE_ALL[g.id])return false;if(KEEP_ONLY[g.id])return KEEP_ONLY[g.id].indexOf(t[0])>=0;return !(HIDE[g.id]&&HIDE[g.id].indexOf(t[0])>=0)})});
+GROUPS=GROUPS.filter(function(g){return g.tools.length});
+var SCEN=[
+ ["AI writes my essay and I submit it","What did you practice? What would you do in the next course without it?"],
+ ["AI quizzes me the night before an exam","How do you know its questions match what your professor emphasized?"],
+ ["AI explains the one step I'm stuck on","What's the difference between this and asking a tutor?"],
+ ["AI summarizes the reading so I can skip it","What do you lose that the summary can't carry?"],
+ ["AI checks my finished work for errors","Do you fix the errors yourself, or accept its rewrite?"],
+ ["AI drafts, I rewrite in my own words","Whose ideas are in the final version? Does your syllabus allow it?"]
+];
+
+var KEY="hia-talk-picks", picks={};
+try{picks=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){picks={}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(picks))}catch(e){}}
+function el(tag,cls,text){var n=document.createElement(tag);if(cls)n.className=cls;if(text!=null)n.textContent=text;return n}
+
+var host=document.getElementById("toolSlides"), frag=document.createDocumentFragment();
+GROUPS.forEach(function(g){
+  var s=el("section","slide");s.dataset.title=g.name;s.dataset.group=g.id;
+  s.appendChild(el("p","eyebrow","Tools · "+g.tools.length+" to choose from"));
+  s.appendChild(el("h2",null,g.name));
+  s.appendChild(el("p","lede",g.blurb));
+  var grid=el("div","grid");
+  g.tools.forEach(function(t){
+    var id=g.id+"|"+t[0], c=el("article","card"), h=el("h3");
+    c.dataset.id=id;
+    if(t[2]){var a=el("a",null,t[0]);a.href=t[2];a.target="_blank";a.rel="noopener";h.appendChild(a)}
+    else h.textContent=t[0];
+    c.appendChild(h);c.appendChild(el("p",null,t[1]));
+    var row=el("div","row");
+    row.appendChild(!t[2]?el("span","tag","Link needed"):t[3]?el("span","src","John Sands, Moraine Valley"):el("span"));
+    var b=el("button","pickbtn");b.type="button";b.dataset.pick=id;
+    row.appendChild(b);c.appendChild(row);grid.appendChild(c);
+  });
+  s.appendChild(grid);
+  s.appendChild(el("p","empty","No picks in this group yet. Turn off Show my picks only to see every tool."));
+  frag.appendChild(s);
+});
+host.replaceWith(frag);
+
+var sc=document.getElementById("scen");
+SCEN.forEach(function(x){
+  var b=el("button");b.type="button";b.setAttribute("aria-expanded","false");
+  b.appendChild(document.createTextNode(x[0]));b.appendChild(el("span",null,x[1]));
+  b.addEventListener("click",function(){b.setAttribute("aria-expanded",b.getAttribute("aria-expanded")==="true"?"false":"true")});
+  sc.appendChild(b);
+});
+
+function paint(){
+  var n=0;
+  document.querySelectorAll(".card").forEach(function(c){
+    var on=!!picks[c.dataset.id];if(on)n++;
+    c.classList.toggle("picked",on);
+    var b=c.querySelector(".pickbtn");
+    b.setAttribute("aria-pressed",on?"true":"false");
+    b.textContent=on?"Picked":"Pick";
+  });
+  document.querySelectorAll(".slide[data-group]").forEach(function(s){
+    s.classList.toggle("noPicks",!s.querySelector(".card.picked"));
+  });
+  document.getElementById("pickCount").textContent=n+" picked";
+}
+document.addEventListener("click",function(e){
+  var b=e.target.closest("[data-pick]");if(!b)return;
+  var id=b.dataset.pick;if(picks[id])delete picks[id];else picks[id]=1;
+  save();paint();
+});
+
+var onlyBtn=document.getElementById("onlyBtn");
+onlyBtn.addEventListener("click",function(){
+  var on=!document.body.classList.contains("only");
+  setOnly(on);
+});
+function setOnly(on){
+  document.body.classList.toggle("only",on);
+  onlyBtn.setAttribute("aria-pressed",on?"true":"false");
+  try{localStorage.setItem(KEY+"-only",on?"1":"")}catch(e){}
+  if(typeof slides!=="undefined")show(cur,true);
+}
+
+var slides=[].slice.call(document.querySelectorAll(".slide")), cur=0;
+var main=document.getElementById("main");
+function show(i,quiet){
+  var dir=i<cur?-1:1;
+  i=Math.max(0,Math.min(slides.length-1,i));
+  function skip(k){return document.body.classList.contains("only")&&slides[k].classList.contains("noPicks")}
+  while(skip(i)&&i+dir>=0&&i+dir<slides.length)i+=dir;
+  while(skip(i)&&i-dir>=0&&i-dir<slides.length)i-=dir;
+  cur=i;
+  slides.forEach(function(s,k){s.classList.toggle("on",k===cur)});
+  document.getElementById("where").textContent=(cur+1)+" / "+slides.length+" · "+slides[cur].dataset.title;
+  document.getElementById("prev").disabled=cur===0;
+  document.getElementById("next").disabled=cur===slides.length-1;
+  main.scrollTop=0;
+  if(!quiet){try{location.replace("#slide-"+(cur+1))}catch(e){}}
+}
+function fromHash(){var m=/^#slide-(\d+)$/.exec(location.hash);show(m?parseInt(m[1],10)-1:0,true)}
+document.getElementById("prev").addEventListener("click",function(){show(cur-1)});
+document.getElementById("next").addEventListener("click",function(){show(cur+1)});
+window.addEventListener("hashchange",fromHash);
+
+var sheet=document.getElementById("sheet");
+
+document.addEventListener("keydown",function(e){
+  if(sheet.classList.contains("on")){if(e.key==="Escape")closeSheet();return}
+  var t=e.target.tagName;if(t==="TEXTAREA"||t==="INPUT")return;
+  if(e.key==="ArrowRight"||e.key==="PageDown"){e.preventDefault();show(cur+1)}
+  else if(e.key==="ArrowLeft"||e.key==="PageUp"){e.preventDefault();show(cur-1)}
+  else if(e.key==="Home"){show(0)}
+  else if(e.key==="End"){show(slides.length-1)}
+});
+var sx=null,sy=null;
+main.addEventListener("touchstart",function(e){sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
+main.addEventListener("touchend",function(e){
+  if(sx===null)return;
+  var dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;sx=null;
+  if(Math.abs(dx)>70&&Math.abs(dx)>2*Math.abs(dy))show(cur+(dx<0?1:-1));
+},{passive:true});
+
+function pickList(){
+  var out=[];
+  GROUPS.forEach(function(g){
+    var rows=g.tools.filter(function(t){return picks[g.id+"|"+t[0]]});
+    if(!rows.length)return;
+    out.push(g.name.toUpperCase());
+    rows.forEach(function(t){out.push("- "+t[0]+(t[2]?"\n  "+t[2]:"\n  (link needed)"))});
+    out.push("");
+  });
+  return out.join("\n").trim()||"Nothing picked yet. Select Pick on any tool card.";
+}
+var msg=document.getElementById("copyMsg"), txt=document.getElementById("pickText");
+function closeSheet(){sheet.classList.remove("on");document.getElementById("listBtn").focus()}
+document.getElementById("listBtn").addEventListener("click",function(){
+  txt.value=pickList();msg.textContent="";sheet.classList.add("on");txt.focus();txt.select();
+});
+document.getElementById("closeBtn").addEventListener("click",closeSheet);
+sheet.addEventListener("click",function(e){if(e.target===sheet)closeSheet()});
+document.getElementById("copyBtn").addEventListener("click",function(){
+  var done=function(){msg.textContent="Copied"}, fail=function(){txt.focus();txt.select();msg.textContent="Select the text and copy it"};
+  try{navigator.clipboard.writeText(txt.value).then(done,fail)}catch(e){fail()}
+});
+document.getElementById("clearBtn").addEventListener("click",function(){
+  picks={};save();paint();txt.value=pickList();msg.textContent="Cleared";
+});
+document.getElementById("fsBtn").addEventListener("click",function(){
+  try{
+    if(document.fullscreenElement)document.exitFullscreen();
+    else document.documentElement.requestFullscreen().catch(function(){});
+  }catch(e){}
+});
+
+paint();
+try{if(localStorage.getItem(KEY+"-only")&&Object.keys(picks).length)setOnly(true)}catch(e){}
+fromHash();
+})();
+</script>
+</body>
+</html>
