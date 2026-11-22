@@ -86,6 +86,11 @@ h2{font-size:clamp(26px,4vw,42px)}
 body.only .card:not(.picked){display:none}
 body.only .slide.noPicks .empty{display:block}
 
+.ideas{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin:0 0 18px;padding:0;list-style:none}
+.ideas li{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:16px;line-height:1.35}
+.ideas b{display:block;font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);margin-bottom:4px;font-weight:500}
+.prompt{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:14px 16px;font-size:17px;line-height:1.5;margin:0 0 10px;white-space:pre-wrap}
+.prompt mark{background:transparent;color:var(--accent);font-weight:600}
 .scen{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 .scen button{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;font-size:18px;font-weight:500;line-height:1.3}
 .scen button span{display:none;margin-top:10px;font-size:15px;font-weight:400;color:var(--muted)}
@@ -131,12 +136,12 @@ body.only .slide.noPicks .empty{display:block}
   <p class="eyebrow">90 minutes</p>
   <h2>How we'll spend the time</h2>
   <ol class="agenda">
-    <li><span class="min">10 min</span><div><strong>Quick poll</strong><span class="note">How are you using AI right now?</span></div></li>
+    <li><span class="min">15 min</span><div><strong>Quick poll, then start a build</strong><span class="note">Your idea goes to the AI and builds while we talk</span></div></li>
     <li><span class="min">10 min</span><div><strong>Why I build</strong><span class="note">The problem that started it</span></div></li>
     <li><span class="min">25 min</span><div><strong>Tour and demo</strong><span class="note">Tools across majors, from two colleges</span></div></li>
-    <li><span class="min">15 min</span><div><strong>Build one live</strong><span class="note">Your problem, your major</span></div></li>
+    <li><span class="min">15 min</span><div><strong>Open what we built</strong><span class="note">Test it, find what's wrong, fix it together</span></div></li>
     <li><span class="min">15 min</span><div><strong>Helps or replaces?</strong><span class="note">Using AI responsibly</span></div></li>
-    <li><span class="min">15 min</span><div><strong>What's next, and your questions</strong></div></li>
+    <li><span class="min">10 min</span><div><strong>What's next, and your questions</strong></div></li>
   </ol>
 </section>
 
@@ -151,6 +156,34 @@ body.only .slide.noPicks .empty{display:block}
   </ul>
 </section>
 
+<section class="slide" data-title="Start a build">
+  <p class="eyebrow">Your turn</p>
+  <h2>Let's start one building right now</h2>
+  <ul class="big">
+    <li>What's your major?</li>
+    <li>What's one thing in it that is hard to learn, practice, or keep track of?</li>
+    <li>Who would use a tool for that, and what would it show them?</li>
+  </ul>
+  <p class="hint">We'll pick one idea, describe it to the AI in plain language, and let it work while we look at other tools.</p>
+</section>
+
+<section class="slide" data-title="What to build">
+  <p class="eyebrow">Keep it small</p>
+  <h2>One concept, something to do, a way to check yourself</h2>
+  <ul class="ideas">
+    <li><b>Nursing</b>Dosage calculation practice with worked answers</li>
+    <li><b>Business</b>Break-even calculator with a chart that moves as you change price and cost</li>
+    <li><b>Psychology</b>Classical or operant conditioning? Read a scenario and sort it</li>
+    <li><b>Biology</b>Step through the stages of mitosis, then put them in order</li>
+    <li><b>Criminal justice</b>Is this search legal? Fourth Amendment scenarios</li>
+    <li><b>History</b>Timeline of one event, with causes and effects to match</li>
+    <li><b>Education</b>Sort sample exam questions by Bloom's taxonomy level</li>
+  </ul>
+  <p class="prompt" id="buildPrompt">Build a single web page that helps a <mark>[major]</mark> student understand <mark>[concept]</mark>. Explain it in three short paragraphs for someone seeing it for the first time. Add one interactive part where the student can <mark>[change, sort, or step through something]</mark> and see the result. End with five practice questions that give feedback on each answer. Make it work on a phone and be accessible.</p>
+  <div class="row" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn" id="copyPrompt" type="button">Copy prompt</button><span class="count" id="copyPromptMsg" role="status"></span></div>
+  <p class="hint">Too broad? Ask: what is the one thing in that course people get stuck on?</p>
+</section>
+
 <section class="slide" data-title="Why I build">
   <p class="eyebrow">Origin</p>
   <h2>Why I started building</h2>
@@ -163,15 +196,15 @@ body.only .slide.noPicks .empty{display:block}
 
 <div id="toolSlides"></div>
 
-<section class="slide" data-title="Build live">
-  <p class="eyebrow">Your turn</p>
-  <h2>Let's build one right now</h2>
+<section class="slide" data-title="Open what we built">
+  <p class="eyebrow">Back to our build</p>
+  <h2>Let's open what we built</h2>
   <ul class="big">
-    <li>What's your major?</li>
-    <li>What's one thing in it that is hard to learn, practice, or keep track of?</li>
-    <li>Who would use a tool for that, and what would it show them?</li>
+    <li>Does it do what we asked?<small>Try it the way a real student would</small></li>
+    <li>What did it get wrong, or make up?<small>Someone who knows the subject has to check</small></li>
+    <li>What's the one change that would make it useful?<small>We'll ask for it and watch the fix</small></li>
   </ul>
-  <p class="hint">We'll turn one answer into a working page before this section ends.</p>
+  <p class="hint">The first version is a draft. Testing and fixing is the part that needs you.</p>
 </section>
 
 <section class="slide" data-title="Helps or replaces">
@@ -588,6 +621,11 @@ document.getElementById("copyBtn").addEventListener("click",function(){
 });
 document.getElementById("clearBtn").addEventListener("click",function(){
   picks={};save();paint();txt.value=pickList();msg.textContent="Cleared";
+});
+document.getElementById("copyPrompt").addEventListener("click",function(){
+  var t=document.getElementById("buildPrompt").textContent, m=document.getElementById("copyPromptMsg");
+  var ok=function(){m.textContent="Copied"}, no=function(){m.textContent="Select the text and copy it"};
+  try{navigator.clipboard.writeText(t).then(ok,no)}catch(e){no()}
 });
 document.getElementById("fsBtn").addEventListener("click",function(){
   try{
