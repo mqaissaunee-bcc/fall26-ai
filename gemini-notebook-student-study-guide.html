@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study Smarter with Gemini Notebook: A Student Tutorial</title>
+<meta name="description" content="A self-paced student tutorial on using Gemini Notebook (formerly NotebookLM) as a study tool: build a notebook from your course materials, then make flashcards, quizzes, audio and video overviews, mind maps, and study guides.">
+<style>
+:root{
+  --paper:#F6F7FB; --surface:#FFFFFF; --sunk:#ECEEF6;
+  --ink:#1A2032; --ink-soft:#4A5268; --line:#D5D9E6;
+  --accent:#4536C9; --accent-soft:#E8E5FB; --accent-ink:#FFFFFF;
+  --audio:#0B6E6D; --audio-soft:#DDF1F0;
+  --video:#9A3412; --video-soft:#FBE9DF;
+  --practice:#1D6B34; --practice-soft:#DFF2E4;
+  --caution:#8A5A00; --caution-soft:#FFF3D6;
+  --ok:#1D6B34; --focus:#1F6FEB;
+  --font-head:"Avenir Next","Segoe UI Variable Display","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+  --font-body:Charter,"Bitstream Charter","Iowan Old Style","Sitka Text",Cambria,Georgia,serif;
+  --font-ui:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-code:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --r-sm:6px; --r-md:12px; --r-lg:20px;
+  --s1:.25rem; --s2:.5rem; --s3:.75rem; --s4:1rem; --s5:1.5rem; --s6:2rem; --s7:3rem; --s8:4.5rem;
+  --measure:70ch;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#12151F; --surface:#1A1F2D; --sunk:#222839;
+    --ink:#E7EAF3; --ink-soft:#AEB5C8; --line:#343B50;
+    --accent:#A99DFF; --accent-soft:#2B2654; --accent-ink:#12151F;
+    --audio:#5FD0CD; --audio-soft:#123433;
+    --video:#F5A47A; --video-soft:#3A2218;
+    --practice:#7DD89A; --practice-soft:#15301D;
+    --caution:#F2C45A; --caution-soft:#3A2E12;
+    --ok:#7DD89A; --focus:#7FB2FF;
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:clamp(1rem,.96rem + .2vw,1.1rem);line-height:1.65}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--accent);text-underline-offset:.18em}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:4px}
+.skip-link{position:absolute;left:-999px;top:0;background:var(--ink);color:var(--paper);padding:var(--s3) var(--s4);z-index:100;font-family:var(--font-ui)}
+.skip-link:focus{left:var(--s4);top:var(--s4)}
+h1,h2,h3,h4{font-family:var(--font-head);line-height:1.2;letter-spacing:-.01em;margin:0 0 var(--s3)}
+h2{font-size:clamp(1.6rem,1.3rem + 1.2vw,2.2rem);font-weight:700}
+h3{font-size:clamp(1.15rem,1.05rem + .4vw,1.35rem);font-weight:650;margin-top:var(--s6)}
+h4{font-size:1rem;font-weight:650;margin-top:var(--s5)}
+p,ul,ol{margin:0 0 var(--s4)}
+li{margin-bottom:var(--s2)}
+code{font-family:var(--font-code);font-size:.88em;background:var(--sunk);padding:.1em .35em;border-radius:4px}
+button{font:inherit}
+
+.topbar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);font-family:var(--font-ui)}
+.topbar-inner{display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s4);max-width:1320px;margin:0 auto}
+.brand{font-weight:650;font-size:.95rem;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.progress-wrap{display:flex;align-items:center;gap:var(--s2);font-size:.85rem;color:var(--ink-soft)}
+.progress-track{width:110px;height:8px;background:var(--sunk);border-radius:99px;overflow:hidden}
+@media (max-width:480px){.progress-track{display:none}}
+.progress-fill{height:100%;width:0;background:var(--accent);transition:width .3s}
+.menu-btn{min-height:44px;min-width:44px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--r-sm);padding:0 var(--s3);cursor:pointer}
+@media (min-width:1080px){.menu-btn{display:none}}
+
+.shell{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:1fr}
+@media (min-width:1080px){.shell{grid-template-columns:270px minmax(0,1fr)}}
+.sidenav{display:none;font-family:var(--font-ui);font-size:.9rem}
+.sidenav.open{display:block;position:fixed;inset:57px 0 0 0;background:var(--paper);z-index:15;overflow:auto;padding:var(--s4)}
+@media (min-width:1080px){
+  .sidenav,.sidenav.open{display:block;position:sticky;top:42px;height:calc(100vh - 42px);overflow:auto;padding:var(--s5) var(--s4);border-right:1px solid var(--line);inset:auto;top:42px;background:transparent;align-self:start}
+}
+.sidenav ol{list-style:none;padding:0;margin:0}
+.sidenav li{margin:0}
+.sidenav a{display:flex;align-items:center;gap:var(--s2);min-height:44px;padding:var(--s1) var(--s3);border-radius:var(--r-sm);color:var(--ink-soft);text-decoration:none}
+.sidenav a:hover{background:var(--sunk);color:var(--ink)}
+.sidenav a[aria-current="true"]{background:var(--accent-soft);color:var(--ink);font-weight:600}
+.sidenav .tick{flex:0 0 1.2rem;height:1.2rem;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:.7rem;color:transparent}
+.sidenav a.done .tick{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.nav-label{font-size:.8rem;color:var(--ink-soft);margin:0 0 var(--s2) var(--s3)}
+
+main{padding:0 var(--s4) var(--s8);min-width:0}
+@media (min-width:720px){main{padding:0 var(--s6) var(--s8)}}
+.section{max-width:880px;margin:0 auto;padding-top:var(--s7);scroll-margin-top:60px}
+.section > p,.section > ul,.section > ol{max-width:var(--measure)}
+.sec-head{display:flex;align-items:baseline;gap:var(--s3);flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:var(--s2);margin-bottom:var(--s5)}
+.sec-head h2{margin:0;flex:1 1 auto}
+.sec-tag{font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft)}
+.lede{font-size:1.12em;color:var(--ink-soft)}
+.small{font-size:.85rem;color:var(--ink-soft);font-family:var(--font-ui)}
+
+.hero{max-width:880px;margin:0 auto;padding:var(--s7) 0 var(--s5)}
+.hero-kicker{font-family:var(--font-ui);font-size:.95rem;color:var(--ink-soft);margin-bottom:var(--s3)}
+.hero h1{font-size:clamp(2.2rem,1.4rem + 3.6vw,4rem);font-weight:750;letter-spacing:-.025em;line-height:1.02;margin-bottom:var(--s4)}
+.hero h1 small{display:block;font-size:.42em;font-weight:500;letter-spacing:0;color:var(--ink-soft);margin-top:var(--s3)}
+.hero-meta{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);font-family:var(--font-ui);font-size:.9rem;color:var(--ink-soft)}
+.hero-meta strong{color:var(--ink)}
+
+.loop{list-style:none;padding:0;margin:var(--s6) 0 var(--s5);display:grid;gap:var(--s3);grid-template-columns:1fr;counter-reset:lp;font-family:var(--font-ui)}
+@media (min-width:640px){.loop{grid-template-columns:repeat(4,1fr)}}
+.loop li{counter-increment:lp;margin:0;background:var(--surface);border:1px solid var(--line);border-top:5px solid var(--accent);border-radius:var(--r-md);padding:var(--s4)}
+.loop li:nth-child(3){border-top-color:var(--practice)}
+.loop li:nth-child(4){border-top-color:var(--video)}
+.loop li::before{content:counter(lp);display:grid;place-items:center;width:1.8rem;height:1.8rem;border-radius:50%;background:var(--ink);color:var(--paper);font-weight:700;font-size:.85rem;margin-bottom:var(--s2)}
+.loop b{display:block;font-size:1rem}
+.loop span{font-size:.84rem;color:var(--ink-soft)}
+
+.callout{border-left:5px solid var(--accent);background:var(--accent-soft);padding:var(--s4) var(--s5);border-radius:0 var(--r-md) var(--r-md) 0;margin:var(--s5) 0;max-width:var(--measure)}
+.callout p:last-child,.callout ul:last-child{margin-bottom:0}
+.callout .c-title{font-family:var(--font-ui);font-weight:650;margin-bottom:var(--s2)}
+.callout.caution{border-color:var(--caution);background:var(--caution-soft)}
+.callout.audio{border-color:var(--audio);background:var(--audio-soft)}
+.callout.video{border-color:var(--video);background:var(--video-soft)}
+.callout.practice{border-color:var(--practice);background:var(--practice-soft)}
+
+.shot{margin:var(--s5) 0;display:none}
+.shot.has-image{display:block}
+.shot-frame{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;background:var(--surface);width:fit-content;max-width:100%;margin-inline:auto}
+.shot figcaption{font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft);margin-top:var(--s2);text-align:center}
+
+.grid{display:grid;gap:var(--s3);grid-template-columns:repeat(auto-fill,minmax(230px,1fr));margin:var(--s4) 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4)}
+.card h4{margin:0 0 var(--s2);font-size:1rem}
+.card p{font-size:.95rem;margin-bottom:var(--s2)}
+.card p:last-child{margin-bottom:0}
+.card.t-audio{border-top:5px solid var(--audio)}
+.card.t-video{border-top:5px solid var(--video)}
+.card.t-practice{border-top:5px solid var(--practice)}
+.card.t-other{border-top:5px solid var(--accent)}
+.table-wrap{overflow-x:auto;margin:var(--s4) 0;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-family:var(--font-ui);font-size:.9rem;min-width:520px}
+th,td{padding:var(--s3) var(--s4);text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--sunk);font-weight:650}
+tbody tr:last-child td,tbody tr:last-child th{border-bottom:0}
+tbody th{font-weight:650}
+
+.tabs{margin:var(--s5) 0}
+.tablist{display:flex;flex-wrap:wrap;gap:var(--s2);border-bottom:1px solid var(--line);margin-bottom:var(--s4)}
+.tab{min-height:44px;padding:0 var(--s4);border:1px solid transparent;border-bottom:none;border-radius:var(--r-sm) var(--r-sm) 0 0;background:transparent;color:var(--ink-soft);cursor:pointer;font-family:var(--font-ui);font-weight:600;margin-bottom:-1px}
+.tab[aria-selected="true"]{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.tabpanel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s5)}
+.tabpanel[hidden]{display:none}
+.tabpanel h4:first-child{margin-top:0}
+.tabpanel > :last-child{margin-bottom:0}
+
+.steps{counter-reset:st;list-style:none;padding:0;max-width:var(--measure)}
+.steps > li{counter-increment:st;position:relative;padding-left:3rem;margin-bottom:var(--s4)}
+.steps > li::before{content:counter(st);position:absolute;left:0;top:-.1rem;width:2.1rem;height:2.1rem;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-family:var(--font-ui);font-weight:700;font-size:.9rem}
+.lab{background:var(--surface);border:2px solid var(--ink);border-radius:var(--r-lg);padding:var(--s5);margin:var(--s6) 0}
+.lab-head{display:flex;flex-wrap:wrap;gap:var(--s2);justify-content:space-between;align-items:baseline;margin-bottom:var(--s3)}
+.lab-head h3{margin:0}
+.lab-count{font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft)}
+.checklist{list-style:none;padding:0;margin:0}
+.checklist li{margin:0;border-top:1px solid var(--line)}
+.checklist label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) 0;cursor:pointer;min-height:44px}
+.checklist input{width:22px;height:22px;margin-top:.2rem;flex:0 0 auto;accent-color:var(--accent)}
+.checklist input:checked + span{color:var(--ink-soft);text-decoration:line-through;text-decoration-color:var(--line)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);min-height:44px;min-width:44px;padding:0 var(--s4);border-radius:var(--r-sm);border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font-family:var(--font-ui);font-weight:600;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn-row{display:flex;flex-wrap:wrap;gap:var(--s2);margin:var(--s3) 0}
+.form-grid{display:grid;gap:var(--s3);grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.field label{display:block;font-family:var(--font-ui);font-size:.85rem;font-weight:600;margin-bottom:var(--s1)}
+.field select,.field input{width:100%;min-height:44px;padding:var(--s2) var(--s3);border:1px solid var(--line);border-radius:var(--r-sm);background:var(--paper);color:var(--ink);font-family:var(--font-ui);font-size:.95rem}
+.output{white-space:pre-wrap;font-family:var(--font-code);font-size:.88rem;background:var(--sunk);border-radius:var(--r-sm);padding:var(--s4);margin-top:var(--s3);border:1px solid var(--line);min-height:4rem}
+.chooser{display:flex;flex-wrap:wrap;gap:var(--s2);margin:var(--s3) 0}
+.chip{min-height:44px;padding:0 var(--s4);border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font-family:var(--font-ui);font-size:.9rem}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.result{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4) var(--s5);min-height:90px}
+.result > :last-child{margin-bottom:0}
+.result h4{margin-top:0}
+
+.prompt{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4);margin-bottom:var(--s3);max-width:var(--measure)}
+.prompt-top{display:flex;justify-content:space-between;align-items:center;gap:var(--s2);flex-wrap:wrap}
+.prompt-top b{font-family:var(--font-ui);font-size:.95rem}
+.prompt blockquote{margin:var(--s2) 0 0;font-family:var(--font-code);font-size:.85rem;background:var(--sunk);padding:var(--s3);border-radius:var(--r-sm)}
+.pill{font-family:var(--font-ui);font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--sunk);color:var(--ink-soft)}
+
+.plan{list-style:none;padding:0;margin:0;border-left:3px solid var(--ink)}
+.plan li{position:relative;padding:0 0 var(--s4) var(--s5);margin:0}
+.plan li::before{content:"";position:absolute;left:-9px;top:.45rem;width:15px;height:15px;border-radius:50%;background:var(--paper);border:3px solid var(--ink)}
+.plan .when{font-family:var(--font-ui);font-weight:700;display:block}
+.plan .what{color:var(--ink-soft);font-size:.95rem}
+
+.q{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4) var(--s5);margin-bottom:var(--s4)}
+.q fieldset{border:0;padding:0;margin:0}
+.q legend{font-family:var(--font-head);font-weight:650;margin-bottom:var(--s3);padding:0}
+.q label{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s2) var(--s3);border-radius:var(--r-sm);cursor:pointer;min-height:44px}
+.q label:hover{background:var(--sunk)}
+.q input{margin-top:.35rem;accent-color:var(--accent)}
+.q .fb{margin:var(--s2) 0 0;font-family:var(--font-ui);font-size:.9rem;padding:var(--s2) var(--s3);border-radius:var(--r-sm)}
+.q .fb.right{background:var(--practice-soft)}
+.q .fb.wrong{background:var(--caution-soft)}
+.score{font-family:var(--font-head);font-size:1.3rem;font-weight:700}
+
+details.ref{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);margin-bottom:var(--s2)}
+details.ref summary{cursor:pointer;padding:var(--s3) var(--s4);font-family:var(--font-ui);font-weight:600;min-height:44px;display:flex;align-items:center}
+details.ref > div{padding:0 var(--s4) var(--s4)}
+
+footer{border-top:1px solid var(--line);margin-top:var(--s8);padding:var(--s5) var(--s4);text-align:center;font-family:var(--font-ui);font-size:.85rem;color:var(--ink-soft)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.progress-fill{transition:none}}
+@media print{
+  .topbar,.sidenav,.btn,.menu-btn{display:none!important}
+  .shell{display:block}
+  .tabpanel[hidden]{display:block!important}
+  .section{padding-top:var(--s5)}
+}
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="sidenav">Sections</button>
+    <span class="brand">Study with Gemini Notebook</span>
+    <div class="progress-wrap">
+      <span id="progressText">0 done</span>
+      <div class="progress-track" role="progressbar" aria-label="Sections completed" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+<nav class="sidenav" id="sidenav" aria-label="Tutorial sections">
+  <p class="nav-label">Tap a circle to mark a section done</p>
+  <ol id="navList"></ol>
+</nav>
+
+<main id="main">
+
+<div class="hero">
+  <p class="hero-kicker">A self-paced tutorial for students</p>
+  <h1>Turn your class materials into a study kit
+    <small>Using Gemini Notebook, the tool formerly called NotebookLM</small></h1>
+  <p class="lede">Give Gemini Notebook your notes, slides, and readings. It answers questions from those materials and turns them into flashcards, practice quizzes, podcast-style audio, short videos, mind maps, and study guides. This page shows you how to make each one and, more importantly, how to study with them.</p>
+
+  <ol class="loop" aria-label="The study loop">
+    <li><b>Gather</b><span>Put one unit's notes, slides, and readings in a notebook.</span></li>
+    <li><b>Ask</b><span>Chat with your materials until the ideas make sense.</span></li>
+    <li><b>Practice</b><span>Test yourself with flashcards and quizzes.</span></li>
+    <li><b>Fix the misses</b><span>Review only what you got wrong, then test again.</span></li>
+  </ol>
+
+  <div class="hero-meta">
+    <span><strong>Time:</strong> about 45 minutes, or jump to what you need</span>
+    <span><strong>Cost:</strong> free with a Google account</span>
+    <span><strong>Current as of:</strong> November 2026</span>
+  </div>
+</div>
+
+<!-- 1 -->
+<section class="section" id="s-start" data-title="Start here">
+  <div class="sec-head"><h2>Start here</h2><span class="sec-tag">5 min</span></div>
+  <p class="lede">A study tool that only knows what you give it.</p>
+  <p>A general chatbot answers from everything it picked up in training, so its version of a topic may not match your course. Gemini Notebook works the other way around. You add <strong>sources</strong> (your notes, your instructor's slides, your textbook chapter), and it answers from those. Every answer carries numbered citations that take you to the exact passage it used.</p>
+  <p>That matters when you study. The flashcards use your instructor's terms, the quiz covers what your class covered, and you can check anything that looks off.</p>
+  <p>Google renamed NotebookLM to Gemini Notebook in July 2026. It's the same product, so older videos and guides that say "NotebookLM" still apply.</p>
+
+  <h3>What you need</h3>
+  <ul>
+    <li>A Google account. See <a href="#s-setup">Set up</a> for which one to use.</li>
+    <li>Materials from <strong>one unit or chapter</strong> of one course. Start small.</li>
+    <li>A browser at <a href="https://notebook.google.com">notebook.google.com</a>, or the Gemini Notebook app on your phone.</li>
+  </ul>
+
+  <div class="callout caution">
+    <p class="c-title">Check your course rules first</p>
+    <p>Making study aids from your own notes is usually fine, but AI rules differ from course to course. Read the AI policy in your syllabus, and ask your instructor if you're unsure, especially before uploading their slides or using AI on anything you'll turn in.</p>
+  </div>
+
+  <div class="lab" data-lab="first">
+    <div class="lab-head"><h3>Your first 15 minutes</h3><span class="lab-count" aria-live="polite"></span></div>
+    <p>In a hurry? Do these six steps now and read the rest later.</p>
+    <ul class="checklist">
+      <li><label><input type="checkbox"><span>Sign in at notebook.google.com and select <strong>Create new</strong>.</span></label></li>
+      <li><label><input type="checkbox"><span>Add two or three sources from one unit: your notes, the slides, a reading.</span></label></li>
+      <li><label><input type="checkbox"><span>In the chat, ask: <em>"What are the five most important ideas in these sources?"</em></span></label></li>
+      <li><label><input type="checkbox"><span>Click one citation number to see where the answer came from.</span></label></li>
+      <li><label><input type="checkbox"><span>In the Studio panel, select <strong>Quiz</strong> and take it.</span></label></li>
+      <li><label><input type="checkbox"><span>Select <strong>Audio Overview</strong> and let it generate for your next walk or commute.</span></label></li>
+    </ul>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="section" id="s-setup" data-title="Set up your account">
+  <div class="sec-head"><h2>Set up your account</h2><span class="sec-tag">3 min</span></div>
+  <p>Which account you sign in with depends on what your school provides.</p>
+  <div class="tabs" data-tabs>
+    <div class="tablist" role="tablist" aria-label="Account situations">
+      <button class="tab" role="tab" id="t-pers" aria-controls="p-pers" aria-selected="true" tabindex="0">My school email is Microsoft</button>
+      <button class="tab" role="tab" id="t-goog" aria-controls="p-goog" aria-selected="false" tabindex="-1">My school email is Google</button>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-pers" aria-labelledby="t-pers">
+      <h4>Use a free personal Google account</h4>
+      <p>If your school email opens in Outlook, it won't sign in to Google tools. A personal Gmail account works fine.</p>
+      <ul>
+        <li>Your school's privacy agreements don't cover a personal account, so treat it like any consumer app.</li>
+        <li>Skip the thumbs-up and thumbs-down buttons on anything private. On personal accounts, feedback can send that conversation to human reviewers.</li>
+        <li>You can share a notebook with classmates by email or with an "anyone with the link" setting.</li>
+      </ul>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-goog" aria-labelledby="t-goog" hidden>
+      <h4>Use your school Google account</h4>
+      <p>If your school gives you a Google account, sign in with it. Your school's Google agreement covers what you upload.</p>
+      <ul>
+        <li>If Gemini Notebook won't open, your school's administrator may have it turned off. Ask the IT help desk.</li>
+        <li>Public "anyone with the link" sharing is turned off. You can share with people at your school.</li>
+        <li>If an instructor assigns a notebook through Google Classroom, they may be able to see your chats in it. You'll see a notice when that's the case.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>What not to upload</h3>
+  <ul>
+    <li><strong>Other people's private information:</strong> classmates' work, group chat screenshots, anything with names and grades.</li>
+    <li><strong>Your own sensitive documents:</strong> financial aid forms, medical paperwork, ID numbers.</li>
+    <li><strong>Materials you were told not to share:</strong> some instructors and publishers restrict uploading slides, exams, or paid textbook files. When in doubt, ask.</li>
+    <li><strong>Lecture recordings made without permission.</strong> Ask before you record a class.</li>
+  </ul>
+  <p class="small">Some features are limited to users 18 and older, including Cinematic videos, video visual styles, and voice conversations in the mobile app.</p>
+</section>
+
+<!-- 3 -->
+<section class="section" id="s-build" data-title="Build a study notebook">
+  <div class="sec-head"><h2>Build a study notebook</h2><span class="sec-tag">7 min</span></div>
+  <p>A notebook is one project with its own sources, chat, and study materials. It has three panels: <strong>Sources</strong> on the left, <strong>Chat</strong> in the middle, and <strong>Studio</strong> on the right, where you make flashcards, quizzes, audio, and video.</p>
+
+  <figure class="shot" data-src="img/02-notebook-three-panels.png" data-alt="A notebook with the Sources panel on the left, Chat in the center, and Studio on the right">
+    <div class="shot-frame"></div>
+    <figcaption>The three panels: Sources feed the Chat and the Studio.</figcaption>
+  </figure>
+
+  <h3>Add your sources</h3>
+  <ol class="steps">
+    <li>Select <strong>Create new</strong> and name the notebook after the course and unit, such as "BIOL 101 Unit 3: Cell Division."</li>
+    <li>Select <strong>Add sources</strong>, then upload files, paste a link, or paste text.</li>
+    <li>Open each source once and read the automatic summary. If the summary is wrong or empty, the file didn't import well.</li>
+  </ol>
+
+  <figure class="shot" data-src="img/03-add-sources-dialog.png" data-alt="The Add sources dialog with upload, Google Drive, link, and paste text options">
+    <div class="shot-frame"></div>
+    <figcaption>You can mix file types in one notebook.</figcaption>
+  </figure>
+
+  <div class="table-wrap">
+    <table>
+      <caption class="sr-only">What students can add as sources</caption>
+      <thead><tr><th scope="col">What you have</th><th scope="col">How to add it</th><th scope="col">Tip</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Typed notes</th><td>Upload the Word or PDF file, or paste the text</td><td>Your own notes are the most valuable source. They show what your instructor stressed.</td></tr>
+        <tr><th scope="row">Handwritten notes</th><td>Upload a photo or scan</td><td>Write neatly and check the summary. Messy pages import poorly.</td></tr>
+        <tr><th scope="row">Lecture slides</th><td>Upload the PowerPoint or PDF</td><td>Slides are thin on their own. Pair them with notes or the reading.</td></tr>
+        <tr><th scope="row">Textbook chapter</th><td>Upload a PDF or EPUB of the chapter</td><td>Free textbooks from OpenStax download as PDFs. Add one chapter, not the whole book.</td></tr>
+        <tr><th scope="row">YouTube lecture</th><td>Paste the link</td><td>The video must be public and have captions.</td></tr>
+        <tr><th scope="row">Recorded lecture</th><td>Upload the audio file</td><td>It's turned into a transcript. Record only with permission.</td></tr>
+        <tr><th scope="row">Study guide or review sheet</th><td>Upload it</td><td>It tells the tool what the exam is likely to cover.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small">The free plan allows 50 sources per notebook and 100 notebooks, which is more than enough.</p>
+
+  <h3>One notebook per unit</h3>
+  <p>A notebook stuffed with a whole semester gives vague flashcards. A notebook for one unit gives specific ones. Make a new notebook for each unit or exam, and before finals, build one more that holds your notes and study guides from all of them.</p>
+
+  <h3>Use the checkboxes</h3>
+  <p>Every source has a checkbox. Only checked sources are used for chat answers and for anything you generate. To quiz yourself on Chapter 4 alone, uncheck everything else first. It's the simplest way to control what you get.</p>
+
+  <div class="callout">
+    <p class="c-title">Good in, good out</p>
+    <p>The tool can only be as accurate as your sources. If your notes have a mistake, your flashcards will repeat it. Include at least one source you trust, such as the textbook chapter or the instructor's slides.</p>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="section" id="s-ask" data-title="Ask your materials">
+  <div class="sec-head"><h2>Ask your materials</h2><span class="sec-tag">7 min</span></div>
+  <p>The chat is where you make sense of the material before you try to memorize it. Type a question in plain language and it answers from your checked sources.</p>
+
+  <h3>Check the citations</h3>
+  <p>Answers contain small numbered markers. Hover over one to see the quoted passage, or click it to jump to that spot in the source. Get in the habit of clicking a few. It catches errors, and rereading the original passage is itself good review.</p>
+
+  <figure class="shot" data-src="img/06-chat-citations.png" data-alt="A chat answer with numbered citation markers and a hover card showing the quoted source passage">
+    <div class="shot-frame"></div>
+    <figcaption>Each numbered marker links to the passage the answer came from.</figcaption>
+  </figure>
+
+  <h3>Turn on Learning Guide</h3>
+  <p>By default the chat hands you answers. Open <strong>Configure chat</strong> and choose <strong>Learning Guide</strong>, and it behaves like a tutor: it asks you questions, breaks problems into steps, and waits for you to try before explaining. Use it when you want to understand something, and the default style when you need a quick fact.</p>
+  <p>You can also choose <strong>Custom</strong> and describe the tutor you want, for example: <em>"Quiz me one question at a time on these sources. Don't give the answer until I try. If I'm wrong, give a hint first."</em></p>
+
+  <h3>Prompts worth copying</h3>
+  <div id="chatPrompts"></div>
+
+  <p><strong>Save what helps.</strong> Select <strong>Save to note</strong> under a good answer to keep it in the Studio panel with its citations. Your chat history is saved between sessions and stays private to you, even in a shared notebook.</p>
+</section>
+
+<!-- 5 -->
+<section class="section" id="s-pick" data-title="Pick the right tool">
+  <div class="sec-head"><h2>Pick the right tool</h2><span class="sec-tag">3 min</span></div>
+  <p>The Studio panel makes nine kinds of study material. Choose what you're trying to do and see where to start.</p>
+
+  <figure class="shot" data-src="img/08-studio-panel.png" data-alt="The Studio panel listing Audio Overview, Video Overview, Mind Map, Reports, Flashcards, Quiz, Infographic, Slide Deck, and Data Table">
+    <div class="shot-frame"></div>
+    <figcaption>Select a tile to generate with default settings, or the pencil icon to customize first.</figcaption>
+  </figure>
+
+  <div class="chooser" id="chooser" role="group" aria-label="What are you trying to do?">
+    <button class="chip" data-goal="terms" aria-pressed="false">Memorize terms</button>
+    <button class="chip" data-goal="test" aria-pressed="false">See if I'm ready for the exam</button>
+    <button class="chip" data-goal="go" aria-pressed="false">Study on the bus or at the gym</button>
+    <button class="chip" data-goal="stuck" aria-pressed="false">Get unstuck on one concept</button>
+    <button class="chip" data-goal="big" aria-pressed="false">See how it all fits together</button>
+    <button class="chip" data-goal="sheet" aria-pressed="false">Make a review sheet</button>
+    <button class="chip" data-goal="compare" aria-pressed="false">Compare similar things</button>
+    <button class="chip" data-goal="cram" aria-pressed="false">The exam is tomorrow</button>
+  </div>
+  <div class="result" id="chooserResult" aria-live="polite"><p class="small">Choose a goal to see a recommendation.</p></div>
+
+  <div class="callout practice">
+    <p class="c-title">Listening feels like studying. Testing yourself is studying.</p>
+    <p>Audio and video are good for a first pass and for review on the go, but they're passive. What makes material stick is pulling it out of your own memory: answering a flashcard before you flip it, taking a quiz, explaining an idea out loud. Whatever you listen to or watch, follow it with a quiz.</p>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="section" id="s-cards" data-title="Flashcards">
+  <div class="sec-head"><h2>Flashcards</h2><span class="sec-tag">5 min</span></div>
+  <p class="lede">Best for vocabulary, definitions, formulas, dates, and anything you need to recall on demand.</p>
+  <ol class="steps">
+    <li>Check the sources you want cards from.</li>
+    <li>In Studio, select the <strong>pencil icon</strong> on <strong>Flashcards</strong>.</li>
+    <li>Choose how many cards (fewer, standard, or more) and a difficulty (easy, medium, or hard).</li>
+    <li>Add a prompt that says what to focus on, then generate.</li>
+  </ol>
+
+  <h3>How to study a deck</h3>
+  <ul>
+    <li><strong>Answer before you flip.</strong> Say it out loud or write it down. Recognizing the answer after you've seen it doesn't count.</li>
+    <li>Mark each card <strong>Got it</strong> or <strong>Missed it</strong>, and be honest about it.</li>
+    <li>At the end, choose <strong>Only cards you missed</strong> and go again until that pile is empty.</li>
+    <li>Use <strong>Explain</strong> on a card you keep missing. It opens an explanation from your sources.</li>
+    <li>Use <strong>Shuffle</strong> so you aren't memorizing the order.</li>
+    <li>Come back tomorrow. Your progress is saved, and a short session each day beats one long one.</li>
+  </ul>
+  <p><strong>Take them elsewhere.</strong> The download button saves the deck as a CSV file, which you can open as a spreadsheet or import into a flashcard app such as Anki or Quizlet.</p>
+
+  <figure class="shot" data-src="img/15-flashcards-quiz.png" data-alt="A flashcard or quiz question in Gemini Notebook with its explanation">
+    <div class="shot-frame"></div>
+    <figcaption>Flashcards and quizzes open in the Studio panel.</figcaption>
+  </figure>
+
+  <h3>Build a flashcard or quiz prompt</h3>
+  <div class="card">
+    <div class="form-grid">
+      <div class="field"><label for="bTool">I'm making</label>
+        <select id="bTool"><option>Flashcards</option><option>Quiz</option></select></div>
+      <div class="field"><label for="bType">Focus on</label>
+        <select id="bType">
+          <option value="terms">Key terms and definitions</option>
+          <option value="apply">Applying ideas to new situations</option>
+          <option value="calc">Formulas and worked problems</option>
+          <option value="mix">Things students commonly mix up</option>
+          <option value="proc">Steps in a process, in order</option>
+        </select></div>
+      <div class="field"><label for="bTopic">Topic (optional)</label>
+        <input id="bTopic" type="text" placeholder="e.g., mitosis vs. meiosis"></div>
+      <div class="field"><label for="bExam">My exam is mostly</label>
+        <select id="bExam"><option value="">Not sure</option><option>multiple choice</option><option>short answer</option><option>problems to solve</option><option>essay</option></select></div>
+    </div>
+    <div class="output" id="bOut" aria-live="polite"></div>
+    <div class="btn-row"><button class="btn" id="bCopy">Copy prompt</button></div>
+    <p class="small" id="bNote"></p>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="section" id="s-quiz" data-title="Practice quizzes">
+  <div class="sec-head"><h2>Practice quizzes</h2><span class="sec-tag">5 min</span></div>
+  <p class="lede">The closest thing to the real exam, and the most honest measure of what you know.</p>
+  <ol class="steps">
+    <li>Check the sources the exam covers.</li>
+    <li>Select the <strong>pencil icon</strong> on <strong>Quiz</strong>. Set the number of questions and the difficulty.</li>
+    <li>In the prompt, describe the kind of questions you want. Quizzes can include multiple choice, short answer, and fill in the blank, so ask for the format your exam uses.</li>
+    <li>Generate, then take it with your notes closed.</li>
+  </ol>
+
+  <h3>Get more out of each quiz</h3>
+  <ul>
+    <li><strong>Try before you use Hint.</strong> Struggling for a moment is part of how memory forms.</li>
+    <li><strong>Read the explanation for every miss</strong>, and for any question you guessed right.</li>
+    <li><strong>Ask about your results.</strong> After a quiz, the chat can discuss your latest results. Try: <em>"Based on my last quiz, what should I review, and where is it in my sources?"</em></li>
+    <li><strong>Make a new quiz, don't retake the old one.</strong> A second pass through the same questions measures your memory of the quiz. Generate a fresh one on your weak topics.</li>
+    <li><strong>Raise the difficulty</strong> once you score well on medium. Hard questions ask you to apply ideas, which is what most exams do.</li>
+  </ul>
+
+  <div class="callout caution">
+    <p class="c-title">Quizzes can be wrong</p>
+    <p>Now and then a question has a wrong answer key or two defensible answers. If something disagrees with your notes, check the citation, then your textbook, then ask your instructor. Spotting a bad question means you know the material.</p>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="section" id="s-audio" data-title="Audio Overviews">
+  <div class="sec-head"><h2>Audio Overviews</h2><span class="sec-tag">5 min</span></div>
+  <p class="lede">A podcast about your own course materials, ready in a few minutes.</p>
+  <p>Select <strong>Audio Overview</strong> in Studio and two AI hosts talk through your checked sources. Select the pencil icon first to choose a format, a length, a language, and a prompt.</p>
+
+  <div class="grid">
+    <div class="card t-audio"><h4>Deep Dive</h4><p>Two hosts explain and connect the ideas. Use it for a first pass through a chapter or a review before the exam.</p></div>
+    <div class="card t-audio"><h4>The Brief</h4><p>One speaker, under two minutes. Use it right before class or as a warm-up before a study session.</p></div>
+    <div class="card t-audio"><h4>The Debate</h4><p>Two hosts argue opposite sides. Use it for courses where you have to weigh positions, such as ethics, history, or policy.</p></div>
+    <div class="card t-audio"><h4>The Critique</h4><p>Two hosts review the material like an editor would. Add your own draft or notes as a source to hear what's unclear or missing.</p></div>
+  </div>
+
+  <figure class="shot" data-src="img/09-audio-customize.png" data-alt="The Audio Overview customization panel with format, language, length, and prompt fields">
+    <div class="shot-frame"></div>
+    <figcaption>The prompt box is where you tell the hosts what you need.</figcaption>
+  </figure>
+
+  <h3>Tell the hosts what you need</h3>
+  <div id="audioPrompts"></div>
+
+  <h3>Ways to listen</h3>
+  <ul>
+    <li><strong>Download it</strong> to your phone so it plays without a connection.</li>
+    <li><strong>Change the speed</strong> from the More menu on the player.</li>
+    <li><strong>Interrupt the hosts.</strong> On a new Deep Dive in English, select <strong>Interactive mode</strong>, press play, then <strong>Join</strong>, and ask a question out loud. They answer from your sources and pick up where they left off.</li>
+    <li><strong>Choose another language.</strong> Audio Overviews work in more than 80 languages, which helps if you think more easily in a language other than the one your course is taught in.</li>
+  </ul>
+
+  <div class="callout audio">
+    <p class="c-title">Make it active</p>
+    <p>Pause every few minutes and say the last point back in your own words. When it ends, write down three things you remember without looking, then take a quiz on the same sources.</p>
+  </div>
+  <p class="small">The free plan allows three Audio Overviews a day, so use the prompt to get what you want on the first try.</p>
+</section>
+
+<!-- 9 -->
+<section class="section" id="s-video" data-title="Video Overviews">
+  <div class="sec-head"><h2>Video Overviews</h2><span class="sec-tag">4 min</span></div>
+  <p class="lede">A narrated video with diagrams and key points, built from your sources.</p>
+  <p>Video helps most with things that are easier to see than to hear: processes with steps, cycles, structures, cause and effect, and comparisons.</p>
+
+  <div class="grid">
+    <div class="card t-video"><h4>Explainer</h4><p>A structured walkthrough of the ideas. This is the one to use for studying.</p></div>
+    <div class="card t-video"><h4>Short</h4><p>About 60 seconds on the key concepts, in a vertical format for your phone. Good as a quick refresher.</p></div>
+    <div class="card t-video"><h4>Cinematic</h4><p>An animated, story-style video. English only, ages 18 and up, and on paid plans.</p></div>
+  </div>
+
+  <ol class="steps">
+    <li>Check only the sources for the concept you're stuck on. A narrow video is a better video.</li>
+    <li>Select the pencil icon on <strong>Video Overview</strong> and choose <strong>Explainer</strong>.</li>
+    <li>In the prompt, name the concept and say what confuses you.</li>
+    <li>Generate, then go do something else. Videos can take 30 minutes or more and keep building if you close the tab.</li>
+  </ol>
+  <div id="videoPrompts"></div>
+
+  <div class="callout video">
+    <p class="c-title">Start it early</p>
+    <p>Because videos take a while, start one at the beginning of a study session and work through flashcards while it builds. The free plan allows three a day.</p>
+  </div>
+  <p>Watch with a pencil in hand. Pause on each diagram and try to redraw it from memory. On-screen text and visuals are AI-generated and occasionally contain errors, so compare anything surprising with your sources.</p>
+</section>
+
+<!-- 10 -->
+<section class="section" id="s-more" data-title="More study tools">
+  <div class="sec-head"><h2>More study tools</h2><span class="sec-tag">4 min</span></div>
+  <div class="tabs" data-tabs>
+    <div class="tablist" role="tablist" aria-label="More Studio tools">
+      <button class="tab" role="tab" id="t-mm" aria-controls="p-mm" aria-selected="true" tabindex="0">Mind Map</button>
+      <button class="tab" role="tab" id="t-sg" aria-controls="p-sg" aria-selected="false" tabindex="-1">Study guide</button>
+      <button class="tab" role="tab" id="t-ig" aria-controls="p-ig" aria-selected="false" tabindex="-1">Infographic</button>
+      <button class="tab" role="tab" id="t-dt" aria-controls="p-dt" aria-selected="false" tabindex="-1">Data Table</button>
+      <button class="tab" role="tab" id="t-sd" aria-controls="p-sd" aria-selected="false" tabindex="-1">Slide Deck</button>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-mm" aria-labelledby="t-mm">
+      <h4>Mind Map</h4>
+      <p>A branching diagram of the unit's topics. Expand a branch to see subtopics, or click any node to ask the chat about it.</p>
+      <p><strong>Study move:</strong> before you open it, sketch your own map of the unit on paper. Then compare. The branches you left out are what to study next.</p>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-sg" aria-labelledby="t-sg" hidden>
+      <h4>Study guide</h4>
+      <p>Select <strong>Reports</strong>, then the <strong>Study Guide</strong> template, for a written guide with key terms and review questions. Select the pencil icon to add instructions first, such as "include a glossary and five short-answer questions with answers at the end."</p>
+      <p>Reports also offers an <strong>Interactive</strong> option that builds a Learning Overview you click through on the web.</p>
+      <p><strong>Study move:</strong> answer the review questions in writing before you read the answers.</p>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-ig" aria-labelledby="t-ig" hidden>
+      <h4>Infographic</h4>
+      <p>A one-page visual summary you can download as an image. Choose the level of detail and the orientation. Portrait works well as a phone lock screen during exam week.</p>
+      <p><strong>Study move:</strong> proofread it against your notes. Generated images sometimes misspell or mislabel things, and finding the errors is good review.</p>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-dt" aria-labelledby="t-dt" hidden>
+      <h4>Data Table</h4>
+      <p>Pulls facts from your sources into a comparison table. Ask for the rows and columns you want, such as "compare the four tissue types by structure, function, and location." It exports to Google Sheets.</p>
+      <p><strong>Study move:</strong> copy the table with one column left blank and fill it in from memory.</p>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="p-sd" aria-labelledby="t-sd" hidden>
+      <h4>Slide Deck</h4>
+      <p>Builds slides from your sources. Useful for a study group, where each person presents one topic.</p>
+      <p><strong>Study move:</strong> teaching is one of the best ways to learn. Present the deck to a friend, or to an empty room, without reading from the slides.</p>
+      <p class="small">If you use generated slides for a graded presentation, check your course's AI policy first and say how you used the tool.</p>
+    </div>
+  </div>
+
+  <h3>Study with other people</h3>
+  <p>Select <strong>Share</strong> to add classmates by email. Everyone can chat with the same sources and use the same flashcards and quizzes, and each person's chat stays private. A study group can split the work: one person adds notes, another makes the quiz, a third checks it against the textbook. Share only materials you're allowed to share.</p>
+
+  <h3>On your phone</h3>
+  <p>The Gemini Notebook app for Android and iOS syncs with the website. Flashcards, quizzes, and audio all work there, and the app can record audio straight into a notebook. Some Studio options are web-only, so build on a computer and review on your phone.</p>
+</section>
+
+<!-- 11 -->
+<section class="section" id="s-plan" data-title="Make a study plan">
+  <div class="sec-head"><h2>Make a study plan</h2><span class="sec-tag">3 min</span></div>
+  <p>Tell this planner how long you have and it lays out which tools to use when. It stays within the free plan's daily limits.</p>
+  <div class="card">
+    <div class="form-grid">
+      <div class="field"><label for="pWhen">My exam is</label>
+        <select id="pWhen">
+          <option value="1">tomorrow</option>
+          <option value="3">in 2 to 3 days</option>
+          <option value="7" selected>in about a week</option>
+          <option value="14">in two weeks or more</option>
+        </select></div>
+      <div class="field"><label for="pTime">Time I can study each day</label>
+        <select id="pTime">
+          <option value="s">about 20 minutes</option>
+          <option value="m" selected>about 45 minutes</option>
+          <option value="l">an hour or more</option>
+        </select></div>
+      <div class="field"><label for="pGo">I have time to listen on the go</label>
+        <select id="pGo"><option value="y">Yes (commute, gym, chores)</option><option value="n">Not really</option></select></div>
+    </div>
+    <div class="result" id="planOut" aria-live="polite" style="margin-top:var(--s4)"></div>
+    <div class="btn-row"><button class="btn ghost" id="planCopy">Copy plan as text</button></div>
+  </div>
+
+  <h3>A weekly routine for the whole semester</h3>
+  <div class="table-wrap">
+    <table>
+      <caption class="sr-only">A weekly routine</caption>
+      <thead><tr><th scope="col">When</th><th scope="col">What to do</th><th scope="col">Time</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">After each class</th><td>Add that day's notes and slides to the unit notebook.</td><td>2 min</td></tr>
+        <tr><th scope="row">Same evening</th><td>Ask the chat for the three main ideas and one thing students often get wrong. Compare with your notes.</td><td>10 min</td></tr>
+        <tr><th scope="row">Midweek</th><td>Run the unit's flashcards. Repeat the missed pile.</td><td>10 min</td></tr>
+        <tr><th scope="row">End of the week</th><td>Take a fresh quiz on the week's sources with your notes closed.</td><td>15 min</td></tr>
+        <tr><th scope="row">On the go</th><td>Listen to a Brief or Deep Dive of the week.</td><td>Free time</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 12 -->
+<section class="section" id="s-smart" data-title="Study smart, stay honest">
+  <div class="sec-head"><h2>Study smart, stay honest</h2><span class="sec-tag">4 min</span></div>
+  <div class="grid">
+    <div class="card"><h4>It makes mistakes</h4><p>Answers come from your sources, which cuts down on errors but doesn't remove them. Click citations, and trust your textbook and instructor over the tool.</p></div>
+    <div class="card"><h4>It only knows your sources</h4><p>If something from class isn't in the notebook, it won't be in your flashcards. Keep the notebook up to date.</p></div>
+    <div class="card"><h4>Do the reading anyway</h4><p>A summary tells you what a chapter says. It can't give you the practice of working through it. Read first, then use the tools to review.</p></div>
+    <div class="card"><h4>Watch for false confidence</h4><p>After a smooth podcast, everything feels familiar. Familiar isn't the same as known. A closed-notes quiz tells you the truth.</p></div>
+  </div>
+
+  <h3>Studying versus doing your work for you</h3>
+  <div class="table-wrap">
+    <table>
+      <caption class="sr-only">Uses that are usually fine and uses that need permission</caption>
+      <thead><tr><th scope="col">Usually fine</th><th scope="col">Check with your instructor first</th></tr></thead>
+      <tbody>
+        <tr><td>Flashcards and quizzes from your own notes</td><td>Uploading instructor slides, exams, or paid materials</td></tr>
+        <tr><td>Asking for an explanation of a concept you're stuck on</td><td>Getting feedback on a draft you'll submit</td></tr>
+        <tr><td>Audio or video review of a chapter you've read</td><td>Using generated slides, text, or images in graded work</td></tr>
+        <tr><td>Practice problems with worked steps</td><td>Using it during an open-note quiz or take-home exam</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Copying generated text into an assignment and turning it in as your own is a different thing from studying, and at most schools it's an academic integrity violation unless the instructor has allowed it. Your syllabus is the authority. If it doesn't say, ask.</p>
+
+  <h3>Free plan limits</h3>
+  <div class="table-wrap">
+    <table>
+      <caption class="sr-only">Free plan daily limits as of November 2026</caption>
+      <thead><tr><th scope="col">What</th><th scope="col">Free limit</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Chat questions</th><td>50 a day</td></tr>
+        <tr><th scope="row">Flashcard sets</th><td>10 a day</td></tr>
+        <tr><th scope="row">Quizzes</th><td>10 a day</td></tr>
+        <tr><th scope="row">Audio Overviews</th><td>3 a day</td></tr>
+        <tr><th scope="row">Video Overviews</th><td>3 a day</td></tr>
+        <tr><th scope="row">Sources</th><td>50 per notebook</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small">Limits reset daily and change from time to time. Google's <a href="https://support.google.com/gemininotebook/answer/16213268">plans page</a> has the current numbers. The free plan is enough for everything in this tutorial.</p>
+</section>
+
+<!-- 13 -->
+<section class="section" id="s-check" data-title="Check yourself">
+  <div class="sec-head"><h2>Check yourself</h2><span class="sec-tag">3 min</span></div>
+  <p>Seven questions on what you just read. You get feedback as soon as you answer.</p>
+  <div id="quiz"></div>
+  <p class="score" id="quizScore" aria-live="polite"></p>
+  <div class="btn-row"><button class="btn ghost" id="quizReset">Shuffle and restart</button></div>
+</section>
+
+<!-- 14 -->
+<section class="section" id="s-ref" data-title="Quick reference">
+  <div class="sec-head"><h2>Quick reference</h2><span class="sec-tag">Keep handy</span></div>
+
+  <details class="ref"><summary>Something went wrong</summary><div>
+    <p><strong>My flashcards are too general.</strong> Uncheck unrelated sources, and name the topic in the prompt.</p>
+    <p><strong>A source imported as gibberish or blank.</strong> Scanned or photographed pages often fail. Try a clearer photo, a typed version, or pasting the text.</p>
+    <p><strong>A YouTube link won't add.</strong> The video needs to be public and have captions.</p>
+    <p><strong>The chat says it can't find the answer.</strong> It isn't in your checked sources. Add the reading that covers it, or check that the right boxes are ticked.</p>
+    <p><strong>There's no Join button on my audio.</strong> Interactive mode needs a newly generated Deep Dive in English.</p>
+    <p><strong>My video is still generating.</strong> That's normal. Close the tab and come back.</p>
+    <p><strong>I hit a daily limit.</strong> It resets tomorrow. Flashcards and quizzes have the most room, so use those.</p>
+    <p><strong>My school email won't sign in.</strong> Microsoft school accounts don't work with Google tools. Use a personal Google account.</p>
+  </div></details>
+
+  <details class="ref"><summary>Words to know</summary><div>
+    <p><strong>Notebook:</strong> one project with its own sources, chat, and study materials.</p>
+    <p><strong>Source:</strong> a file, link, or text you add. Answers come only from checked sources.</p>
+    <p><strong>Citation:</strong> a numbered marker linking an answer to the passage it came from.</p>
+    <p><strong>Studio:</strong> the panel that makes flashcards, quizzes, audio, video, and more.</p>
+    <p><strong>Learning Guide:</strong> a chat style that tutors you with questions and steps.</p>
+    <p><strong>Audio Overview:</strong> an AI-generated spoken discussion of your sources.</p>
+    <p><strong>Video Overview:</strong> an AI-generated narrated video of your sources.</p>
+  </div></details>
+
+  <details class="ref"><summary>Official help pages</summary><div>
+    <ul>
+      <li><a href="https://support.google.com/gemininotebook/answer/16164461">Learn about Gemini Notebook</a></li>
+      <li><a href="https://support.google.com/gemininotebook/answer/16215270">Add or discover sources</a></li>
+      <li><a href="https://support.google.com/gemininotebook/answer/16179559">Use chat</a></li>
+      <li><a href="https://support.google.com/gemininotebook/answer/16958963">Flashcards and quizzes</a></li>
+      <li><a href="https://support.google.com/gemininotebook/answer/16212820">Audio Overviews</a></li>
+      <li><a href="https://support.google.com/gemininotebook/answer/16454555">Video Overviews</a></li>
+      <li><a href="https://support.google.com/gemininotebook/answer/17004255">Privacy and terms</a></li>
+    </ul>
+  </div></details>
+
+  <div class="btn-row"><button class="btn ghost" id="resetAll">Reset my progress on this page</button></div>
+</section>
+
+</main>
+</div>
+
+<footer>
+  <p>Study with Gemini Notebook: a student tutorial, 2026. Features and limits reflect Google's documentation as of November 2026 and may change. Follow your course's AI policy.</p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var KEY = "gemini-notebook-student-v1";
+  var state = {done:{}, labs:{}};
+  try { var saved = JSON.parse(localStorage.getItem(KEY)); if (saved) state = Object.assign(state, saved); } catch(e){}
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+  function el(tag, cls, text){ var e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
+  function $(id){ return document.getElementById(id); }
+
+  /* ---------- Navigation + progress ---------- */
+  var sections = Array.prototype.slice.call(document.querySelectorAll(".section"));
+  var navList = $("navList");
+  var total = sections.length;
+  $("progressBar").setAttribute("aria-valuemax", total);
+  var menuBtn = $("menuBtn"), sidenav = $("sidenav");
+  function closeMenu(){ sidenav.classList.remove("open"); menuBtn.setAttribute("aria-expanded","false"); }
+  sections.forEach(function(sec){
+    var li = el("li"), a = el("a");
+    a.href = "#" + sec.id; a.dataset.id = sec.id;
+    var tick = el("span","tick","✓");
+    tick.setAttribute("role","checkbox"); tick.setAttribute("tabindex","0");
+    tick.setAttribute("aria-label","Mark " + sec.dataset.title + " done");
+    a.appendChild(tick); a.appendChild(el("span",null,sec.dataset.title));
+    li.appendChild(a); navList.appendChild(li);
+    function toggle(ev){ ev.preventDefault(); ev.stopPropagation(); state.done[sec.id] = !state.done[sec.id]; save(); renderProgress(); }
+    tick.addEventListener("click", toggle);
+    tick.addEventListener("keydown", function(ev){ if (ev.key===" "||ev.key==="Enter") toggle(ev); });
+    a.addEventListener("click", closeMenu);
+  });
+  function renderProgress(){
+    var n = 0;
+    navList.querySelectorAll("a").forEach(function(a){
+      var d = !!state.done[a.dataset.id];
+      a.classList.toggle("done", d);
+      a.querySelector(".tick").setAttribute("aria-checked", d ? "true" : "false");
+      if (d) n++;
+    });
+    $("progressFill").style.width = (n/total*100) + "%";
+    $("progressBar").setAttribute("aria-valuenow", n);
+    $("progressText").textContent = n + " of " + total + " done";
+  }
+  renderProgress();
+  if ("IntersectionObserver" in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.isIntersecting) navList.querySelectorAll("a").forEach(function(a){ a.setAttribute("aria-current", a.dataset.id===en.target.id ? "true" : "false"); });
+      });
+    }, {rootMargin:"-40% 0px -55% 0px"});
+    sections.forEach(function(s){ io.observe(s); });
+  }
+  menuBtn.addEventListener("click", function(){
+    var open = sidenav.classList.toggle("open");
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  document.addEventListener("keydown", function(e){ if (e.key==="Escape" && sidenav.classList.contains("open")){ closeMenu(); menuBtn.focus(); } });
+
+  /* ---------- Optional screenshots: shown only if the image file exists ---------- */
+  document.querySelectorAll("figure.shot[data-src]").forEach(function(fig){
+    var img = new Image();
+    img.addEventListener("load", function(){
+      img.alt = fig.dataset.alt || "";
+      var scale = parseFloat(fig.dataset.scale) || 2;
+      img.style.maxWidth = Math.round(img.naturalWidth / scale) + "px";
+      img.style.width = "100%";
+      fig.querySelector(".shot-frame").appendChild(img);
+      fig.classList.add("has-image");
+    });
+    img.src = fig.dataset.src;
+  });
+
+  /* ---------- Tabs ---------- */
+  document.querySelectorAll("[data-tabs]").forEach(function(group){
+    var tabs = Array.prototype.slice.call(group.querySelectorAll('[role="tab"]'));
+    function activate(tab, focus){
+      tabs.forEach(function(t){
+        var sel = t===tab;
+        t.setAttribute("aria-selected", sel ? "true" : "false");
+        t.tabIndex = sel ? 0 : -1;
+        $(t.getAttribute("aria-controls")).hidden = !sel;
+      });
+      if (focus) tab.focus();
+    }
+    tabs.forEach(function(t,i){
+      t.addEventListener("click", function(){ activate(t,false); });
+      t.addEventListener("keydown", function(e){
+        var idx = null;
+        if (e.key==="ArrowRight") idx=(i+1)%tabs.length;
+        else if (e.key==="ArrowLeft") idx=(i-1+tabs.length)%tabs.length;
+        else if (e.key==="Home") idx=0;
+        else if (e.key==="End") idx=tabs.length-1;
+        if (idx!==null){ e.preventDefault(); activate(tabs[idx],true); }
+      });
+    });
+  });
+
+  /* ---------- Copy helper ---------- */
+  function copyText(text, btn){
+    var original = btn.textContent;
+    function done(ok){ btn.textContent = ok ? "Copied" : "Select and copy manually"; setTimeout(function(){ btn.textContent = original; }, 1800); }
+    function fallback(){
+      try {
+        var ta = document.createElement("textarea");
+        ta.value = text; ta.setAttribute("readonly",""); ta.style.position="absolute"; ta.style.left="-9999px";
+        document.body.appendChild(ta); ta.select();
+        var ok = document.execCommand("copy");
+        document.body.removeChild(ta); done(ok);
+      } catch(e){ done(false); }
+    }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(function(){ done(true); }, fallback);
+    else fallback();
+  }
+  function promptBlock(title, text){
+    var d = el("div","prompt"), top = el("div","prompt-top");
+    top.appendChild(el("b",null,title));
+    var btn = el("button","btn ghost","Copy");
+    btn.setAttribute("aria-label","Copy prompt: " + title);
+    btn.addEventListener("click", function(){ copyText(text, btn); });
+    top.appendChild(btn); d.appendChild(top); d.appendChild(el("blockquote",null,text));
+    return d;
+  }
+  function fillPrompts(id, list){ var box = $(id); list.forEach(function(p){ box.appendChild(promptBlock(p[0], p[1])); }); }
+
+  fillPrompts("chatPrompts", [
+    ["Find what matters", "What are the five most important ideas in these sources? Give one sentence on each and cite where it appears."],
+    ["Explain it simply", "Explain [concept] as if I've never seen it before. Use an everyday example, then show me where my sources cover it."],
+    ["Find my weak spots", "Ask me five questions about these sources, one at a time. Wait for my answer each time, then tell me what I got right and what I missed."],
+    ["Predict the exam", "Based on what these sources emphasize, what topics are most likely to be on an exam? For each, write one practice question."],
+    ["Work a problem with me", "Walk me through a problem like the examples in my sources, one step at a time. Ask me what the next step is before you show it."],
+    ["Untangle two ideas", "What's the difference between [A] and [B]? Give me a way to remember which is which."],
+    ["Check my explanation", "Here's my explanation of [concept] in my own words: [your explanation]. What did I get right, what's wrong, and what's missing according to my sources?"]
+  ]);
+  fillPrompts("audioPrompts", [
+    ["First pass on a chapter", "I'm a student seeing this material for the first time. Explain the main ideas in order, define every key term, and use one everyday example for the hardest idea."],
+    ["Exam review", "I have an exam on this material. Focus on what's most likely to be tested and the mistakes students commonly make. End with five questions I should be able to answer."],
+    ["Just the hard part", "Spend the whole time on [topic]. Assume I understand the basics and go slowly through the part people find confusing."],
+    ["Quiz me as I listen", "After each main idea, ask a question and pause briefly before giving the answer so I can try it myself."]
+  ]);
+  fillPrompts("videoPrompts", [
+    ["Step-by-step process", "Walk through [process] one step at a time with a simple diagram for each step. I get confused about [what confuses you]."],
+    ["Side-by-side comparison", "Compare [A] and [B]. Show what they share first, then the differences in a table-style visual."]
+  ]);
+
+  /* ---------- Tool chooser ---------- */
+  var goals = {
+    terms: ["Flashcards", "Generate a deck on easy or medium, answer each card before flipping, and rerun only the cards you missed. Short daily sessions work better than one long one.", "#s-cards"],
+    test: ["A practice quiz on hard", "Take it with your notes closed. Then ask the chat what to review based on your results, and make a fresh quiz on those topics.", "#s-quiz"],
+    go: ["Audio Overview", "Use a Deep Dive for a full review or The Brief for a two-minute recap. Download it so it plays offline, then take a quiz when you're back at a desk.", "#s-audio"],
+    stuck: ["Learning Guide chat, then an Explainer video", "Switch the chat to Learning Guide and ask it to walk you through the concept step by step. If it still doesn't click, make an Explainer video on that one concept.", "#s-ask"],
+    big: ["Mind Map", "Sketch your own map of the unit first, then generate one and compare. Click any node to ask the chat about it.", "#s-more"],
+    sheet: ["Reports, Study Guide template", "Ask for a glossary and review questions. Answer the questions in writing before you read the answers.", "#s-more"],
+    compare: ["Data Table", "Ask for the rows and columns you want. Then cover a column and fill it in from memory.", "#s-more"],
+    cram: ["Quiz first, then target the misses", "Take one medium quiz to find out what you don't know. Make flashcards on only those topics and run the missed pile until it's empty. Listen to The Brief on the way to the exam. Skip video tonight, since it takes too long to generate.", "#s-plan"]
+  };
+  var chips = document.querySelectorAll("#chooser .chip");
+  var chooserResult = $("chooserResult");
+  chips.forEach(function(c){
+    c.addEventListener("click", function(){
+      chips.forEach(function(x){ x.setAttribute("aria-pressed", x===c ? "true" : "false"); });
+      var g = goals[c.dataset.goal];
+      chooserResult.innerHTML = "";
+      chooserResult.appendChild(el("h4",null,"Start with: " + g[0]));
+      chooserResult.appendChild(el("p",null,g[1]));
+      var p = el("p","small"), a = el("a",null,"Go to that section");
+      a.href = g[2]; p.appendChild(a); chooserResult.appendChild(p);
+    });
+  });
+
+  /* ---------- Flashcard / quiz prompt builder ---------- */
+  var focusText = {
+    terms: "Focus on key terms and their definitions, using the wording from my sources.",
+    apply: "Ask me to apply the ideas to new, realistic situations instead of recalling definitions.",
+    calc: "Focus on formulas and worked problems. Include the units, and show the steps in the explanation.",
+    mix: "Focus on ideas that students commonly confuse with each other, and make the differences clear.",
+    proc: "Focus on the steps of each process and the order they happen in."
+  };
+  function buildPrompt(){
+    var tool = $("bTool").value, type = $("bType").value, topic = $("bTopic").value.trim(), exam = $("bExam").value;
+    var lines = [];
+    if (topic) lines.push("Cover only " + topic + ".");
+    lines.push(focusText[type]);
+    if (tool==="Quiz"){
+      if (exam==="multiple choice") lines.push("Use multiple-choice questions with wrong answers that are believable.");
+      else if (exam==="short answer") lines.push("Use short-answer and fill-in-the-blank questions.");
+      else if (exam==="problems to solve") lines.push("Use problems I have to work out, not recall questions.");
+      else if (exam==="essay") lines.push("Use short-answer questions that ask me to explain why, as practice for essay questions.");
+      lines.push("Explain why each correct answer is right.");
+    } else {
+      lines.push("Keep each card to one idea, with a short answer I can say out loud.");
+      if (exam==="problems to solve") lines.push("Put a short problem on the front and the worked answer on the back.");
+    }
+    $("bOut").textContent = lines.join(" ");
+    $("bNote").textContent = "Select the pencil icon on " + tool + ", paste this into the prompt box, and pick a difficulty. Start on medium.";
+  }
+  ["bTool","bType","bTopic","bExam"].forEach(function(id){ $(id).addEventListener("input", buildPrompt); $(id).addEventListener("change", buildPrompt); });
+  buildPrompt();
+  $("bCopy").addEventListener("click", function(){ copyText($("bOut").textContent, this); });
+
+  /* ---------- Study plan builder ---------- */
+  var planText = "";
+  function buildPlan(){
+    var when = $("pWhen").value, time = $("pTime").value, go = $("pGo").value==="y";
+    var steps = [];
+    var listen = go ? " Download it for the commute." : "";
+    if (when==="1"){
+      steps.push(["Right now", "Put your notes, slides, and any review sheet in one notebook. Take one medium quiz with notes closed to find what you don't know."]);
+      steps.push(["Next", "Make flashcards on only the topics you missed. Run the deck, then repeat the missed pile until it's empty."]);
+      if (time!=="s") steps.push(["Then", "For anything still unclear, switch the chat to Learning Guide and work through it step by step."]);
+      steps.push(["Before bed", "Take a fresh quiz on hard. Review the explanations for your misses, then stop and sleep."]);
+      steps.push(["Tomorrow", go ? "Listen to The Brief on the way to the exam." : "Flip through your missed cards once before the exam."]);
+    } else if (when==="3"){
+      steps.push(["Day 1", "Build the notebook. Ask the chat for the main ideas and likely exam topics. Generate a Deep Dive audio." + listen + " Take a medium quiz."]);
+      steps.push(["Day 2", "Make flashcards on the topics you missed and run them twice. " + (time==="s" ? "Use Learning Guide on your single weakest topic." : "Start an Explainer video on your weakest concept and use Learning Guide while it builds.")]);
+      steps.push(["Day 3", "Take a fresh quiz on hard with notes closed. Run only your missed flashcards. " + (go ? "Listen to The Brief on the way in." : "Reread your saved notes.")]);
+    } else if (when==="7"){
+      steps.push(["Days 1–2", "Build the notebook. Generate a Mind Map and a Deep Dive to get the big picture." + listen + " Ask the chat what's likely to be tested."]);
+      steps.push(["Days 3–4", "Make flashcards and run them daily, repeating the missed pile. " + (time==="s" ? "Ten minutes a day is enough." : "Use Learning Guide on anything you can't explain in your own words.")]);
+      steps.push(["Day 5", "Take a medium quiz with notes closed. Ask the chat what to review based on your results. " + (time==="l" ? "Start an Explainer video on the weakest concept." : "")]);
+      steps.push(["Day 6", "Make new flashcards or a new quiz on only your weak topics. Generate a Study Guide report and answer its review questions in writing."]);
+      steps.push(["Day 7", "Take a fresh quiz on hard. Run the missed cards once. " + (go ? "Listen to The Brief on the way to the exam." : "Stop early and rest.")]);
+    } else {
+      steps.push(["This week", "Build one notebook per unit as you go. After each class, add your notes and ask the chat for the three main ideas."]);
+      steps.push(["Every other day", "Run flashcards for " + (time==="s" ? "ten minutes" : "ten to fifteen minutes") + ", repeating the missed pile. Spacing sessions out is what makes them work."]);
+      steps.push(["End of each week", "Take a fresh quiz on the week's material with notes closed." + (go ? " Listen to a Deep Dive of the week on the go." : "")]);
+      steps.push(["One week out", "Build a review notebook with your notes and study guides from every unit. Generate a Mind Map and compare it with one you sketch yourself."]);
+      steps.push(["Last three days", "Take a hard quiz each day on a fresh set of questions. Use Learning Guide and one Explainer video for whatever you keep missing."]);
+    }
+    var out = $("planOut"); out.innerHTML = "";
+    var ol = el("ol","plan");
+    planText = "";
+    steps.forEach(function(s){
+      var li = el("li");
+      li.appendChild(el("span","when",s[0]));
+      li.appendChild(el("span","what",s[1].trim()));
+      ol.appendChild(li);
+      planText += s[0] + ": " + s[1].trim() + "\n";
+    });
+    out.appendChild(ol);
+  }
+  ["pWhen","pTime","pGo"].forEach(function(id){ $(id).addEventListener("change", buildPlan); });
+  buildPlan();
+  $("planCopy").addEventListener("click", function(){ copyText(planText, this); });
+
+  /* ---------- Checklists ---------- */
+  function labCount(lab){
+    var boxes = lab.querySelectorAll('input[type="checkbox"]'), n = 0;
+    boxes.forEach(function(b){ if (b.checked) n++; });
+    lab.querySelector(".lab-count").textContent = n + " of " + boxes.length + " done";
+  }
+  document.querySelectorAll("[data-lab]").forEach(function(lab){
+    var id = lab.dataset.lab;
+    var boxes = Array.prototype.slice.call(lab.querySelectorAll('input[type="checkbox"]'));
+    var savedVals = state.labs[id] || [];
+    boxes.forEach(function(b,i){
+      b.checked = !!savedVals[i];
+      b.addEventListener("change", function(){ state.labs[id] = boxes.map(function(x){ return x.checked; }); save(); labCount(lab); });
+    });
+    labCount(lab);
+  });
+
+  /* ---------- Quiz ---------- */
+  var questions = [
+    {q:"What makes Gemini Notebook different from a general chatbot?", a:"It answers from the sources you add and cites the passages it used.", w:["It never makes mistakes.","It searches the whole internet for every answer.","It only works with Google Docs."], e:"Answers are grounded in your sources, which is why the flashcards match your course."},
+    {q:"You want a quiz on Chapter 4 only, but your notebook holds four chapters. What do you do?", a:"Uncheck the other sources before generating the quiz.", w:["Delete the other chapters.","Generate the quiz and skip the questions you don't need.","Start a new Google account."], e:"Chat and Studio use only the sources that are checked."},
+    {q:"Which habit makes flashcards work?", a:"Answering each card before you flip it, then repeating the ones you missed.", w:["Flipping through the deck quickly several times.","Reading the answers first so you know what to expect.","Marking every card 'Got it' to finish sooner."], e:"Pulling the answer from memory is what builds it. Rerunning the missed pile puts your time where it's needed."},
+    {q:"You just listened to a Deep Dive and the chapter feels familiar. What's the best next step?", a:"Take a closed-notes quiz on the same sources.", w:["Listen again at double speed.","Move on, since familiar means you know it.","Generate a second podcast in another format."], e:"Listening is passive. A quiz shows what you can recall without help."},
+    {q:"A quiz answer disagrees with your class notes. What should you do?", a:"Click the citation, check the textbook, and ask your instructor if it's still unclear.", w:["Trust the quiz, because it comes from your sources.","Delete the notebook and start over.","Ignore it and hope it isn't on the exam."], e:"Generated material can be wrong. Your textbook and instructor are the authority."},
+    {q:"Which chat setting makes it act like a tutor that asks you questions and works in steps?", a:"Learning Guide", w:["Deep Dive","Interactive mode","Fast Research"], e:"Learning Guide is in Configure chat. Deep Dive and Interactive mode belong to Audio Overviews."},
+    {q:"Which of these should you check with your instructor before doing?", a:"Uploading their slides or using generated text in an assignment.", w:["Making flashcards from your own notes.","Listening to an audio review of a chapter you've read.","Asking the chat to explain a concept from your notes."], e:"Studying from your own notes is usually fine. Sharing course materials and using AI in graded work depend on course policy."}
+  ];
+  function shuffle(arr){ var a=arr.slice(); for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+  var quizEl = $("quiz"), scoreEl = $("quizScore"), answered, correct;
+  function renderQuiz(){
+    quizEl.innerHTML = ""; answered = 0; correct = 0; scoreEl.textContent = "";
+    shuffle(questions).forEach(function(item, qi){
+      var box = el("div","q"), fs = el("fieldset");
+      fs.appendChild(el("legend",null,(qi+1) + ". " + item.q));
+      var fb = el("p","fb"); fb.hidden = true; fb.setAttribute("aria-live","polite");
+      shuffle([item.a].concat(item.w)).forEach(function(o){
+        var lab = el("label"), inp = el("input");
+        inp.type="radio"; inp.name="q"+qi; inp.value=o;
+        lab.appendChild(inp); lab.appendChild(el("span",null,o)); fs.appendChild(lab);
+        inp.addEventListener("change", function(){
+          var right = o===item.a;
+          fs.querySelectorAll("input").forEach(function(x){ x.disabled = true; });
+          fb.hidden = false;
+          fb.className = "fb " + (right ? "right" : "wrong");
+          fb.textContent = (right ? "Correct. " : "Not quite. The answer is: " + item.a + " ") + item.e;
+          answered++; if (right) correct++;
+          if (answered===questions.length) scoreEl.textContent = "You scored " + correct + " out of " + questions.length + ".";
+        });
+      });
+      fs.appendChild(fb); box.appendChild(fs); quizEl.appendChild(box);
+    });
+  }
+  renderQuiz();
+  $("quizReset").addEventListener("click", renderQuiz);
+
+  /* ---------- Reset ---------- */
+  $("resetAll").addEventListener("click", function(){
+    state = {done:{}, labs:{}}; save();
+    document.querySelectorAll("[data-lab]").forEach(function(lab){
+      lab.querySelectorAll('input[type="checkbox"]').forEach(function(b){ b.checked=false; });
+      labCount(lab);
+    });
+    renderProgress(); renderQuiz();
+  });
+})();
+</script>
+</body>
+</html>
